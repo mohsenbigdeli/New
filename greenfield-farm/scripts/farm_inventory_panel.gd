@@ -22,7 +22,9 @@ const ITEMS := [
 	{"key":"seed_corn", "name":"Corn Seeds"},
 	{"key":"turnip", "name":"Turnip"},
 	{"key":"carrot", "name":"Carrot"},
-	{"key":"corn", "name":"Corn"}
+	{"key":"corn", "name":"Corn"},
+	{"key":"egg", "name":"Egg"},
+	{"key":"milk", "name":"Milk"}
 ]
 
 func _ready() -> void:
@@ -74,36 +76,36 @@ func _build_bag_button() -> void:
 
 func _build_panel() -> void:
 	panel = Panel.new()
-	panel.position = Vector2(286,104)
-	panel.size = Vector2(708,506)
+	panel.position = Vector2(286,54)
+	panel.size = Vector2(708,614)
 	panel.add_theme_stylebox_override("panel", _style_box(Color("#2b2119f2"), Color("#c89b5b"), 18, 3))
 	panel.visible = false
 	add_child(panel)
 
 	var header := Panel.new()
 	header.position = Vector2(16,16)
-	header.size = Vector2(676,76)
+	header.size = Vector2(676,68)
 	header.add_theme_stylebox_override("panel", _style_box(Color("#60432f"), Color("#d3a25f"), 12, 2))
 	panel.add_child(header)
-	title_label = _label(header, Vector2(18,9), Vector2(420,30), "BACKPACK", 24, Color("#fff0c8"))
-	subtitle_label = _label(header, Vector2(19,42), Vector2(560,22), "Seeds and harvested crops", 12, Color("#e7c998"))
+	title_label = _label(header, Vector2(18,7), Vector2(420,28), "BACKPACK", 22, Color("#fff0c8"))
+	subtitle_label = _label(header, Vector2(19,36), Vector2(560,22), "Seeds, crops and animal products", 12, Color("#e7c998"))
 
 	var close := Button.new()
 	close.text = "X"
-	close.position = Vector2(618,14)
+	close.position = Vector2(618,12)
 	close.size = Vector2(42,42)
 	_style_button(close, Color("#9d5448"))
 	header.add_child(close)
 	close.pressed.connect(close_panel)
 
-	_label(panel, Vector2(24,104), Vector2(260,24), "ITEM", 12, Color("#d1ad70"))
-	_label(panel, Vector2(362,104), Vector2(92,24), "BAG", 12, Color("#d1ad70"))
-	_label(panel, Vector2(548,104), Vector2(108,24), "CHEST", 12, Color("#d1ad70"))
+	_label(panel, Vector2(24,92), Vector2(260,22), "ITEM", 11, Color("#d1ad70"))
+	_label(panel, Vector2(362,92), Vector2(92,22), "BAG", 11, Color("#d1ad70"))
+	_label(panel, Vector2(548,92), Vector2(108,22), "CHEST", 11, Color("#d1ad70"))
 
 	for i in range(ITEMS.size()):
 		var item: Dictionary = ITEMS[i]
 		var key := String(item["key"])
-		var y := 134 + i * 52
+		var y := 116 + i * 52
 		var row := Panel.new()
 		row.position = Vector2(20,y)
 		row.size = Vector2(668,44)
@@ -135,7 +137,7 @@ func _build_panel() -> void:
 		to_bag.pressed.connect(_transfer.bind(key, "to_bag"))
 		right_buttons[key] = to_bag
 
-	var footer := _label(panel, Vector2(28,456), Vector2(650,32), "Open the farm chest near your house to move items into storage.", 12, Color("#d6bb8d"))
+	var footer := _label(panel, Vector2(28,548), Vector2(650,42), "Farm storage can hold seeds, crops, eggs and milk. Animal products can also be sold or shipped.", 12, Color("#d6bb8d"))
 	footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _on_bag_pressed() -> void:
@@ -151,7 +153,7 @@ func open_bag(bag: Dictionary) -> void:
 	is_open = true
 	panel.visible = true
 	title_label.text = "BACKPACK"
-	subtitle_label.text = "Your seeds and harvested crops"
+	subtitle_label.text = "Seeds, harvested crops and animal products"
 	_refresh_rows()
 	open_state_changed.emit(true)
 
