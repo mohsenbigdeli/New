@@ -95,18 +95,24 @@ func _build_ui() -> void:
 	panel.add_child(close)
 	close.pressed.connect(close_panel)
 
-func start_fishing(use_bait: bool, weather: String, minute_of_day: int) -> void:
+func start_fishing(use_bait: bool, weather: String, minute_of_day: int, reel_upgraded: bool = false) -> void:
 	bait_used = use_bait
-	target_width = 0.28 if bait_used else 0.18
-	target_start = randf_range(0.10, 0.90 - target_width)
+	target_width = 0.18
+	if bait_used:
+		target_width += 0.10
+	if reel_upgraded:
+		target_width += 0.06
+	target_width = minf(target_width, 0.38)
+	target_start = randf_range(0.08, 0.92 - target_width)
 	cursor_value = randf_range(0.02, 0.12)
 	cursor_dir = 1.0
 	elapsed = 0.0
 	is_open = true
 	panel.visible = true
 	var hour := int(minute_of_day / 60)
-	var bait_text := "Bait equipped: catch zone is wider." if bait_used else "No bait: the catch zone is smaller."
-	status_label.text = "%s  •  %02d:00  •  %s" % [weather, hour, bait_text]
+	var bait_text := "Bait equipped" if bait_used else "No bait"
+	var reel_text := "Copper Reel" if reel_upgraded else "Basic Reel"
+	status_label.text = "%s  •  %02d:00  •  %s  •  %s" % [weather, hour, bait_text, reel_text]
 	bar.queue_redraw()
 	open_state_changed.emit(true)
 
@@ -121,7 +127,7 @@ func _process(delta: float) -> void:
 	if not is_open:
 		return
 	elapsed += delta
-	var speed := 0.62 + minf(elapsed * 0.012, 0.22)
+	var speed: float = 0.62 + minf(elapsed * 0.012, 0.22)
 	cursor_value += cursor_dir * speed * delta
 	if cursor_value >= 1.0:
 		cursor_value = 1.0
