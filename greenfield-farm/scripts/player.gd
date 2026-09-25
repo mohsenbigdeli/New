@@ -3,6 +3,11 @@ class_name FarmPlayer
 
 signal action_requested(target_position: Vector2)
 
+const TEX_DOWN: Texture2D = preload("res://assets/art/player_down.svg")
+const TEX_UP: Texture2D = preload("res://assets/art/player_up.svg")
+const TEX_LEFT: Texture2D = preload("res://assets/art/player_left.svg")
+const TEX_RIGHT: Texture2D = preload("res://assets/art/player_right.svg")
+
 var speed := 300.0
 var facing := Vector2.DOWN
 var virtual_move := Vector2.ZERO
@@ -11,6 +16,8 @@ var controls_locked := false
 var world_size := Vector2(2304, 1536)
 var walk_time := 0.0
 var is_walking := false
+var character_sprite: Sprite2D
+var action_flash := 0.0
 
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
@@ -18,8 +25,15 @@ func _ready() -> void:
 	capsule.radius = 15
 	capsule.height = 42
 	shape.shape = capsule
-	shape.position = Vector2(0, 4)
+	shape.position = Vector2(0, 10)
 	add_child(shape)
+
+	character_sprite = Sprite2D.new()
+	character_sprite.texture = TEX_DOWN
+	character_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	character_sprite.position = Vector2(0, -6)
+	character_sprite.z_index = 2
+	add_child(character_sprite)
 
 	var camera := Camera2D.new()
 	camera.enabled = true
@@ -33,9 +47,12 @@ func _ready() -> void:
 	queue_redraw()
 
 func _physics_process(delta: float) -> void:
+	if action_flash > 0.0:
+		action_flash = maxf(0.0, action_flash - delta)
 	if controls_locked:
 		velocity = Vector2.ZERO
 		is_walking = false
+		_update_sprite()
 		queue_redraw()
 		return
 
@@ -47,7 +64,7 @@ func _physics_process(delta: float) -> void:
 	if is_walking:
 		dir = dir.normalized()
 		facing = dir
-		walk_time += delta * 9.0
+		walk_time += delta * 10.0
 	else:
 		walk_time = 0.0
 
@@ -55,7 +72,26 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	position.x = clamp(position.x, 36.0, world_size.x - 36.0)
 	position.y = clamp(position.y, 50.0, world_size.y - 42.0)
+	_update_sprite()
 	queue_redraw()
+
+func _update_sprite() -> void:
+	if not character_sprite:
+		return
+	if absf(facing.x) > absf(facing.y):
+		character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
+	else:
+		character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
+	var bob := 0.0
+	var sway := 0.0
+	if is_walking:
+		bob = absf(sin(walk_time)) * 2.0
+		sway = sin(walk_time) * 0.025
+	character_sprite.position = Vector2(0, -6 - bob)
+	character_sprite.rotation = sway
+	character_sprite.scale = Vector2(1.05, 1.05)
+	if action_flash > 0.0:
+		character_sprite.scale = Vector2(1.10, 0.98)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if controls_locked:
@@ -79,45 +115,25 @@ func set_controls_locked(locked: bool) -> void:
 func request_action() -> void:
 	if not can_act or controls_locked:
 		return
+	action_flash = 0.16
 	action_requested.emit(position + facing.normalized() * 62.0)
 	can_act = false
 	await get_tree().create_timer(0.16).timeout
 	can_act = true
 
 func _draw() -> void:
-	var bob := sin(walk_time) * 2.0 if is_walking else 0.0
-	var leg_swing := sin(walk_time) * 5.0 if is_walking else 0.0
-	_draw_ellipse(Vector2(0,22), Vector2(22,8), Color(0,0,0,0.22))
+	# soft contact shadow and action target marker
+	_draw_shadow(Vector2(0, 28), Vector2(22, 7), Color(0,0,0,0.20))
+	var marker_alpha := 0.66 if action_flash > 0.0 else 0.30
+	draw_circle(facing.normalized()*37.0 + Vector2(0,5), 3.5, Color(1,1,1,marker_alpha))
+	if action_flash > 0.0:
+		var hand := facing.normalized() * 28.0 + Vector2(0,-4)
+		draw_line(hand, hand + facing.normalized()*22.0, Color("#d9b66f"), 5.0)
+		draw_circle(hand + facing.normalized()*23.0, 6.0, Color("#c3a263"))
 
-	# legs and boots
-	draw_rect(Rect2(-14, 8+bob+leg_swing*0.25, 10, 21), Color("#405173"), true)
-	draw_rect(Rect2(4, 8+bob-leg_swing*0.25, 10, 21), Color("#405173"), true)
-	draw_rect(Rect2(-15, 26+bob+leg_swing*0.25, 12, 6), Color("#473a30"), true)
-	draw_rect(Rect2(3, 26+bob-leg_swing*0.25, 12, 6), Color("#473a30"), true)
-
-	# body, shirt and overalls
-	draw_rect(Rect2(-20,-23+bob,40,38), Color("#df6f54"), true)
-	draw_rect(Rect2(-13,-8+bob,26,23), Color("#4f7eb4"), true)
-	draw_rect(Rect2(-13,-12+bob,6,14), Color("#4f7eb4"), true)
-	draw_rect(Rect2(7,-12+bob,6,14), Color("#4f7eb4"), true)
-
-	# arms
-	draw_line(Vector2(-20,-12+bob), Vector2(-25,4+bob+leg_swing*0.18), Color("#efc49e"), 7)
-	draw_line(Vector2(20,-12+bob), Vector2(25,4+bob-leg_swing*0.18), Color("#efc49e"), 7)
-
-	# head and hair
-	draw_circle(Vector2(0,-37+bob), 18, Color("#f1c59f"))
-	draw_arc(Vector2(0,-41+bob), 18, PI, TAU, 20, Color("#4a332a"), 9)
-	draw_circle(Vector2(-6,-38+bob), 1.7, Color("#2e2a27"))
-	draw_circle(Vector2(6,-38+bob), 1.7, Color("#2e2a27"))
-	draw_line(Vector2(-4,-30+bob), Vector2(4,-30+bob), Color("#a45d54"), 2)
-
-	# facing marker kept subtle for touch controls
-	draw_circle(facing.normalized()*34.0 + Vector2(0,3), 3.5, Color(1,1,1,0.48))
-
-func _draw_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+func _draw_shadow(center: Vector2, radii: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
-	for i in range(24):
-		var a := TAU * float(i) / 24.0
+	for i in range(20):
+		var a := TAU * float(i) / 20.0
 		points.append(center + Vector2(cos(a)*radii.x, sin(a)*radii.y))
 	draw_colored_polygon(points, color)
