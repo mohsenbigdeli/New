@@ -17,6 +17,7 @@ var world_size := Vector2(2304, 1536)
 var walk_time := 0.0
 var is_walking := false
 var character_sprite: Sprite2D
+var camera: Camera2D
 var action_flash := 0.0
 var equipped_tool := 0
 
@@ -37,7 +38,7 @@ func _ready() -> void:
 	character_sprite.scale = Vector2(1.30, 1.30)
 	add_child(character_sprite)
 
-	var camera := Camera2D.new()
+	camera = Camera2D.new()
 	camera.enabled = true
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 8.5
@@ -118,6 +119,16 @@ func set_controls_locked(locked: bool) -> void:
 		virtual_move = Vector2.ZERO
 		velocity = Vector2.ZERO
 
+func set_world_bounds(size: Vector2, zoom_value: float = 1.16) -> void:
+	world_size = size
+	if camera:
+		camera.limit_left = 0
+		camera.limit_top = 0
+		camera.limit_right = int(size.x)
+		camera.limit_bottom = int(size.y)
+		camera.zoom = Vector2(zoom_value, zoom_value)
+		camera.reset_smoothing()
+
 func set_equipped_tool(index: int) -> void:
 	equipped_tool = clampi(index, 0, 5)
 
@@ -145,22 +156,18 @@ func _draw_tool_action() -> void:
 	var hand := d * 25.0 + Vector2(0,-7)
 	match equipped_tool:
 		0:
-			# hoe swing
 			draw_line(hand - d*7.0, hand + d*32.0, Color("#8b633f"), 6.0)
 			draw_line(hand + d*31.0 - side*12.0, hand + d*31.0 + side*12.0, Color("#b9b2a0"), 7.0)
 		1,2,3:
-			# seed scatter
 			for i in range(4):
 				var spread := side * float(i-1.5) * 7.0
 				draw_circle(hand + d*(25.0 + i*5.0) + spread, 3.0, Color("#d6b567"))
 		4:
-			# watering can and droplets
 			draw_rect(Rect2(hand + d*8.0 - Vector2(10,8), Vector2(20,16)), Color("#6fa8ba"), true)
 			draw_line(hand + d*17.0, hand + d*31.0 + side*7.0, Color("#94c7d5"), 5.0)
 			for i in range(3):
 				draw_circle(hand + d*(36.0 + i*7.0) + side*float(i-1)*6.0, 3.2, Color(0.55,0.82,0.95,0.85))
 		5:
-			# harvest sparkle
 			for i in range(4):
 				var a := TAU * float(i) / 4.0
 				var p := hand + d*34.0 + Vector2(cos(a),sin(a))*13.0
