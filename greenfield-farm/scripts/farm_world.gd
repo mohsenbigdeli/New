@@ -192,7 +192,7 @@ func _draw_ground() -> void:
 	draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color("#79b85d"), true)
 	for y in range(0, int(WORLD_SIZE.y), 96):
 		for x in range(0, int(WORLD_SIZE.x), 96):
-			if ((x / 96) + (y / 96)) as int % 2 == 0:
+			if (int(x / 96) + int(y / 96)) % 2 == 0:
 				draw_circle(Vector2(x + 38, y + 42), 2.4, Color("#6bab52"))
 			draw_line(Vector2(x + 62, y + 70), Vector2(x + 66, y + 61), Color("#5d9f49"), 2)
 
@@ -238,7 +238,7 @@ func _draw_crop(center: Vector2, crop: String, stage: int, age: int) -> void:
 	var def: Dictionary = crop_defs[crop]
 	var needed := int(def["days"])
 	var maturity := clampf(float(age) / float(needed), 0.0, 1.0)
-	var s := 7.0 + 13.0 * max(maturity, float(stage) / 3.0)
+	var s: float = 7.0 + 13.0 * maxf(maturity, float(stage) / 3.0)
 	draw_line(center + Vector2(0, 18), center + Vector2(0, -s), Color("#2d6b35"), 5)
 	draw_circle(center + Vector2(-s*0.55,-s*0.20), s*0.48, def["leaf"])
 	draw_circle(center + Vector2(s*0.55,-s*0.24), s*0.48, def["leaf"].lightened(0.08))
@@ -299,13 +299,13 @@ func _npc_position(base: Vector2, phase_offset: float) -> Vector2:
 	return base + Vector2(sin(npc_phase * 0.55 + phase_offset) * 34.0, cos(npc_phase * 0.42 + phase_offset) * 18.0)
 
 func _draw_npc(p: Vector2, shirt: Color, label: String) -> void:
-	draw_ellipse(p+Vector2(0,18), Vector2(22,8), Color(0,0,0,0.18))
+	_draw_custom_ellipse(p+Vector2(0,18), Vector2(22,8), Color(0,0,0,0.18))
 	draw_rect(Rect2(p+Vector2(-14,-8), Vector2(28,34)), shirt, true)
 	draw_circle(p+Vector2(0,-22), 14, Color("#efc29e"))
 	draw_arc(p+Vector2(0,-27), 14, PI, TAU, 16, Color("#51382d"), 6)
 	draw_string(ThemeDB.fallback_font, p+Vector2(-28,48), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("#2e342b"))
 
-func draw_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+func _draw_custom_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
 	for i in range(24):
 		var a := TAU * float(i) / 24.0
