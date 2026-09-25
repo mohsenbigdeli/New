@@ -10,6 +10,7 @@ var ambient_fx: FarmAmbientFX
 var focus_overlay: FarmFocusOverlay
 var storage_chest: FarmStorageChest
 var inventory_ui: FarmInventoryPanel
+var interiors: FarmInteriors
 
 var selected_tool := 0
 var energy := 100
@@ -18,6 +19,7 @@ var minute_of_day := 6 * 60
 var clock_accumulator := 0.0
 var minute_step_seconds := 0.75
 var warned_late := false
+var outside_return_position := Vector2(370, 430)
 
 var seed_inventory := {"turnip": 8, "carrot": 4, "corn": 2}
 var produce_inventory := {"turnip": 0, "carrot": 0, "corn": 0}
@@ -57,6 +59,10 @@ func _ready() -> void:
 	storage_chest.name = "StorageChest"
 	add_child(storage_chest)
 
+	interiors = FarmInteriors.new()
+	interiors.name = "Interiors"
+	add_child(interiors)
+
 	player = FarmPlayer.new()
 	player.name = "Player"
 	player.position = Vector2(370, 420)
@@ -85,7 +91,7 @@ func _ready() -> void:
 	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
 
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
-	ui.show_message("Welcome to Greenfield. Your BAG is ready, and a storage chest sits beside the farmhouse.")
+	ui.show_message("v0.7: The farmhouse and General Store can now be entered. Walk to a door and press USE.")
 	_update_ui()
 
 func _process(delta: float) -> void:
@@ -102,7 +108,8 @@ func _process(delta: float) -> void:
 			farm.set_time(minute_of_day)
 			_update_ui()
 
-	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
+	if interiors.active_room == "outside":
+		ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
 	_update_context_target()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -130,6 +137,8 @@ func _select_tool(index: int) -> void:
 	_update_ui()
 
 func _get_near_interaction() -> Dictionary:
+	if interiors.active_room != "outside":
+		return interiors.get_interaction(player.position)
 	var chest_interaction := storage_chest.get_interaction(player.position)
 	if not chest_interaction.is_empty():
 		return chest_interaction
@@ -144,12 +153,16 @@ func _on_player_action(target_position: Vector2) -> void:
 		_handle_interaction(interaction)
 		return
 
+	if interiors.active_room != "outside":
+		ui.show_message("Nothing here to use. Explore the furniture or head for the door.")
+		return
+
 	var cell := farm.world_to_cell(target_position)
 	if not farm.is_valid_cell(cell):
 		ui.show_message("Walk closer to a field tile or town location.")
 		return
 	if energy <= 0:
-		ui.show_message("You're exhausted. Go to the farmhouse and sleep.")
+		ui.show_message("You're exhausted. Go inside the farmhouse and use the bed.")
 		return
 
 	var worked := false
@@ -196,22 +209,78 @@ func _crop_for_tool(tool: int) -> String:
 	return "turnip"
 
 func _handle_interaction(data: Dictionary) -> void:
-	match String(data.get("type", "")):
+	var kind := String(data.get("type", ""))
+	match kind:
 		"shop":
-			inventory_ui.close_panel()
-			inventory_ui.bag_button.disabled = true
-			ui.open_shop(money, seed_prices, sell_prices, produce_inventory)
-			player.set_controls_locked(true)
+			if interiors.active_room == "outside":
+				_enter_interior("store")
+			else:
+				inventory_ui.close_panel()
+				inventory_ui.bag_button.disabled = true
+				ui.open_shop(money, seed_prices, sell_prices, produce_inventory)
+				player.set_controls_locked(true)
 		"home":
+			if interiors.active_room == "outside":
+				_enter_interior("home")
+		"bed":
 			if minute_of_day < 17 * 60:
-				ui.show_message("It's still early, but sleeping will pass the whole day.")
+				ui.show_message("You turn in early and let the day pass.")
 			_start_next_day(false)
+		"interior_exit":
+			_exit_interior()
+		"home_note":
+			ui.show_message("Farm Journal: Water crops every day. Shipping pays the next morning.")
+		"store_sign":
+			ui.show_message("Seed Guide: Turnip 3 days · Carrot 4 days · Corn 6 days.")
 		"shipping":
 			_queue_shipping()
 		"chest":
 			inventory_ui.open_chest(_bag_snapshot(), storage_inventory)
 		"npc":
 			_talk_to_npc(String(data.get("id", "")))
+
+func _enter_interior(room: String) -> void:
+	if room != "home" and room != "store":
+		return
+	inventory_ui.close_panel()
+	ui.close_shop()
+	inventory_ui.bag_button.disabled = false
+	outside_return_position = Vector2(370, 438) if room == "home" else Vector2(1780, 438)
+	_set_room_state(room)
+	player.position = interiors.enter_room(room)
+	player.facing = Vector2.UP
+	ui.show_message("Entered %s." % ("Farmhouse" if room == "home" else "Willow General Store"))
+
+func _exit_interior() -> void:
+	var old_room := interiors.active_room
+	_set_room_state("outside")
+	player.position = outside_return_position
+	player.facing = Vector2.DOWN
+	ui.show_message("Back outside." if old_room != "outside" else "")
+
+func _set_room_state(room: String) -> void:
+	if room == "outside":
+		interiors.leave_room()
+		farm.visible = true
+		storage_chest.visible = true
+		ambient_fx.visible = true
+		focus_overlay.visible = true
+		_set_farm_collision_enabled(true)
+		player.set_world_bounds(FarmWorld.WORLD_SIZE, 1.16)
+	else:
+		interiors.active_room = room
+		interiors.visible = true
+		farm.visible = false
+		storage_chest.visible = false
+		ambient_fx.visible = false
+		focus_overlay.visible = false
+		_set_farm_collision_enabled(false)
+		player.set_world_bounds(FarmInteriors.ROOM_SIZE, 1.04)
+
+func _set_farm_collision_enabled(enabled: bool) -> void:
+	for child in farm.get_children():
+		if child is CollisionObject2D:
+			(child as CollisionObject2D).collision_layer = 1 if enabled else 0
 
 func _talk_to_npc(id: String) -> void:
 	match id:
@@ -394,6 +463,8 @@ func _on_inventory_transfer(item_key: String, direction: String) -> void:
 	_update_ui()
 
 func _start_next_day(from_midnight: bool) -> void:
+	if interiors.active_room != "outside":
+		_set_room_state("outside")
 	var shipped_gold := _settle_shipping()
 	minute_of_day = 6 * 60
 	energy = 100
@@ -402,7 +473,8 @@ func _start_next_day(from_midnight: bool) -> void:
 	var next_weather := "Rain" if roll == 0 else ("Cloudy" if roll == 1 else "Sunny")
 	farm.next_day(next_weather)
 	farm.set_time(minute_of_day)
-	player.position = Vector2(370, 420)
+	player.position = Vector2(370, 438)
+	player.facing = Vector2.DOWN
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
 
 	var morning_message := "A new morning begins." if from_midnight else "You wake up refreshed."
@@ -422,6 +494,11 @@ func _update_context_target() -> void:
 	if not interaction.is_empty():
 		focus_overlay.clear_target()
 		ui.set_context_hint("USE  •  %s" % String(interaction.get("name", "Interact")))
+		return
+
+	if interiors.active_room != "outside":
+		focus_overlay.clear_target()
+		ui.set_context_hint("")
 		return
 
 	var target_position := player.position + player.facing.normalized() * 67.0
@@ -469,10 +546,13 @@ func _update_ui() -> void:
 
 func save_game() -> void:
 	var data := {
-		"save_version": 6,
+		"save_version": 7,
 		"farm": farm.get_save_data(),
 		"player_x": player.position.x,
 		"player_y": player.position.y,
+		"room": interiors.active_room,
+		"outside_return_x": outside_return_position.x,
+		"outside_return_y": outside_return_position.y,
 		"seeds": seed_inventory,
 		"produce": produce_inventory,
 		"shipping_pending": shipping_pending,
@@ -487,7 +567,7 @@ func save_game() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
 		f.store_string(JSON.stringify(data))
-		ui.show_message("Game saved, including farm chest storage.")
+		ui.show_message("Game saved, including your current location and interiors.")
 
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
@@ -499,7 +579,6 @@ func load_game() -> void:
 		ui.show_message("Save file is invalid.")
 		return
 	farm.load_save_data(parsed.get("farm", {}))
-	player.position = Vector2(float(parsed.get("player_x", 370)), float(parsed.get("player_y", 420)))
 	seed_inventory = parsed.get("seeds", seed_inventory)
 	produce_inventory = parsed.get("produce", produce_inventory)
 	shipping_pending = parsed.get("shipping_pending", shipping_pending)
@@ -509,6 +588,13 @@ func load_game() -> void:
 	minute_of_day = int(parsed.get("minute", 360))
 	selected_tool = int(parsed.get("selected", 0))
 	player.set_equipped_tool(selected_tool)
+	outside_return_position = Vector2(float(parsed.get("outside_return_x", 370)), float(parsed.get("outside_return_y", 438)))
+
+	var saved_room := String(parsed.get("room", "outside"))
+	if saved_room != "home" and saved_room != "store":
+		saved_room = "outside"
+	_set_room_state(saved_room)
+	player.position = Vector2(float(parsed.get("player_x", 370)), float(parsed.get("player_y", 420)))
 
 	if parsed.has("quest_stage"):
 		quest_stage = int(parsed.get("quest_stage", 0))
@@ -531,5 +617,5 @@ func load_game() -> void:
 	farm.set_time(minute_of_day)
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
 	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
-	ui.show_message("Game loaded. Inventory and chest restored.")
+	ui.show_message("Game loaded. Location, inventory and storage restored.")
 	_update_ui()
