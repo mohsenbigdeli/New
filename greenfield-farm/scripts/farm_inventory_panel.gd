@@ -24,7 +24,11 @@ const ITEMS := [
 	{"key":"carrot", "name":"Carrot"},
 	{"key":"corn", "name":"Corn"},
 	{"key":"egg", "name":"Egg"},
-	{"key":"milk", "name":"Milk"}
+	{"key":"milk", "name":"Milk"},
+	{"key":"fish", "name":"Fresh Fish"},
+	{"key":"stone", "name":"Stone"},
+	{"key":"copper", "name":"Copper Ore"},
+	{"key":"bait", "name":"Fishing Bait"}
 ]
 
 func _ready() -> void:
@@ -46,11 +50,11 @@ func _style_box(fill: Color, border: Color, radius: int = 12, width: int = 2) ->
 	return style
 
 func _style_button(button: Button, accent := Color("#876040")) -> void:
-	button.add_theme_stylebox_override("normal", _style_box(Color("#5e432fdc"), Color("#d3a25f"), 9, 2))
-	button.add_theme_stylebox_override("hover", _style_box(Color("#76543aee"), Color("#f0c97e"), 9, 2))
-	button.add_theme_stylebox_override("pressed", _style_box(accent.darkened(0.15), Color("#ffe2a2"), 9, 2))
+	button.add_theme_stylebox_override("normal", _style_box(Color("#5e432fdc"), Color("#d3a25f"), 8, 2))
+	button.add_theme_stylebox_override("hover", _style_box(Color("#76543aee"), Color("#f0c97e"), 8, 2))
+	button.add_theme_stylebox_override("pressed", _style_box(accent.darkened(0.15), Color("#ffe2a2"), 8, 2))
 	button.add_theme_color_override("font_color", Color("#fff0cc"))
-	button.add_theme_font_size_override("font_size", 13)
+	button.add_theme_font_size_override("font_size", 12)
 
 func _label(parent: Node, pos: Vector2, size: Vector2, text: String, font_size: int, color := Color("#f5e6c7")) -> Label:
 	var label := Label.new()
@@ -76,53 +80,53 @@ func _build_bag_button() -> void:
 
 func _build_panel() -> void:
 	panel = Panel.new()
-	panel.position = Vector2(286,54)
-	panel.size = Vector2(708,614)
+	panel.position = Vector2(286,24)
+	panel.size = Vector2(708,672)
 	panel.add_theme_stylebox_override("panel", _style_box(Color("#2b2119f2"), Color("#c89b5b"), 18, 3))
 	panel.visible = false
 	add_child(panel)
 
 	var header := Panel.new()
-	header.position = Vector2(16,16)
-	header.size = Vector2(676,68)
+	header.position = Vector2(16,14)
+	header.size = Vector2(676,62)
 	header.add_theme_stylebox_override("panel", _style_box(Color("#60432f"), Color("#d3a25f"), 12, 2))
 	panel.add_child(header)
-	title_label = _label(header, Vector2(18,7), Vector2(420,28), "BACKPACK", 22, Color("#fff0c8"))
-	subtitle_label = _label(header, Vector2(19,36), Vector2(560,22), "Seeds, crops and animal products", 12, Color("#e7c998"))
+	title_label = _label(header, Vector2(18,5), Vector2(420,27), "BACKPACK", 21, Color("#fff0c8"))
+	subtitle_label = _label(header, Vector2(19,32), Vector2(560,20), "Farm, animal, fishing and mining items", 11, Color("#e7c998"))
 
 	var close := Button.new()
 	close.text = "X"
-	close.position = Vector2(618,12)
-	close.size = Vector2(42,42)
+	close.position = Vector2(620,10)
+	close.size = Vector2(40,40)
 	_style_button(close, Color("#9d5448"))
 	header.add_child(close)
 	close.pressed.connect(close_panel)
 
-	_label(panel, Vector2(24,92), Vector2(260,22), "ITEM", 11, Color("#d1ad70"))
-	_label(panel, Vector2(362,92), Vector2(92,22), "BAG", 11, Color("#d1ad70"))
-	_label(panel, Vector2(548,92), Vector2(108,22), "CHEST", 11, Color("#d1ad70"))
+	_label(panel, Vector2(24,82), Vector2(260,20), "ITEM", 10, Color("#d1ad70"))
+	_label(panel, Vector2(362,82), Vector2(92,20), "BAG", 10, Color("#d1ad70"))
+	_label(panel, Vector2(548,82), Vector2(108,20), "CHEST", 10, Color("#d1ad70"))
 
 	for i in range(ITEMS.size()):
 		var item: Dictionary = ITEMS[i]
 		var key := String(item["key"])
-		var y := 116 + i * 52
+		var y := 103 + i * 43
 		var row := Panel.new()
 		row.position = Vector2(20,y)
-		row.size = Vector2(668,44)
-		row.add_theme_stylebox_override("panel", _style_box(Color("#3c2d22c7"), Color("#755536"), 9, 1))
+		row.size = Vector2(668,36)
+		row.add_theme_stylebox_override("panel", _style_box(Color("#3c2d22c7"), Color("#755536"), 8, 1))
 		panel.add_child(row)
-		_label(row, Vector2(14,9), Vector2(245,26), String(item["name"]), 14)
-		var bag_count := _label(row, Vector2(342,9), Vector2(70,26), "0", 15, Color("#ffd77a"))
+		_label(row, Vector2(14,6), Vector2(245,24), String(item["name"]), 12)
+		var bag_count := _label(row, Vector2(342,6), Vector2(70,24), "0", 13, Color("#ffd77a"))
 		bag_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		row_labels[key + "_bag"] = bag_count
-		var chest_count := _label(row, Vector2(528,9), Vector2(70,26), "-", 15, Color("#b7d98d"))
+		var chest_count := _label(row, Vector2(528,6), Vector2(70,24), "-", 13, Color("#b7d98d"))
 		chest_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		row_labels[key + "_chest"] = chest_count
 
 		var to_chest := Button.new()
 		to_chest.text = ">"
-		to_chest.position = Vector2(430,5)
-		to_chest.size = Vector2(44,34)
+		to_chest.position = Vector2(430,3)
+		to_chest.size = Vector2(44,30)
 		_style_button(to_chest, Color("#7a8f55"))
 		row.add_child(to_chest)
 		to_chest.pressed.connect(_transfer.bind(key, "to_chest"))
@@ -130,14 +134,14 @@ func _build_panel() -> void:
 
 		var to_bag := Button.new()
 		to_bag.text = "<"
-		to_bag.position = Vector2(480,5)
-		to_bag.size = Vector2(44,34)
+		to_bag.position = Vector2(480,3)
+		to_bag.size = Vector2(44,30)
 		_style_button(to_bag, Color("#8f7650"))
 		row.add_child(to_bag)
 		to_bag.pressed.connect(_transfer.bind(key, "to_bag"))
 		right_buttons[key] = to_bag
 
-	var footer := _label(panel, Vector2(28,548), Vector2(650,42), "Farm storage can hold seeds, crops, eggs and milk. Animal products can also be sold or shipped.", 12, Color("#d6bb8d"))
+	var footer := _label(panel, Vector2(28,628), Vector2(650,30), "Farm storage now accepts crops, animal products, fish, ore, stone and bait.", 11, Color("#d6bb8d"))
 	footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _on_bag_pressed() -> void:
@@ -153,7 +157,7 @@ func open_bag(bag: Dictionary) -> void:
 	is_open = true
 	panel.visible = true
 	title_label.text = "BACKPACK"
-	subtitle_label.text = "Seeds, harvested crops and animal products"
+	subtitle_label.text = "Farm, animal, fishing and mining items"
 	_refresh_rows()
 	open_state_changed.emit(true)
 
