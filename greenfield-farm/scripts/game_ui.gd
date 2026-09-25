@@ -15,13 +15,14 @@ var time_label: Label
 var money_label: Label
 var weather_label: Label
 var energy_label: Label
+var energy_bar: ProgressBar
 var inventory_label: Label
 var message_label: Label
 var quest_label: Label
 var tool_buttons: Array[Button] = []
 var movement_state := {"left": false, "right": false, "up": false, "down": false}
 
-var shop_panel: ColorRect
+var shop_panel: Panel
 var shop_money_label: Label
 var shop_inventory_label: Label
 var shop_open := false
@@ -34,78 +35,148 @@ func _ready() -> void:
 	_build_mobile_controls()
 	_build_shop()
 
-func _make_panel(rect: Rect2, alpha := 0.84) -> ColorRect:
-	var panel := ColorRect.new()
+func _panel_style(fill: Color, border: Color, radius: int = 12, border_width: int = 3) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = fill
+	style.border_color = border
+	style.set_border_width_all(border_width)
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.shadow_color = Color(0.08,0.05,0.03,0.30)
+	style.shadow_size = 6
+	return style
+
+func _button_style(fill: Color, border: Color) -> StyleBoxFlat:
+	var style := _panel_style(fill, border, 10, 2)
+	style.shadow_size = 3
+	return style
+
+func _make_panel(rect: Rect2, fill := Color(0.16,0.11,0.07,0.92), border := Color("#c89759")) -> Panel:
+	var panel := Panel.new()
 	panel.position = rect.position
 	panel.size = rect.size
-	panel.color = Color(0.075,0.085,0.075,alpha)
+	panel.add_theme_stylebox_override("panel", _panel_style(fill, border))
 	add_child(panel)
 	return panel
 
-func _make_label(parent: Node, pos: Vector2, font_size: int) -> Label:
+func _make_label(parent: Node, pos: Vector2, font_size: int, color := Color("#fff4d4")) -> Label:
 	var label := Label.new()
 	label.position = pos
 	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0.08,0.05,0.03,0.72))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
 	parent.add_child(label)
 	return label
 
+func _style_button(button: Button, accent := Color("#c58a4b")) -> void:
+	button.add_theme_stylebox_override("normal", _button_style(Color("#6f4b32"), Color("#d7a45f")))
+	button.add_theme_stylebox_override("hover", _button_style(Color("#80583a"), Color("#f0c477")))
+	button.add_theme_stylebox_override("pressed", _button_style(accent.darkened(0.24), Color("#ffe0a0")))
+	button.add_theme_color_override("font_color", Color("#fff2cd"))
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_pressed_color", Color.WHITE)
+	button.add_theme_color_override("font_shadow_color", Color(0,0,0,0.55))
+	button.add_theme_constant_override("shadow_offset_x", 1)
+	button.add_theme_constant_override("shadow_offset_y", 2)
+
 func _build_top_bar() -> void:
-	var p := _make_panel(Rect2(18,14,820,96), 0.86)
-	day_label = _make_label(p, Vector2(16,10), 21)
-	time_label = _make_label(p, Vector2(128,10), 21)
-	money_label = _make_label(p, Vector2(252,10), 21)
-	weather_label = _make_label(p, Vector2(376,10), 20)
-	energy_label = _make_label(p, Vector2(530,10), 20)
-	inventory_label = _make_label(p, Vector2(16,42), 16)
-	message_label = _make_label(p, Vector2(16,68), 14)
-	message_label.size = Vector2(780,24)
+	var p := _make_panel(Rect2(18,14,820,104), Color("#382719e8"), Color("#c6924f"))
+	var title := _make_label(p, Vector2(18,8), 13, Color("#e7bd73"))
+	title.text = "GREENFIELD FARM"
+	day_label = _make_label(p, Vector2(18,31), 21)
+	time_label = _make_label(p, Vector2(127,31), 21)
+	money_label = _make_label(p, Vector2(248,31), 21, Color("#ffd66d"))
+	weather_label = _make_label(p, Vector2(370,31), 19)
+	energy_label = _make_label(p, Vector2(530,29), 15, Color("#ffd9a6"))
+
+	energy_bar = ProgressBar.new()
+	energy_bar.position = Vector2(530,52)
+	energy_bar.size = Vector2(250,18)
+	energy_bar.min_value = 0
+	energy_bar.max_value = 100
+	energy_bar.show_percentage = false
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color("#241a13")
+	bg.corner_radius_top_left = 7
+	bg.corner_radius_top_right = 7
+	bg.corner_radius_bottom_left = 7
+	bg.corner_radius_bottom_right = 7
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color("#77b95c")
+	fill.corner_radius_top_left = 7
+	fill.corner_radius_top_right = 7
+	fill.corner_radius_bottom_left = 7
+	fill.corner_radius_bottom_right = 7
+	energy_bar.add_theme_stylebox_override("background", bg)
+	energy_bar.add_theme_stylebox_override("fill", fill)
+	p.add_child(energy_bar)
+
+	inventory_label = _make_label(p, Vector2(18,71), 14, Color("#f2dec0"))
+	inventory_label.size = Vector2(790,28)
+
+	message_label = _make_label(p, Vector2(18,122), 14, Color("#3f2b1b"))
+	message_label.size = Vector2(820,40)
+	var toast := _make_panel(Rect2(18,120,820,42), Color("#f4ddb0e8"), Color("#80552f"))
+	toast.move_to_front()
+	message_label.reparent(toast)
+	message_label.position = Vector2(16,9)
+	message_label.add_theme_color_override("font_shadow_color", Color(1,1,1,0))
 
 	var save := Button.new()
 	save.text = "SAVE"
-	save.position = Vector2(1088,18)
-	save.size = Vector2(80,48)
+	save.position = Vector2(1090,18)
+	save.size = Vector2(80,50)
+	_style_button(save)
 	add_child(save)
 	save.pressed.connect(_on_save_button_pressed)
 
 	var load := Button.new()
 	load.text = "LOAD"
-	load.position = Vector2(1176,18)
-	load.size = Vector2(80,48)
+	load.position = Vector2(1178,18)
+	load.size = Vector2(80,50)
+	_style_button(load)
 	add_child(load)
 	load.pressed.connect(_on_load_button_pressed)
 
 func _build_quest_panel() -> void:
-	var p := _make_panel(Rect2(850,14,220,96), 0.80)
-	var title := _make_label(p, Vector2(12,8), 15)
+	var p := _make_panel(Rect2(850,14,222,104), Color("#4a3222ed"), Color("#d1a25f"))
+	var title := _make_label(p, Vector2(14,10), 15, Color("#ffd986"))
 	title.text = "TOWN REQUEST"
-	quest_label = _make_label(p, Vector2(12,34), 14)
-	quest_label.size = Vector2(198,54)
+	quest_label = _make_label(p, Vector2(14,36), 14, Color("#f5e2bf"))
+	quest_label.size = Vector2(194,58)
 	quest_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _build_hotbar() -> void:
-	var names := ["Hoe", "Turnip", "Carrot", "Corn", "Water", "Harvest"]
-	var p := _make_panel(Rect2(284,638,770,72), 0.88)
+	var names := ["HOE", "TURNIP", "CARROT", "CORN", "WATER", "HARVEST"]
+	var icons := ["#", "T", "C", "C", "~", "+"]
+	var p := _make_panel(Rect2(286,628,768,82), Color("#342319ea"), Color("#c38a4c"))
 	for i in range(names.size()):
 		var b := Button.new()
-		b.text = "%d %s" % [i+1, names[i]]
-		b.position = Vector2(8 + i*127, 8)
-		b.size = Vector2(119,56)
-		b.add_theme_font_size_override("font_size",15)
+		b.text = "%s\n%s" % [icons[i], names[i]]
+		b.position = Vector2(8 + i*126, 8)
+		b.size = Vector2(118,66)
+		b.add_theme_font_size_override("font_size",14)
+		_style_button(b)
 		b.pressed.connect(_on_tool_button_pressed.bind(i))
 		p.add_child(b)
 		tool_buttons.append(b)
 
 func _build_mobile_controls() -> void:
-	_add_move_button("↑", Vector2(102,532), "up")
-	_add_move_button("↓", Vector2(102,644), "down")
-	_add_move_button("←", Vector2(22,588), "left")
-	_add_move_button("→", Vector2(182,588), "right")
+	_add_move_button("↑", Vector2(105,526), "up")
+	_add_move_button("↓", Vector2(105,642), "down")
+	_add_move_button("←", Vector2(23,584), "left")
+	_add_move_button("→", Vector2(187,584), "right")
 
 	var action := Button.new()
 	action.text = "USE"
-	action.position = Vector2(1110,568)
-	action.size = Vector2(130,112)
-	action.add_theme_font_size_override("font_size",26)
+	action.position = Vector2(1102,566)
+	action.size = Vector2(140,116)
+	action.add_theme_font_size_override("font_size",24)
+	_style_button(action, Color("#c98245"))
 	add_child(action)
 	action.pressed.connect(_on_action_button_pressed)
 
@@ -113,48 +184,60 @@ func _add_move_button(text: String, pos: Vector2, key: String) -> void:
 	var b := Button.new()
 	b.text = text
 	b.position = pos
-	b.size = Vector2(78,68)
+	b.size = Vector2(82,72)
 	b.add_theme_font_size_override("font_size",28)
+	_style_button(b, Color("#6a8650"))
+	b.modulate = Color(1,1,1,0.88)
 	add_child(b)
 	b.button_down.connect(_set_move.bind(key, true))
 	b.button_up.connect(_set_move.bind(key, false))
 
 func _build_shop() -> void:
-	shop_panel = ColorRect.new()
-	shop_panel.position = Vector2(345,125)
-	shop_panel.size = Vector2(590,470)
-	shop_panel.color = Color(0.10,0.11,0.09,0.97)
+	shop_panel = Panel.new()
+	shop_panel.position = Vector2(338,118)
+	shop_panel.size = Vector2(604,486)
+	shop_panel.add_theme_stylebox_override("panel", _panel_style(Color("#f1d8a8"), Color("#70492e"), 18, 5))
 	shop_panel.visible = false
 	add_child(shop_panel)
 
-	var title := _make_label(shop_panel, Vector2(28,20), 30)
+	var header := Panel.new()
+	header.position = Vector2(18,16)
+	header.size = Vector2(568,72)
+	header.add_theme_stylebox_override("panel", _panel_style(Color("#6b4730"), Color("#c89350"), 12, 3))
+	shop_panel.add_child(header)
+	var title := _make_label(header, Vector2(20,10), 28, Color("#fff0c7"))
 	title.text = "Willow General Store"
-	var sub := _make_label(shop_panel, Vector2(28,61), 15)
-	sub.text = "Seeds, supplies and produce trading"
-	shop_money_label = _make_label(shop_panel, Vector2(430,28), 22)
-	shop_inventory_label = _make_label(shop_panel, Vector2(28,104), 17)
-	shop_inventory_label.size = Vector2(530,60)
+	var sub := _make_label(header, Vector2(22,44), 13, Color("#efd5a0"))
+	sub.text = "Seeds · supplies · produce trading"
+	shop_money_label = _make_label(header, Vector2(460,20), 22, Color("#ffd66d"))
+
+	shop_inventory_label = _make_label(shop_panel, Vector2(32,106), 16, Color("#52351f"))
+	shop_inventory_label.size = Vector2(540,58)
 	shop_inventory_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	shop_inventory_label.add_theme_color_override("font_shadow_color", Color(1,1,1,0))
 
 	_add_shop_buy_button("Turnip Seed", "turnip", Vector2(28,182))
-	_add_shop_buy_button("Carrot Seed", "carrot", Vector2(208,182))
-	_add_shop_buy_button("Corn Seed", "corn", Vector2(388,182))
+	_add_shop_buy_button("Carrot Seed", "carrot", Vector2(212,182))
+	_add_shop_buy_button("Corn Seed", "corn", Vector2(396,182))
 
 	var sell := Button.new()
 	sell.text = "SELL ALL HARVEST"
-	sell.position = Vector2(28,286)
-	sell.size = Vector2(532,64)
-	sell.add_theme_font_size_override("font_size",20)
+	sell.position = Vector2(28,290)
+	sell.size = Vector2(548,64)
+	sell.add_theme_font_size_override("font_size",19)
+	_style_button(sell, Color("#7a9c52"))
 	shop_panel.add_child(sell)
 	sell.pressed.connect(_on_sell_all_pressed)
 
-	var hint := _make_label(shop_panel, Vector2(28,365), 14)
-	hint.text = "Tip: the shipping bin near the farm sells produce too."
+	var hint := _make_label(shop_panel, Vector2(32,372), 14, Color("#61452c"))
+	hint.text = "Tip: the shipping bin beside the field sells produce too."
+	hint.add_theme_color_override("font_shadow_color", Color(1,1,1,0))
 
 	var close := Button.new()
 	close.text = "CLOSE"
-	close.position = Vector2(390,402)
-	close.size = Vector2(170,48)
+	close.position = Vector2(394,416)
+	close.size = Vector2(182,48)
+	_style_button(close)
 	shop_panel.add_child(close)
 	close.pressed.connect(_on_close_shop_pressed)
 
@@ -163,8 +246,9 @@ func _add_shop_buy_button(label_text: String, crop: String, pos: Vector2) -> voi
 	b.name = "Buy_%s" % crop
 	b.text = label_text
 	b.position = pos
-	b.size = Vector2(164,78)
+	b.size = Vector2(164,84)
 	b.add_theme_font_size_override("font_size",16)
+	_style_button(b, Color("#a86b43"))
 	shop_panel.add_child(b)
 	b.pressed.connect(_on_buy_pressed.bind(crop))
 
@@ -205,7 +289,7 @@ func open_shop(current_money: int, seed_prices: Dictionary, sell_prices: Diction
 	shop_open = true
 	shop_panel.visible = true
 	refresh_shop(current_money, seed_prices, sell_prices, produce)
-	show_message("Store opened.")
+	show_message("Store opened. Buy seeds or sell today's harvest.")
 
 func close_shop() -> void:
 	shop_open = false
@@ -217,7 +301,7 @@ func close_shop() -> void:
 
 func refresh_shop(current_money: int, seed_prices: Dictionary, sell_prices: Dictionary, produce: Dictionary) -> void:
 	shop_money_label.text = "%dg" % current_money
-	shop_inventory_label.text = "Harvest: Turnip %d · Carrot %d · Corn %d\nSell prices: %dg / %dg / %dg" % [
+	shop_inventory_label.text = "Harvest   Turnip %d   Carrot %d   Corn %d\nSell price   %dg       %dg       %dg" % [
 		int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0)),
 		int(sell_prices.get("turnip",0)), int(sell_prices.get("carrot",0)), int(sell_prices.get("corn",0))
 	]
@@ -233,19 +317,23 @@ func update_status(day: int, minute_of_day: int, current_money: int, current_wea
 	time_label.text = "%02d:%02d" % [hour, minute]
 	money_label.text = "%dg" % current_money
 	weather_label.text = current_weather
-	energy_label.text = "Energy %d" % energy
-	inventory_label.text = "Seeds  T:%d C:%d Corn:%d    Harvest  T:%d C:%d Corn:%d" % [
+	energy_label.text = "ENERGY  %d" % energy
+	energy_bar.value = energy
+	inventory_label.text = "Seeds  Turnip:%d  Carrot:%d  Corn:%d      Harvest  T:%d  C:%d  Corn:%d" % [
 		int(seeds.get("turnip",0)), int(seeds.get("carrot",0)), int(seeds.get("corn",0)),
 		int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0))
 	]
 	if not quest_started:
-		quest_label.text = "Talk to Mayor Rowan in town."
+		quest_label.text = "Find Mayor Rowan\nin the town square."
 	elif quest_complete:
-		quest_label.text = "Rowan: Complete!\nReward received: 300g"
+		quest_label.text = "Completed!\nReward: 300g"
 	else:
 		quest_label.text = "Harvest 5 turnips\nProgress: %d / 5" % quest_turnips
 	for i in range(tool_buttons.size()):
-		tool_buttons[i].modulate = Color("#ffe78a") if i == selected else Color.WHITE
+		if i == selected:
+			tool_buttons[i].modulate = Color("#ffe18a")
+		else:
+			tool_buttons[i].modulate = Color.WHITE
 
 func show_message(text: String) -> void:
 	if message_label:
