@@ -16,9 +16,13 @@ var money_label: Label
 var weather_label: Label
 var energy_label: Label
 var energy_bar: ProgressBar
+var energy_fill_style: StyleBoxFlat
 var inventory_label: Label
 var message_label: Label
 var quest_label: Label
+var shipping_label: Label
+var context_label: Label
+var context_panel: Panel
 var tool_buttons: Array[Button] = []
 var joystick: FarmJoystick
 var toast_panel: Panel
@@ -34,6 +38,7 @@ func _ready() -> void:
 	_build_compact_hud()
 	_build_hotbar()
 	_build_mobile_controls()
+	_build_context_prompt()
 	_build_shop()
 
 func _process(delta: float) -> void:
@@ -95,14 +100,15 @@ func _build_compact_hud() -> void:
 	var title := _make_label(info, Vector2(14,7), 12, Color("#d9b870"))
 	title.text = "GREENFIELD FARM"
 	day_label = _make_label(info, Vector2(14,27), 19)
-	time_label = _make_label(info, Vector2(100,27), 19)
-	money_label = _make_label(info, Vector2(205,27), 19, Color("#ffd46c"))
-	weather_label = _make_label(info, Vector2(305,27), 16)
+	time_label = _make_label(info, Vector2(128,27), 19)
+	money_label = _make_label(info, Vector2(226,27), 19, Color("#ffd46c"))
+	weather_label = _make_label(info, Vector2(319,27), 15)
 	inventory_label = _make_label(info, Vector2(14,54), 11, Color("#ead7b3"))
 	inventory_label.size = Vector2(395,18)
 
 	var energy_panel := _make_panel(Rect2(450,14,388,78), Color("#2f241bd9"), Color("#9d7b49"), 13)
-	energy_label = _make_label(energy_panel, Vector2(18,11), 13, Color("#f0d7a2"))
+	energy_label = _make_label(energy_panel, Vector2(18,9), 13, Color("#f0d7a2"))
+	shipping_label = _make_label(energy_panel, Vector2(224,9), 12, Color("#f6c96f"))
 	energy_bar = ProgressBar.new()
 	energy_bar.position = Vector2(18,36)
 	energy_bar.size = Vector2(352,22)
@@ -115,14 +121,14 @@ func _build_compact_hud() -> void:
 	bg.corner_radius_top_right = 9
 	bg.corner_radius_bottom_left = 9
 	bg.corner_radius_bottom_right = 9
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = Color("#78b85c")
-	fill.corner_radius_top_left = 9
-	fill.corner_radius_top_right = 9
-	fill.corner_radius_bottom_left = 9
-	fill.corner_radius_bottom_right = 9
+	energy_fill_style = StyleBoxFlat.new()
+	energy_fill_style.bg_color = Color("#78b85c")
+	energy_fill_style.corner_radius_top_left = 9
+	energy_fill_style.corner_radius_top_right = 9
+	energy_fill_style.corner_radius_bottom_left = 9
+	energy_fill_style.corner_radius_bottom_right = 9
 	energy_bar.add_theme_stylebox_override("background", bg)
-	energy_bar.add_theme_stylebox_override("fill", fill)
+	energy_bar.add_theme_stylebox_override("fill", energy_fill_style)
 	energy_panel.add_child(energy_bar)
 
 	var quest := _make_panel(Rect2(852,14,250,78), Color("#3e2c20dc"), Color("#bd9155"), 13)
@@ -188,6 +194,13 @@ func _build_mobile_controls() -> void:
 	add_child(action)
 	action.pressed.connect(_on_action_button_pressed)
 
+func _build_context_prompt() -> void:
+	context_panel = _make_panel(Rect2(450,607,380,34), Color("#1f1a15c9"), Color("#9d7a4d"), 12)
+	context_label = _make_label(context_panel, Vector2(12,6), 13, Color("#f4e4c2"))
+	context_label.size = Vector2(356,22)
+	context_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	context_panel.visible = false
+
 func _build_shop() -> void:
 	shop_panel = Panel.new()
 	shop_panel.position = Vector2(360,118)
@@ -217,7 +230,7 @@ func _build_shop() -> void:
 	_add_shop_buy_button("Corn", "corn", Vector2(368,176))
 
 	var sell := Button.new()
-	sell.text = "SELL ALL HARVEST"
+	sell.text = "SELL NOW AT STORE"
 	sell.position = Vector2(24,286)
 	sell.size = Vector2(512,62)
 	sell.add_theme_font_size_override("font_size",17)
@@ -226,7 +239,7 @@ func _build_shop() -> void:
 	sell.pressed.connect(_on_sell_all_pressed)
 
 	var hint := _make_label(shop_panel, Vector2(28,366), 13, Color("#62462e"))
-	hint.text = "Shipping bin beside the field also sells produce."
+	hint.text = "Shipping Bin pays the next morning. Store sales pay instantly."
 	hint.add_theme_color_override("font_shadow_color", Color(1,1,1,0))
 
 	var close := Button.new()
@@ -284,6 +297,7 @@ func open_shop(current_money: int, seed_prices: Dictionary, sell_prices: Diction
 	if joystick:
 		joystick.force_release()
 	shop_panel.visible = true
+	set_context_hint("")
 	refresh_shop(current_money, seed_prices, sell_prices, produce)
 	show_message("Store opened. Buy seeds or sell today's harvest.")
 
@@ -306,33 +320,45 @@ func refresh_shop(current_money: int, seed_prices: Dictionary, sell_prices: Dict
 		if b:
 			b.text = "%s Seed\n%dg" % [crop.capitalize(), int(seed_prices.get(crop,0))]
 
-func update_status(day: int, minute_of_day: int, current_money: int, current_weather: String, seeds: Dictionary, produce: Dictionary, selected: int, energy: int, quest_started: bool, quest_complete: bool, quest_turnips: int) -> void:
+func update_status(season_name: String, season_day: int, minute_of_day: int, current_money: int, current_weather: String, seeds: Dictionary, produce: Dictionary, selected: int, energy: int, quest_text: String, shipping_value: int) -> void:
 	var hour := int(minute_of_day / 60)
 	var minute := int(minute_of_day % 60)
-	day_label.text = "Day %d" % day
+	day_label.text = "%s %d" % [season_name, season_day]
 	time_label.text = "%02d:%02d" % [hour, minute]
 	money_label.text = "%dg" % current_money
 	weather_label.text = current_weather
 	energy_label.text = "ENERGY  %d / 100" % energy
+	shipping_label.text = "BIN %dg" % shipping_value
 	energy_bar.value = energy
+	if energy_fill_style:
+		if energy <= 20:
+			energy_fill_style.bg_color = Color("#d76952")
+		elif energy <= 45:
+			energy_fill_style.bg_color = Color("#d6a34f")
+		else:
+			energy_fill_style.bg_color = Color("#78b85c")
 	inventory_label.text = "Seeds  T:%d  C:%d  Corn:%d     Harvest  %d / %d / %d" % [
 		int(seeds.get("turnip",0)), int(seeds.get("carrot",0)), int(seeds.get("corn",0)),
 		int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0))
 	]
-	if not quest_started:
-		quest_label.text = "Find Mayor Rowan in town."
-	elif quest_complete:
-		quest_label.text = "Completed · reward 300g"
-	else:
-		quest_label.text = "Harvest turnips  %d / 5" % quest_turnips
+	quest_label.text = quest_text
 	for i in range(tool_buttons.size()):
 		if i == selected:
 			tool_buttons[i].modulate = Color("#ffe39a")
 		else:
 			tool_buttons[i].modulate = Color(1,1,1,0.94)
 
+func set_context_hint(text: String) -> void:
+	if not context_panel or not context_label:
+		return
+	if text == "":
+		context_panel.visible = false
+	else:
+		context_label.text = text
+		context_panel.visible = true
+
 func show_message(text: String) -> void:
 	if message_label and toast_panel:
 		message_label.text = text
 		toast_panel.visible = true
-		toast_timer = 3.0
+		toast_timer = 3.2
