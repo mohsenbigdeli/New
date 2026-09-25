@@ -8,6 +8,8 @@ var player: FarmPlayer
 var ui: GameUI
 var ambient_fx: FarmAmbientFX
 var focus_overlay: FarmFocusOverlay
+var storage_chest: FarmStorageChest
+var inventory_ui: FarmInventoryPanel
 
 var selected_tool := 0
 var energy := 100
@@ -20,6 +22,14 @@ var warned_late := false
 var seed_inventory := {"turnip": 8, "carrot": 4, "corn": 2}
 var produce_inventory := {"turnip": 0, "carrot": 0, "corn": 0}
 var shipping_pending := {"turnip": 0, "carrot": 0, "corn": 0}
+var storage_inventory := {
+	"seed_turnip": 0,
+	"seed_carrot": 0,
+	"seed_corn": 0,
+	"turnip": 0,
+	"carrot": 0,
+	"corn": 0
+}
 var seed_prices := {"turnip": 20, "carrot": 35, "corn": 60}
 var sell_prices := {"turnip": 55, "carrot": 80, "corn": 130}
 
@@ -43,6 +53,10 @@ func _ready() -> void:
 	focus_overlay.name = "FocusOverlay"
 	add_child(focus_overlay)
 
+	storage_chest = FarmStorageChest.new()
+	storage_chest.name = "StorageChest"
+	add_child(storage_chest)
+
 	player = FarmPlayer.new()
 	player.name = "Player"
 	player.position = Vector2(370, 420)
@@ -63,45 +77,69 @@ func _ready() -> void:
 	ui.sell_all_pressed.connect(_sell_all_produce)
 	ui.close_shop_pressed.connect(_close_shop)
 
+	inventory_ui = FarmInventoryPanel.new()
+	inventory_ui.name = "InventoryUI"
+	add_child(inventory_ui)
+	inventory_ui.open_state_changed.connect(_on_inventory_open_changed)
+	inventory_ui.transfer_requested.connect(_on_inventory_transfer)
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
+
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
-	ui.show_message("Welcome to Greenfield. Talk to Rowan and begin rebuilding the farm.")
+	ui.show_message("Welcome to Greenfield. Your BAG is ready, and a storage chest sits beside the farmhouse.")
 	_update_ui()
 
 func _process(delta: float) -> void:
-	clock_accumulator += delta
-	if clock_accumulator >= minute_step_seconds:
-		clock_accumulator -= minute_step_seconds
-		minute_of_day += 10
-		if minute_of_day >= 22 * 60 and not warned_late:
-			warned_late = true
-			ui.show_message("It's getting late. Head home before midnight.")
-		if minute_of_day >= 24 * 60:
-			_start_next_day(true)
-		farm.set_time(minute_of_day)
-		_update_ui()
+	if not ui.shop_open and not inventory_ui.is_open:
+		clock_accumulator += delta
+		if clock_accumulator >= minute_step_seconds:
+			clock_accumulator -= minute_step_seconds
+			minute_of_day += 10
+			if minute_of_day >= 22 * 60 and not warned_late:
+				warned_late = true
+				ui.show_message("It's getting late. Head home before midnight.")
+			if minute_of_day >= 24 * 60:
+				_start_next_day(true)
+			farm.set_time(minute_of_day)
+			_update_ui()
 
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
 	_update_context_target()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_I and not ui.shop_open:
+			if inventory_ui.is_open:
+				inventory_ui.close_panel()
+			else:
+				inventory_ui.open_bag(_bag_snapshot())
+			return
+		if inventory_ui.is_open or ui.shop_open:
+			return
 		if event.keycode == KEY_Q:
 			_select_tool((selected_tool + 1) % 6)
 		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
 			_select_tool(int(event.keycode - KEY_1))
 
 func _select_tool(index: int) -> void:
+	if inventory_ui.is_open or ui.shop_open:
+		return
 	selected_tool = clampi(index, 0, 5)
 	player.set_equipped_tool(selected_tool)
 	var names := ["Hoe", "Turnip Seeds", "Carrot Seeds", "Corn Seeds", "Watering Can", "Harvest"]
 	ui.show_message("%s selected." % names[selected_tool])
 	_update_ui()
 
+func _get_near_interaction() -> Dictionary:
+	var chest_interaction := storage_chest.get_interaction(player.position)
+	if not chest_interaction.is_empty():
+		return chest_interaction
+	return farm.get_interaction_near(player.position)
+
 func _on_player_action(target_position: Vector2) -> void:
-	if ui.shop_open:
+	if ui.shop_open or inventory_ui.is_open:
 		return
 
-	var interaction := farm.get_interaction_near(player.position)
+	var interaction := _get_near_interaction()
 	if not interaction.is_empty():
 		_handle_interaction(interaction)
 		return
@@ -147,6 +185,7 @@ func _on_player_action(target_position: Vector2) -> void:
 		energy = maxi(0, energy - cost)
 	else:
 		ui.show_message("That action doesn't work on this tile yet.")
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
 	_update_ui()
 
 func _crop_for_tool(tool: int) -> String:
@@ -159,6 +198,8 @@ func _crop_for_tool(tool: int) -> String:
 func _handle_interaction(data: Dictionary) -> void:
 	match String(data.get("type", "")):
 		"shop":
+			inventory_ui.close_panel()
+			inventory_ui.bag_button.disabled = true
 			ui.open_shop(money, seed_prices, sell_prices, produce_inventory)
 			player.set_controls_locked(true)
 		"home":
@@ -167,6 +208,8 @@ func _handle_interaction(data: Dictionary) -> void:
 			_start_next_day(false)
 		"shipping":
 			_queue_shipping()
+		"chest":
+			inventory_ui.open_chest(_bag_snapshot(), storage_inventory)
 		"npc":
 			_talk_to_npc(String(data.get("id", "")))
 
@@ -239,6 +282,7 @@ func _buy_seed(crop: String) -> void:
 	seed_inventory[crop] = int(seed_inventory.get(crop, 0)) + 1
 	ui.show_message("Bought 1 %s seed for %dg." % [crop.capitalize(), price])
 	ui.refresh_shop(money, seed_prices, sell_prices, produce_inventory)
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
 	_update_ui()
 
 func _sell_all_produce() -> void:
@@ -253,6 +297,7 @@ func _sell_all_produce() -> void:
 		ui.show_message("Sold directly to the store for %dg." % earned)
 	if ui.shop_open:
 		ui.refresh_shop(money, seed_prices, sell_prices, produce_inventory)
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
 	_update_ui()
 
 func _queue_shipping() -> void:
@@ -269,6 +314,7 @@ func _queue_shipping() -> void:
 		ui.show_message("The shipping bin is empty. Harvest something first.")
 	else:
 		ui.show_message("Shipped %d items. Estimated payout tomorrow: %dg." % [queued_count, queued_value])
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
 	_update_ui()
 
 func _shipping_value() -> int:
@@ -287,7 +333,65 @@ func _settle_shipping() -> int:
 
 func _close_shop() -> void:
 	ui.close_shop()
+	inventory_ui.bag_button.disabled = false
 	player.set_controls_locked(false)
+
+func _on_inventory_open_changed(open: bool) -> void:
+	if ui.shop_open:
+		return
+	player.set_controls_locked(open)
+	if not open:
+		player.set_virtual_move(Vector2.ZERO)
+
+func _bag_snapshot() -> Dictionary:
+	return {
+		"seed_turnip": int(seed_inventory.get("turnip", 0)),
+		"seed_carrot": int(seed_inventory.get("carrot", 0)),
+		"seed_corn": int(seed_inventory.get("corn", 0)),
+		"turnip": int(produce_inventory.get("turnip", 0)),
+		"carrot": int(produce_inventory.get("carrot", 0)),
+		"corn": int(produce_inventory.get("corn", 0))
+	}
+
+func _bag_item_count(item_key: String) -> int:
+	match item_key:
+		"seed_turnip": return int(seed_inventory.get("turnip", 0))
+		"seed_carrot": return int(seed_inventory.get("carrot", 0))
+		"seed_corn": return int(seed_inventory.get("corn", 0))
+		"turnip": return int(produce_inventory.get("turnip", 0))
+		"carrot": return int(produce_inventory.get("carrot", 0))
+		"corn": return int(produce_inventory.get("corn", 0))
+	return 0
+
+func _set_bag_item_count(item_key: String, value: int) -> void:
+	value = maxi(0, value)
+	match item_key:
+		"seed_turnip": seed_inventory["turnip"] = value
+		"seed_carrot": seed_inventory["carrot"] = value
+		"seed_corn": seed_inventory["corn"] = value
+		"turnip": produce_inventory["turnip"] = value
+		"carrot": produce_inventory["carrot"] = value
+		"corn": produce_inventory["corn"] = value
+
+func _on_inventory_transfer(item_key: String, direction: String) -> void:
+	if not storage_inventory.has(item_key):
+		return
+	var bag_count := _bag_item_count(item_key)
+	var chest_count := int(storage_inventory.get(item_key, 0))
+	if direction == "to_chest":
+		if bag_count <= 0:
+			return
+		_set_bag_item_count(item_key, bag_count - 1)
+		storage_inventory[item_key] = chest_count + 1
+	elif direction == "to_bag":
+		if chest_count <= 0:
+			return
+		storage_inventory[item_key] = chest_count - 1
+		_set_bag_item_count(item_key, bag_count + 1)
+	else:
+		return
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
+	_update_ui()
 
 func _start_next_day(from_midnight: bool) -> void:
 	var shipped_gold := _settle_shipping()
@@ -309,12 +413,12 @@ func _start_next_day(from_midnight: bool) -> void:
 	_update_ui()
 
 func _update_context_target() -> void:
-	if ui.shop_open:
+	if ui.shop_open or inventory_ui.is_open:
 		focus_overlay.clear_target()
 		ui.set_context_hint("")
 		return
 
-	var interaction := farm.get_interaction_near(player.position)
+	var interaction := _get_near_interaction()
 	if not interaction.is_empty():
 		focus_overlay.clear_target()
 		ui.set_context_hint("USE  •  %s" % String(interaction.get("name", "Interact")))
@@ -365,13 +469,14 @@ func _update_ui() -> void:
 
 func save_game() -> void:
 	var data := {
-		"save_version": 5,
+		"save_version": 6,
 		"farm": farm.get_save_data(),
 		"player_x": player.position.x,
 		"player_y": player.position.y,
 		"seeds": seed_inventory,
 		"produce": produce_inventory,
 		"shipping_pending": shipping_pending,
+		"storage_inventory": storage_inventory,
 		"money": money,
 		"energy": energy,
 		"minute": minute_of_day,
@@ -382,7 +487,7 @@ func save_game() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
 		f.store_string(JSON.stringify(data))
-		ui.show_message("Game saved.")
+		ui.show_message("Game saved, including farm chest storage.")
 
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
@@ -398,6 +503,7 @@ func load_game() -> void:
 	seed_inventory = parsed.get("seeds", seed_inventory)
 	produce_inventory = parsed.get("produce", produce_inventory)
 	shipping_pending = parsed.get("shipping_pending", shipping_pending)
+	storage_inventory = parsed.get("storage_inventory", storage_inventory)
 	money = int(parsed.get("money", 350))
 	energy = int(parsed.get("energy", 100))
 	minute_of_day = int(parsed.get("minute", 360))
@@ -424,5 +530,6 @@ func load_game() -> void:
 	warned_late = minute_of_day >= 22 * 60
 	farm.set_time(minute_of_day)
 	ambient_fx.update_environment(farm.current_day, farm.weather, minute_of_day)
-	ui.show_message("Game loaded.")
+	inventory_ui.refresh_data(_bag_snapshot(), storage_inventory)
+	ui.show_message("Game loaded. Inventory and chest restored.")
 	_update_ui()
