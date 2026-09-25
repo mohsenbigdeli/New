@@ -7,17 +7,28 @@ const ROWS := 8
 const ORIGIN := Vector2(110, 470)
 const WORLD_SIZE := Vector2(2304, 1536)
 
-const HOUSE_RECT := Rect2(150, 120, 430, 230)
-const STORE_RECT := Rect2(1580, 130, 400, 250)
-const TOWN_HALL_RECT := Rect2(1650, 820, 430, 260)
-const BARN_RECT := Rect2(220, 1110, 430, 250)
+const HOUSE_RECT := Rect2(150, 120, 430, 260)
+const STORE_RECT := Rect2(1580, 120, 400, 260)
+const TOWN_HALL_RECT := Rect2(1640, 815, 430, 280)
+const BARN_RECT := Rect2(220, 1090, 430, 260)
 
-const HOUSE_DOOR := Vector2(365, 370)
-const STORE_DOOR := Vector2(1780, 400)
+const HOUSE_DOOR := Vector2(365, 386)
+const STORE_DOOR := Vector2(1780, 392)
 const MAYOR_SPOT := Vector2(1450, 920)
 const LINA_SPOT := Vector2(1160, 1030)
 const MARNIE_SPOT := Vector2(1260, 690)
 const SHIPPING_BIN := Vector2(1080, 680)
+
+const GRASS_TEX: Texture2D = preload("res://assets/art/grass_tile.svg")
+const PATH_TEX: Texture2D = preload("res://assets/art/path_tile.svg")
+const SOIL_TEX: Texture2D = preload("res://assets/art/soil_tile.svg")
+const SOIL_WET_TEX: Texture2D = preload("res://assets/art/soil_wet_tile.svg")
+const WATER_TEX: Texture2D = preload("res://assets/art/water_tile.svg")
+const TREE_TEX: Texture2D = preload("res://assets/art/tree.svg")
+const FARMHOUSE_TEX: Texture2D = preload("res://assets/art/farmhouse.svg")
+const STORE_TEX: Texture2D = preload("res://assets/art/store.svg")
+const BARN_TEX: Texture2D = preload("res://assets/art/barn.svg")
+const TOWNHALL_TEX: Texture2D = preload("res://assets/art/townhall.svg")
 
 var cells: Dictionary = {}
 var current_day := 1
@@ -26,7 +37,7 @@ var time_of_day := 360
 var npc_phase := 0.0
 
 var crop_defs := {
-	"turnip": {"days": 3, "leaf": Color("#58b947"), "fruit": Color("#e9e7da")},
+	"turnip": {"days": 3, "leaf": Color("#58b947"), "fruit": Color("#ece9dd")},
 	"carrot": {"days": 4, "leaf": Color("#3f9f48"), "fruit": Color("#ee8a2d")},
 	"corn": {"days": 6, "leaf": Color("#67ad45"), "fruit": Color("#f2c84b")}
 }
@@ -46,9 +57,9 @@ func _add_building_collider(rect: Rect2) -> void:
 	var body := StaticBody2D.new()
 	var shape_node := CollisionShape2D.new()
 	var shape := RectangleShape2D.new()
-	shape.size = rect.size
+	shape.size = rect.size * Vector2(0.90, 0.72)
 	shape_node.shape = shape
-	body.position = rect.position + rect.size * 0.5
+	body.position = rect.position + Vector2(rect.size.x * 0.5, rect.size.y * 0.61)
 	body.add_child(shape_node)
 	add_child(body)
 
@@ -177,147 +188,195 @@ func _draw() -> void:
 	_draw_paths()
 	_draw_water()
 	_draw_farm()
-	_draw_building(HOUSE_RECT, Color("#d9c18f"), Color("#9e5c3c"), "FARMHOUSE")
-	_draw_building(STORE_RECT, Color("#e2bf78"), Color("#7f4f36"), "GENERAL STORE")
-	_draw_building(TOWN_HALL_RECT, Color("#d9d2c3"), Color("#6f596b"), "TOWN HALL")
-	_draw_building(BARN_RECT, Color("#b95445"), Color("#7a3a31"), "BARN")
+	_draw_world_props()
+	_draw_texture_rect(FARMHOUSE_TEX, HOUSE_RECT, false)
+	_draw_texture_rect(STORE_TEX, STORE_RECT, false)
+	_draw_texture_rect(TOWNHALL_TEX, TOWN_HALL_RECT, false)
+	_draw_texture_rect(BARN_TEX, BARN_RECT, false)
 	_draw_shipping_bin()
-	_draw_decorations()
-	_draw_npc(_npc_position(MAYOR_SPOT, 0.0), Color("#754c8c"), "Rowan")
-	_draw_npc(_npc_position(LINA_SPOT, 1.7), Color("#4b87a8"), "Lina")
-	_draw_npc(_npc_position(MARNIE_SPOT, 3.2), Color("#b86c6f"), "Marnie")
+	_draw_npc(_npc_position(MAYOR_SPOT, 0.0), Color("#76508f"), Color("#d8b36e"), "Rowan")
+	_draw_npc(_npc_position(LINA_SPOT, 1.7), Color("#4c8cae"), Color("#6a4438"), "Lina")
+	_draw_npc(_npc_position(MARNIE_SPOT, 3.2), Color("#bd6b72"), Color("#9b6a38"), "Marnie")
+	_draw_weather_fx()
 	_draw_daylight_overlay()
 
 func _draw_ground() -> void:
-	draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color("#79b85d"), true)
-	for y in range(0, int(WORLD_SIZE.y), 96):
-		for x in range(0, int(WORLD_SIZE.x), 96):
-			if (int(x / 96) + int(y / 96)) % 2 == 0:
-				draw_circle(Vector2(x + 38, y + 42), 2.4, Color("#6bab52"))
-			draw_line(Vector2(x + 62, y + 70), Vector2(x + 66, y + 61), Color("#5d9f49"), 2)
+	for y in range(0, int(WORLD_SIZE.y), TILE_SIZE):
+		for x in range(0, int(WORLD_SIZE.x), TILE_SIZE):
+			draw_texture_rect(GRASS_TEX, Rect2(x, y, TILE_SIZE, TILE_SIZE), false)
 
 func _draw_paths() -> void:
-	var path := Color("#d6bb86")
-	draw_rect(Rect2(0, 390, WORLD_SIZE.x, 92), path, true)
-	draw_rect(Rect2(1010, 390, 100, 900), path, true)
-	draw_rect(Rect2(1010, 790, 1080, 96), path, true)
-	draw_rect(Rect2(1060, 1110, 1010, 84), path, true)
-	for x in range(0, int(WORLD_SIZE.x), 70):
-		draw_circle(Vector2(x + 24, 434), 3.0, Color("#bca16f"))
+	_tile_texture_in_rect(PATH_TEX, Rect2(0, 390, WORLD_SIZE.x, 96), 64)
+	_tile_texture_in_rect(PATH_TEX, Rect2(1010, 390, 112, 900), 64)
+	_tile_texture_in_rect(PATH_TEX, Rect2(1010, 790, 1080, 96), 64)
+	_tile_texture_in_rect(PATH_TEX, Rect2(1060, 1110, 1010, 88), 64)
+	# town square stone edge
+	draw_rect(Rect2(1530, 735, 590, 12), Color("#8f876f"), true)
+	draw_rect(Rect2(1530, 1100, 590, 12), Color("#8f876f"), true)
 
 func _draw_water() -> void:
-	draw_rect(Rect2(2120, 0, 184, WORLD_SIZE.y), Color("#50a8cb"), true)
-	for y in range(30, int(WORLD_SIZE.y), 70):
-		draw_line(Vector2(2140, y), Vector2(2268, y + 10), Color(0.55,0.88,0.95,0.55), 3)
-	draw_circle(Vector2(1360, 560), 150, Color("#4fa7c8"))
-	draw_circle(Vector2(1360, 560), 126, Color("#5ab4d1"))
-	draw_circle(Vector2(1310, 520), 11, Color("#76b858"))
-	draw_circle(Vector2(1395, 600), 14, Color("#76b858"))
+	_tile_texture_in_rect(WATER_TEX, Rect2(2120, 0, 184, WORLD_SIZE.y), 64)
+	# pond with layered shore
+	draw_circle(Vector2(1360, 560), 166, Color("#bda46e"))
+	draw_circle(Vector2(1360, 560), 154, Color("#4d9fc1"))
+	for y in range(430, 690, 64):
+		for x in range(1230, 1490, 64):
+			var p := Vector2(x + 32, y + 32)
+			if p.distance_to(Vector2(1360, 560)) < 135.0:
+				draw_texture_rect(WATER_TEX, Rect2(x, y, 64, 64), false)
+	draw_circle(Vector2(1305, 520), 13, Color("#79bc5b"))
+	draw_circle(Vector2(1400, 610), 15, Color("#79bc5b"))
 
 func _draw_farm() -> void:
-	draw_rect(Rect2(ORIGIN - Vector2(12,12), Vector2(COLS*TILE_SIZE+24, ROWS*TILE_SIZE+24)), Color("#4f8f42"), true)
+	var border := Rect2(ORIGIN - Vector2(18,18), Vector2(COLS*TILE_SIZE+36, ROWS*TILE_SIZE+36))
+	draw_rect(border, Color("#4e873d"), true)
 	for y in range(ROWS):
 		for x in range(COLS):
 			var c := Vector2i(x, y)
-			var rect := Rect2(ORIGIN + Vector2(x*TILE_SIZE, y*TILE_SIZE), Vector2(TILE_SIZE-3, TILE_SIZE-3))
+			var rect := Rect2(ORIGIN + Vector2(x*TILE_SIZE, y*TILE_SIZE), Vector2(TILE_SIZE-2, TILE_SIZE-2))
 			var data: Dictionary = get_cell(c)
-			var base := Color("#78b75a") if (x+y)%2 == 0 else Color("#73af55")
 			if bool(data["tilled"]):
-				base = Color("#875d38")
-			if bool(data["watered"]):
-				base = Color("#60462f")
-			draw_rect(rect, base, true)
-			if bool(data["tilled"]):
-				for row in 3:
-					draw_line(rect.position + Vector2(8, 16 + row*16), rect.position + Vector2(rect.size.x-8, 16 + row*16), Color(0.24,0.16,0.10,0.28), 2)
+				var tex := SOIL_WET_TEX if bool(data["watered"]) else SOIL_TEX
+				draw_texture_rect(tex, rect, false)
+			else:
+				draw_texture_rect(GRASS_TEX, rect, false)
 			var crop := String(data["crop"])
 			if crop != "":
 				_draw_crop(rect.get_center(), crop, int(data["stage"]), int(data["age"]))
+	_draw_farm_fence()
 
 func _draw_crop(center: Vector2, crop: String, stage: int, age: int) -> void:
 	var def: Dictionary = crop_defs[crop]
 	var needed := int(def["days"])
 	var maturity := clampf(float(age) / float(needed), 0.0, 1.0)
-	var s: float = 7.0 + 13.0 * maxf(maturity, float(stage) / 3.0)
-	draw_line(center + Vector2(0, 18), center + Vector2(0, -s), Color("#2d6b35"), 5)
-	draw_circle(center + Vector2(-s*0.55,-s*0.20), s*0.48, def["leaf"])
-	draw_circle(center + Vector2(s*0.55,-s*0.24), s*0.48, def["leaf"].lightened(0.08))
-	if maturity >= 1.0:
-		if crop == "corn":
-			draw_rect(Rect2(center + Vector2(-5,-4), Vector2(10,25)), def["fruit"], true)
-		elif crop == "carrot":
-			var pts := PackedVector2Array([center+Vector2(-10,7), center+Vector2(10,7), center+Vector2(0,25)])
-			draw_colored_polygon(pts, def["fruit"])
-		else:
-			draw_circle(center + Vector2(0, 10), 13, def["fruit"])
-			draw_circle(center + Vector2(0, 13), 5, Color("#b98ac9"))
+	var scale_value: float = 0.45 + maxf(maturity, float(stage) / 3.0) * 0.72
+	var leaf: Color = def["leaf"]
+	var fruit: Color = def["fruit"]
+	# little soil/contact shadow
+	draw_circle(center + Vector2(0, 16), 12.0 * scale_value, Color(0.14,0.10,0.07,0.24))
+	if crop == "corn":
+		draw_rect(Rect2(center + Vector2(-3, -24*scale_value), Vector2(6, 42*scale_value)), Color("#37733d"), true)
+		draw_colored_polygon(PackedVector2Array([center+Vector2(-4,-5), center+Vector2(-18,-17), center+Vector2(-7,-20)]), leaf)
+		draw_colored_polygon(PackedVector2Array([center+Vector2(4,-1), center+Vector2(18,-13), center+Vector2(8,-17)]), leaf.lightened(0.08))
+		if maturity >= 1.0:
+			draw_rect(Rect2(center + Vector2(4,-8), Vector2(8,22)), fruit, true)
+			draw_rect(Rect2(center + Vector2(6,-5), Vector2(4,14)), Color("#ffd96a"), true)
+	else:
+		var stem_h := 18.0 * scale_value
+		draw_rect(Rect2(center + Vector2(-2,-stem_h), Vector2(4,stem_h+8)), Color("#2e6f37"), true)
+		draw_colored_polygon(PackedVector2Array([center+Vector2(-1,-stem_h+5), center+Vector2(-18*scale_value,-11*scale_value), center+Vector2(-7*scale_value,2)]), leaf)
+		draw_colored_polygon(PackedVector2Array([center+Vector2(1,-stem_h+3), center+Vector2(18*scale_value,-13*scale_value), center+Vector2(7*scale_value,3)]), leaf.lightened(0.10))
+		if maturity >= 1.0:
+			if crop == "carrot":
+				draw_colored_polygon(PackedVector2Array([center+Vector2(-9,6), center+Vector2(9,6), center+Vector2(0,27)]), fruit)
+				draw_rect(Rect2(center+Vector2(-2,8), Vector2(4,13)), Color("#f7b15a"), true)
+			else:
+				draw_circle(center + Vector2(0,12), 13, fruit)
+				draw_rect(Rect2(center+Vector2(-5,7), Vector2(10,5)), Color("#cab3de"), true)
 
-func _draw_building(rect: Rect2, wall: Color, roof: Color, title: String) -> void:
-	draw_rect(rect, wall, true)
-	var roof_pts := PackedVector2Array([
-		rect.position + Vector2(-20, 18),
-		rect.position + Vector2(rect.size.x * 0.5, -55),
-		rect.position + Vector2(rect.size.x + 20, 18),
-		rect.position + Vector2(rect.size.x, 72),
-		rect.position + Vector2(0, 72)
-	])
-	draw_colored_polygon(roof_pts, roof)
-	var door := Rect2(rect.position + Vector2(rect.size.x*0.5-30, rect.size.y-78), Vector2(60,78))
-	draw_rect(door, Color("#694b37"), true)
-	draw_circle(door.position + Vector2(48,39), 4, Color("#e9c56d"))
-	for i in 2:
-		var wp := rect.position + Vector2(62 + i*(rect.size.x-124), 112)
-		draw_rect(Rect2(wp, Vector2(62,52)), Color("#9bd1e0"), true)
-		draw_line(wp+Vector2(31,0), wp+Vector2(31,52), Color("#e7e2ce"), 4)
-		draw_line(wp+Vector2(0,26), wp+Vector2(62,26), Color("#e7e2ce"), 4)
-	draw_string(ThemeDB.fallback_font, rect.position + Vector2(28, 103), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color("#4b3a2f"))
+func _draw_farm_fence() -> void:
+	var left := ORIGIN.x - 32
+	var top := ORIGIN.y - 34
+	var right := ORIGIN.x + COLS*TILE_SIZE + 28
+	var bottom := ORIGIN.y + ROWS*TILE_SIZE + 30
+	for x in range(int(left), int(right), 56):
+		_draw_fence_post(Vector2(x, top))
+		_draw_fence_post(Vector2(x, bottom))
+	for y in range(int(top), int(bottom), 56):
+		_draw_fence_post(Vector2(left, y))
+		if y < int(bottom)-80 or y > int(bottom)-10:
+			_draw_fence_post(Vector2(right, y))
+
+func _draw_fence_post(p: Vector2) -> void:
+	draw_rect(Rect2(p-Vector2(4,14), Vector2(8,28)), Color("#6c4a32"), true)
+	draw_rect(Rect2(p-Vector2(7,11), Vector2(14,5)), Color("#a8794e"), true)
+	draw_rect(Rect2(p-Vector2(7,0), Vector2(14,5)), Color("#a8794e"), true)
+
+func _draw_world_props() -> void:
+	var trees := [Vector2(65,40),Vector2(680,40),Vector2(840,145),Vector2(1990,410),Vector2(730,1180),Vector2(1430,1210),Vector2(1980,1290),Vector2(80,1260)]
+	for p in trees:
+		draw_texture_rect(TREE_TEX, Rect2(p, Vector2(128,160)), false)
+	# bushes
+	for p in [Vector2(900,1010),Vector2(1490,670),Vector2(1870,640),Vector2(770,382),Vector2(1140,1280)]:
+		draw_circle(p, 25, Color("#4a8f45"))
+		draw_circle(p+Vector2(-17,-4), 18, Color("#5ca553"))
+		draw_circle(p+Vector2(16,-9), 19, Color("#68b05c"))
+		draw_circle(p+Vector2(2,-16), 4, Color("#f3ce73"))
+	# flower lane near town
+	for i in range(8):
+		var fp := Vector2(1160 + i*100, 752 + (i%2)*8)
+		draw_rect(Rect2(fp+Vector2(-1,4), Vector2(3,9)), Color("#3b7b3f"), true)
+		draw_circle(fp, 5, Color("#f2d75d") if i%2 == 0 else Color("#f19bb0"))
+	# benches
+	_draw_bench(Vector2(1500, 1030))
+	_draw_bench(Vector2(1880, 700))
+
+func _draw_bench(p: Vector2) -> void:
+	draw_rect(Rect2(p, Vector2(76,10)), Color("#80573b"), true)
+	draw_rect(Rect2(p+Vector2(4,13), Vector2(68,8)), Color("#9c6b45"), true)
+	draw_rect(Rect2(p+Vector2(10,20), Vector2(7,18)), Color("#64452f"), true)
+	draw_rect(Rect2(p+Vector2(59,20), Vector2(7,18)), Color("#64452f"), true)
 
 func _draw_shipping_bin() -> void:
-	draw_rect(Rect2(SHIPPING_BIN-Vector2(38,28), Vector2(76,56)), Color("#8a5d36"), true)
-	draw_rect(Rect2(SHIPPING_BIN-Vector2(44,34), Vector2(88,12)), Color("#644328"), true)
-	draw_string(ThemeDB.fallback_font, SHIPPING_BIN + Vector2(-34,48), "SHIP", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#3e3228"))
-
-func _draw_decorations() -> void:
-	for p in [Vector2(75,90),Vector2(690,120),Vector2(900,220),Vector2(2030,470),Vector2(790,1220),Vector2(1460,1250),Vector2(2020,1330)]:
-		_draw_tree(p)
-	for p in [Vector2(930,1030),Vector2(1500,690),Vector2(1870,650),Vector2(760,410)]:
-		draw_circle(p, 24, Color("#5d9945"))
-		draw_circle(p+Vector2(-17,-3), 18, Color("#66aa4e"))
-		draw_circle(p+Vector2(16,-8), 19, Color("#70b657"))
-	for x in range(1160, 2050, 180):
-		draw_circle(Vector2(x, 760), 5, Color("#f2d85a"))
-		draw_circle(Vector2(x+8, 766), 4, Color("#f4a7bd"))
-
-func _draw_tree(p: Vector2) -> void:
-	draw_rect(Rect2(p+Vector2(-9,25),Vector2(18,48)), Color("#765039"), true)
-	draw_circle(p, 43, Color("#2f783d"))
-	draw_circle(p+Vector2(-28,9), 30, Color("#3d8d48"))
-	draw_circle(p+Vector2(25,7), 32, Color("#44994d"))
-	draw_circle(p+Vector2(4,-28), 29, Color("#4ba254"))
+	draw_rect(Rect2(SHIPPING_BIN-Vector2(42,31), Vector2(84,62)), Color("#805334"), true)
+	draw_rect(Rect2(SHIPPING_BIN-Vector2(47,37), Vector2(94,13)), Color("#553b29"), true)
+	draw_rect(Rect2(SHIPPING_BIN-Vector2(32,18), Vector2(64,6)), Color("#a46f44"), true)
+	draw_string(ThemeDB.fallback_font, SHIPPING_BIN + Vector2(-34,52), "SHIP", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("#403328"))
 
 func _npc_position(base: Vector2, phase_offset: float) -> Vector2:
-	return base + Vector2(sin(npc_phase * 0.55 + phase_offset) * 34.0, cos(npc_phase * 0.42 + phase_offset) * 18.0)
+	return base + Vector2(sin(npc_phase * 0.55 + phase_offset) * 28.0, cos(npc_phase * 0.42 + phase_offset) * 13.0)
 
-func _draw_npc(p: Vector2, shirt: Color, label: String) -> void:
-	_draw_custom_ellipse(p+Vector2(0,18), Vector2(22,8), Color(0,0,0,0.18))
-	draw_rect(Rect2(p+Vector2(-14,-8), Vector2(28,34)), shirt, true)
-	draw_circle(p+Vector2(0,-22), 14, Color("#efc29e"))
-	draw_arc(p+Vector2(0,-27), 14, PI, TAU, 16, Color("#51382d"), 6)
-	draw_string(ThemeDB.fallback_font, p+Vector2(-28,48), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("#2e342b"))
+func _draw_npc(p: Vector2, shirt: Color, hair: Color, label: String) -> void:
+	var bob := sin(npc_phase * 3.0 + p.x * 0.01) * 1.3
+	_draw_pixel_ellipse(p+Vector2(0,23), Vector2(20,7), Color(0,0,0,0.18))
+	draw_rect(Rect2(p+Vector2(-13,-5+bob), Vector2(26,31)), shirt, true)
+	draw_rect(Rect2(p+Vector2(-11,22+bob), Vector2(8,15)), Color("#4a5570"), true)
+	draw_rect(Rect2(p+Vector2(3,22+bob), Vector2(8,15)), Color("#4a5570"), true)
+	draw_rect(Rect2(p+Vector2(-19,0+bob), Vector2(6,19)), Color("#efc39e"), true)
+	draw_rect(Rect2(p+Vector2(13,0+bob), Vector2(6,19)), Color("#efc39e"), true)
+	draw_rect(Rect2(p+Vector2(-14,-31+bob), Vector2(28,27)), Color("#efc39e"), true)
+	draw_rect(Rect2(p+Vector2(-16,-36+bob), Vector2(32,10)), hair, true)
+	draw_rect(Rect2(p+Vector2(-12,-39+bob), Vector2(23,6)), hair.lightened(0.06), true)
+	draw_rect(Rect2(p+Vector2(-7,-20+bob), Vector2(3,3)), Color("#2f2925"), true)
+	draw_rect(Rect2(p+Vector2(5,-20+bob), Vector2(3,3)), Color("#2f2925"), true)
+	draw_string(ThemeDB.fallback_font, p+Vector2(-27,55), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("#263228"))
 
-func _draw_custom_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+func _draw_pixel_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
-	for i in range(24):
-		var a := TAU * float(i) / 24.0
+	for i in range(20):
+		var a := TAU * float(i) / 20.0
 		points.append(center + Vector2(cos(a)*radii.x, sin(a)*radii.y))
 	draw_colored_polygon(points, color)
+
+func _tile_texture_in_rect(texture: Texture2D, rect: Rect2, step: int) -> void:
+	var start_x := int(rect.position.x)
+	var start_y := int(rect.position.y)
+	var end_x := int(rect.end.x)
+	var end_y := int(rect.end.y)
+	for y in range(start_y, end_y, step):
+		for x in range(start_x, end_x, step):
+			var w := minf(float(step), rect.end.x - float(x))
+			var h := minf(float(step), rect.end.y - float(y))
+			if w > 0.0 and h > 0.0:
+				draw_texture_rect(texture, Rect2(float(x), float(y), w, h), false)
+
+func _draw_weather_fx() -> void:
+	if weather == "Cloudy":
+		draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color(0.45,0.52,0.55,0.08), true)
+	elif weather == "Rain":
+		draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color(0.20,0.30,0.40,0.10), true)
+		var fall := fmod(npc_phase * 220.0, 80.0)
+		for y in range(-80, int(WORLD_SIZE.y), 80):
+			for x in range(20, int(WORLD_SIZE.x), 120):
+				var rp := Vector2(float(x) + fmod(float(y), 70.0), float(y) + fall)
+				draw_line(rp, rp+Vector2(-7,18), Color(0.72,0.86,0.96,0.42), 2.0)
 
 func _draw_daylight_overlay() -> void:
 	var hour := float(time_of_day) / 60.0
 	var alpha := 0.0
 	if hour >= 19.0:
-		alpha = clampf((hour - 19.0) / 4.0, 0.0, 0.48)
+		alpha = clampf((hour - 19.0) / 4.0, 0.0, 0.46)
 	elif hour < 7.0:
-		alpha = clampf((7.0 - hour) / 1.5, 0.0, 0.35)
+		alpha = clampf((7.0 - hour) / 1.5, 0.0, 0.34)
 	if alpha > 0.0:
 		draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color(0.08,0.12,0.26,alpha), true)
