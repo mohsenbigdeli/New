@@ -20,7 +20,7 @@ var inventory_label: Label
 var message_label: Label
 var quest_label: Label
 var tool_buttons: Array[Button] = []
-var joystick: VirtualJoystick
+var joystick: FarmJoystick
 var toast_panel: Panel
 var toast_timer := 0.0
 
@@ -172,7 +172,7 @@ func _build_hotbar() -> void:
 		tool_buttons.append(b)
 
 func _build_mobile_controls() -> void:
-	joystick = VirtualJoystick.new()
+	joystick = FarmJoystick.new()
 	joystick.position = Vector2(22,545)
 	joystick.size = Vector2(154,154)
 	add_child(joystick)
