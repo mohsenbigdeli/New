@@ -36,8 +36,8 @@ func break_rock(index: int) -> Dictionary:
 	if bool(rocks[index].get("broken",false)):
 		return {}
 	rocks[index]["broken"] = true
-	var stone := 1 + (randi() % 3)
-	var copper := 1 if (randi() % 100) < 38 else 0
+	var stone: int = 1 + (randi() % 3)
+	var copper: int = 1 if (randi() % 100) < 38 else 0
 	if int(rocks[index].get("variant",0)) == 2 and (randi() % 100) < 45:
 		copper += 1
 	queue_redraw()
@@ -70,8 +70,8 @@ func _draw() -> void:
 			_draw_rock(ROCK_POINTS[i], int(rocks[i].get("variant",0)))
 
 func _draw_rock(pos: Vector2, variant: int) -> void:
-	draw_ellipse(pos + Vector2(7,18), Vector2(43,15), Color(0,0,0,0.25))
-	var base := Color("#636168") if variant != 2 else Color("#70645f")
+	_draw_custom_ellipse(pos + Vector2(7,18), Vector2(43,15), Color(0,0,0,0.25))
+	var base: Color = Color("#636168") if variant != 2 else Color("#70645f")
 	draw_circle(pos,34,base)
 	draw_circle(pos+Vector2(-20,8),20,base.darkened(0.06))
 	draw_circle(pos+Vector2(18,4),24,base.lightened(0.04))
@@ -85,7 +85,7 @@ func _draw_rubble(pos: Vector2) -> void:
 	for p in [Vector2(-18,7),Vector2(0,11),Vector2(19,5),Vector2(-5,-3)]:
 		draw_circle(pos+p,8,Color("#4e4c51"))
 
-func draw_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+func _draw_custom_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
 	var pts := PackedVector2Array()
 	for i in range(24):
 		var a := TAU * float(i) / 24.0
