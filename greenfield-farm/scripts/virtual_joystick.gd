@@ -1,5 +1,5 @@
 extends Control
-class_name VirtualJoystick
+class_name FarmJoystick
 
 signal vector_changed(direction: Vector2)
 
@@ -50,8 +50,8 @@ func force_release() -> void:
 	_reset()
 
 func _update_from_point(point: Vector2) -> void:
-	var center := size * 0.5
-	var offset := point - center
+	var center: Vector2 = size * 0.5
+	var offset: Vector2 = point - center
 	if offset.length() > radius:
 		offset = offset.normalized() * radius
 	knob_position = center + offset
@@ -68,17 +68,15 @@ func _reset() -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var center := size * 0.5
-	# soft outer shadow
+	var center: Vector2 = size * 0.5
 	draw_circle(center + Vector2(0, 5), radius + 13.0, Color(0.07, 0.05, 0.03, 0.20))
 	draw_circle(center, radius + 10.0, Color(0.18, 0.13, 0.09, 0.48))
 	draw_circle(center, radius + 4.0, Color(0.78, 0.66, 0.46, 0.32))
 	draw_circle(center, radius, Color(0.18, 0.26, 0.14, 0.50))
-	# four subtle direction ticks
-	for v in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
-		var p := center + v * 42.0
+	var directions: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
+	for v: Vector2 in directions:
+		var p: Vector2 = center + v * 42.0
 		draw_circle(p, 3.5, Color(1, 0.94, 0.76, 0.42))
-	# knob
 	draw_circle(knob_position + Vector2(0, 3), knob_radius + 3.0, Color(0.05, 0.04, 0.03, 0.28))
 	draw_circle(knob_position, knob_radius + 2.0, Color(0.92, 0.79, 0.53, 0.88))
 	draw_circle(knob_position, knob_radius - 4.0, Color(0.34, 0.48, 0.25, 0.96))
