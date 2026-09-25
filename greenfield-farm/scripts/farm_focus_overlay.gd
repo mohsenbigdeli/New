@@ -26,16 +26,17 @@ func clear_target() -> void:
 func _draw() -> void:
 	if not target_valid:
 		return
-	var pos := FarmWorld.ORIGIN + Vector2(target_cell.x * FarmWorld.TILE_SIZE + 4, target_cell.y * FarmWorld.TILE_SIZE + 4)
-	var rect := Rect2(pos, Vector2(FarmWorld.TILE_SIZE - 8, FarmWorld.TILE_SIZE - 8))
-	var accent := _tool_color(selected_tool)
+	var pos: Vector2 = FarmWorld.ORIGIN + Vector2(target_cell.x * FarmWorld.TILE_SIZE + 4, target_cell.y * FarmWorld.TILE_SIZE + 4)
+	var rect: Rect2 = Rect2(pos, Vector2(FarmWorld.TILE_SIZE - 8, FarmWorld.TILE_SIZE - 8))
+	var accent: Color = _tool_color(selected_tool)
 	draw_rect(rect, Color(accent, 0.10), true)
 	draw_rect(rect, Color(accent, 0.82), false, 3.0)
-	var pulse := 0.42 + 0.18 * sin(Time.get_ticks_msec() * 0.006)
-	var center := rect.get_center()
-	for corner in [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]:
-		var dir := (center - corner).normalized()
-		draw_line(corner, corner + dir * 12.0, Color(accent, pulse), 4.0)
+	var pulse: float = 0.42 + 0.18 * sin(Time.get_ticks_msec() * 0.006)
+	var center: Vector2 = rect.get_center()
+	var corners: Array[Vector2] = [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]
+	for corner: Vector2 in corners:
+		var direction: Vector2 = (center - corner).normalized()
+		draw_line(corner, corner + direction * 12.0, Color(accent, pulse), 4.0)
 
 func _tool_color(index: int) -> Color:
 	match index:
