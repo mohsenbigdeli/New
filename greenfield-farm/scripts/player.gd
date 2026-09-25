@@ -8,7 +8,7 @@ const TEX_UP: Texture2D = preload("res://assets/art/player_up.svg")
 const TEX_LEFT: Texture2D = preload("res://assets/art/player_left.svg")
 const TEX_RIGHT: Texture2D = preload("res://assets/art/player_right.svg")
 
-var speed := 300.0
+var speed := 285.0
 var facing := Vector2.DOWN
 var virtual_move := Vector2.ZERO
 var can_act := true
@@ -18,27 +18,30 @@ var walk_time := 0.0
 var is_walking := false
 var character_sprite: Sprite2D
 var action_flash := 0.0
+var equipped_tool := 0
 
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
 	var capsule := CapsuleShape2D.new()
-	capsule.radius = 15
-	capsule.height = 42
+	capsule.radius = 17
+	capsule.height = 46
 	shape.shape = capsule
-	shape.position = Vector2(0, 10)
+	shape.position = Vector2(0, 13)
 	add_child(shape)
 
 	character_sprite = Sprite2D.new()
 	character_sprite.texture = TEX_DOWN
 	character_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	character_sprite.position = Vector2(0, -6)
+	character_sprite.position = Vector2(0, -10)
 	character_sprite.z_index = 2
+	character_sprite.scale = Vector2(1.30, 1.30)
 	add_child(character_sprite)
 
 	var camera := Camera2D.new()
 	camera.enabled = true
 	camera.position_smoothing_enabled = true
-	camera.position_smoothing_speed = 7.5
+	camera.position_smoothing_speed = 8.5
+	camera.zoom = Vector2(1.16, 1.16)
 	camera.limit_left = 0
 	camera.limit_top = 0
 	camera.limit_right = int(world_size.x)
@@ -64,14 +67,14 @@ func _physics_process(delta: float) -> void:
 	if is_walking:
 		dir = dir.normalized()
 		facing = dir
-		walk_time += delta * 10.0
+		walk_time += delta * 9.0
 	else:
 		walk_time = 0.0
 
 	velocity = dir * speed
 	move_and_slide()
-	position.x = clamp(position.x, 36.0, world_size.x - 36.0)
-	position.y = clamp(position.y, 50.0, world_size.y - 42.0)
+	position.x = clamp(position.x, 42.0, world_size.x - 42.0)
+	position.y = clamp(position.y, 56.0, world_size.y - 48.0)
 	_update_sprite()
 	queue_redraw()
 
@@ -82,16 +85,19 @@ func _update_sprite() -> void:
 		character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
 	else:
 		character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
+
 	var bob := 0.0
 	var sway := 0.0
 	if is_walking:
-		bob = absf(sin(walk_time)) * 2.0
-		sway = sin(walk_time) * 0.025
-	character_sprite.position = Vector2(0, -6 - bob)
+		bob = absf(sin(walk_time)) * 3.0
+		sway = sin(walk_time) * 0.022
+	character_sprite.position = Vector2(0, -10 - bob)
 	character_sprite.rotation = sway
-	character_sprite.scale = Vector2(1.05, 1.05)
+	character_sprite.scale = Vector2(1.30, 1.30)
 	if action_flash > 0.0:
-		character_sprite.scale = Vector2(1.10, 0.98)
+		var t := action_flash / 0.22
+		character_sprite.scale = Vector2(1.34 + 0.05*(1.0-t), 1.24)
+		character_sprite.rotation += sin(t * PI) * 0.06 * signf(facing.x if absf(facing.x) > 0.2 else 1.0)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if controls_locked:
@@ -104,7 +110,7 @@ func set_virtual_move(dir: Vector2) -> void:
 	if controls_locked:
 		virtual_move = Vector2.ZERO
 	else:
-		virtual_move = dir
+		virtual_move = dir.limit_length(1.0)
 
 func set_controls_locked(locked: bool) -> void:
 	controls_locked = locked
@@ -112,28 +118,58 @@ func set_controls_locked(locked: bool) -> void:
 		virtual_move = Vector2.ZERO
 		velocity = Vector2.ZERO
 
+func set_equipped_tool(index: int) -> void:
+	equipped_tool = clampi(index, 0, 5)
+
 func request_action() -> void:
 	if not can_act or controls_locked:
 		return
-	action_flash = 0.16
-	action_requested.emit(position + facing.normalized() * 62.0)
+	action_flash = 0.22
+	action_requested.emit(position + facing.normalized() * 67.0)
+	queue_redraw()
 	can_act = false
-	await get_tree().create_timer(0.16).timeout
+	await get_tree().create_timer(0.20).timeout
 	can_act = true
 
 func _draw() -> void:
-	# soft contact shadow and action target marker
-	_draw_shadow(Vector2(0, 28), Vector2(22, 7), Color(0,0,0,0.20))
-	var marker_alpha := 0.66 if action_flash > 0.0 else 0.30
-	draw_circle(facing.normalized()*37.0 + Vector2(0,5), 3.5, Color(1,1,1,marker_alpha))
+	_draw_shadow(Vector2(0, 32), Vector2(28, 9), Color(0,0,0,0.24))
+	var marker_alpha := 0.62 if action_flash > 0.0 else 0.20
+	var target := facing.normalized()*43.0 + Vector2(0,7)
+	draw_circle(target, 4.0, Color(1,0.95,0.75,marker_alpha))
 	if action_flash > 0.0:
-		var hand := facing.normalized() * 28.0 + Vector2(0,-4)
-		draw_line(hand, hand + facing.normalized()*22.0, Color("#d9b66f"), 5.0)
-		draw_circle(hand + facing.normalized()*23.0, 6.0, Color("#c3a263"))
+		_draw_tool_action()
+
+func _draw_tool_action() -> void:
+	var d := facing.normalized()
+	var side := Vector2(-d.y, d.x)
+	var hand := d * 25.0 + Vector2(0,-7)
+	match equipped_tool:
+		0:
+			# hoe swing
+			draw_line(hand - d*7.0, hand + d*32.0, Color("#8b633f"), 6.0)
+			draw_line(hand + d*31.0 - side*12.0, hand + d*31.0 + side*12.0, Color("#b9b2a0"), 7.0)
+		1,2,3:
+			# seed scatter
+			for i in range(4):
+				var spread := side * float(i-1.5) * 7.0
+				draw_circle(hand + d*(25.0 + i*5.0) + spread, 3.0, Color("#d6b567"))
+		4:
+			# watering can and droplets
+			draw_rect(Rect2(hand + d*8.0 - Vector2(10,8), Vector2(20,16)), Color("#6fa8ba"), true)
+			draw_line(hand + d*17.0, hand + d*31.0 + side*7.0, Color("#94c7d5"), 5.0)
+			for i in range(3):
+				draw_circle(hand + d*(36.0 + i*7.0) + side*float(i-1)*6.0, 3.2, Color(0.55,0.82,0.95,0.85))
+		5:
+			# harvest sparkle
+			for i in range(4):
+				var a := TAU * float(i) / 4.0
+				var p := hand + d*34.0 + Vector2(cos(a),sin(a))*13.0
+				draw_line(p-Vector2(4,0), p+Vector2(4,0), Color("#ffe27a"), 2.5)
+				draw_line(p-Vector2(0,4), p+Vector2(0,4), Color("#ffe27a"), 2.5)
 
 func _draw_shadow(center: Vector2, radii: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
-	for i in range(20):
-		var a := TAU * float(i) / 20.0
+	for i in range(24):
+		var a := TAU * float(i) / 24.0
 		points.append(center + Vector2(cos(a)*radii.x, sin(a)*radii.y))
 	draw_colored_polygon(points, color)
