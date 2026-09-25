@@ -34,6 +34,7 @@ func _ready() -> void:
 	player.world_size = FarmWorld.WORLD_SIZE
 	add_child(player)
 	player.action_requested.connect(_on_player_action)
+	player.set_equipped_tool(selected_tool)
 
 	ui = GameUI.new()
 	ui.name = "GameUI"
@@ -47,7 +48,7 @@ func _ready() -> void:
 	ui.sell_all_pressed.connect(_sell_all_produce)
 	ui.close_shop_pressed.connect(_close_shop)
 
-	ui.show_message("Welcome to Greenfield. Explore the town, meet Rowan, and build your farm.")
+	ui.show_message("Welcome to Greenfield. Explore the town and grow your farm.")
 	_update_ui()
 
 func _process(delta: float) -> void:
@@ -69,6 +70,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _select_tool(index: int) -> void:
 	selected_tool = clampi(index, 0, 5)
+	player.set_equipped_tool(selected_tool)
 	var names := ["Hoe", "Turnip Seeds", "Carrot Seeds", "Corn Seeds", "Watering Can", "Harvest"]
 	ui.show_message("%s selected." % names[selected_tool])
 	_update_ui()
@@ -84,7 +86,7 @@ func _on_player_action(target_position: Vector2) -> void:
 
 	var cell := farm.world_to_cell(target_position)
 	if not farm.is_valid_cell(cell):
-		ui.show_message("Nothing to use here. Walk closer to a field tile or town location.")
+		ui.show_message("Walk closer to a field tile or town location.")
 		return
 	if energy <= 0:
 		ui.show_message("You're exhausted. Go to the farmhouse and sleep.")
@@ -144,7 +146,7 @@ func _handle_interaction(data: Dictionary) -> void:
 			player.set_controls_locked(true)
 		"home":
 			if minute_of_day < 17 * 60:
-				ui.show_message("It's still early. You can sleep now, but the whole day will pass.")
+				ui.show_message("It's still early. Sleeping will pass the whole day.")
 			_start_next_day(false)
 		"shipping":
 			_sell_all_produce()
@@ -156,15 +158,15 @@ func _talk_to_npc(id: String) -> void:
 		"mayor":
 			if not quest_started:
 				quest_started = true
-				ui.show_message("Rowan: Welcome! Harvest 5 turnips and I'll pay you 300g.")
+				ui.show_message("Rowan: Harvest 5 turnips and I'll pay you 300g.")
 			elif quest_complete:
 				ui.show_message("Rowan: Greenfield is already looking better. Great work!")
 			else:
-				ui.show_message("Rowan: Bring in 5 turnips. Progress: %d/5." % quest_turnips)
+				ui.show_message("Rowan: Turnip progress %d/5." % quest_turnips)
 		"lina":
-			ui.show_message("Lina: Carrots take longer than turnips, but they sell for more.")
+			ui.show_message("Lina: Carrots take longer, but sell for more.")
 		"marnie":
-			ui.show_message("Marnie: Rain waters every tilled plot overnight. Save your energy when it rains!")
+			ui.show_message("Marnie: Rain waters tilled plots overnight.")
 	_update_ui()
 
 func _buy_seed(crop: String) -> void:
@@ -249,7 +251,7 @@ func save_game() -> void:
 
 func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
-		ui.show_message("No v0.2 save file yet.")
+		ui.show_message("No save file yet.")
 		return
 	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	var parsed = JSON.parse_string(f.get_as_text())
@@ -264,6 +266,7 @@ func load_game() -> void:
 	energy = int(parsed.get("energy", 100))
 	minute_of_day = int(parsed.get("minute", 360))
 	selected_tool = int(parsed.get("selected", 0))
+	player.set_equipped_tool(selected_tool)
 	quest_started = bool(parsed.get("quest_started", false))
 	quest_complete = bool(parsed.get("quest_complete", false))
 	quest_turnips = int(parsed.get("quest_turnips", 0))
