@@ -28,8 +28,9 @@ func _set_room_state(room: String) -> void:
 
 func _apply_v10_ui_skin() -> void:
 	# Replace prototype hotbar letters with hand-drawn game icons.
-	for i in range(mini(ui.tool_buttons.size(), TOOL_ICONS.size())):
-		var b := ui.tool_buttons[i]
+	var tool_count: int = mini(ui.tool_buttons.size(), TOOL_ICONS.size())
+	for i in range(tool_count):
+		var b: Button = ui.tool_buttons[i]
 		b.icon = TOOL_ICONS[i]
 		b.text = ""
 		b.expand_icon = false
@@ -49,10 +50,13 @@ func _apply_v10_ui_skin() -> void:
 		_reskin_buttons(fishing_panel)
 
 func _reskin_buttons(root: Node) -> void:
-	for child in root.get_children():
+	for child_variant in root.get_children():
+		var child: Node = child_variant as Node
+		if not child:
+			continue
 		if child is Button:
-			var b := child as Button
-			if b not in ui.tool_buttons:
+			var b: Button = child as Button
+			if not ui.tool_buttons.has(b):
 				b.add_theme_stylebox_override("normal", _button_box(Color("#59402fef"), Color("#b98b50"), 10, 2))
 				b.add_theme_stylebox_override("hover", _button_box(Color("#71523bec"), Color("#e0bb76"), 10, 2))
 				b.add_theme_stylebox_override("pressed", _button_box(Color("#3e2f26f2"), Color("#f4d795"), 10, 3))
@@ -62,7 +66,7 @@ func _reskin_buttons(root: Node) -> void:
 		_reskin_buttons(child)
 
 func _button_box(fill: Color, border: Color, radius: int, border_width: int) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
+	var s: StyleBoxFlat = StyleBoxFlat.new()
 	s.bg_color = fill
 	s.border_color = border
 	s.set_border_width_all(border_width)
