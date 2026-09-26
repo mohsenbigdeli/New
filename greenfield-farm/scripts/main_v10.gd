@@ -19,7 +19,7 @@ func _ready() -> void:
 	visual_polish.setup(farm)
 	visual_polish.set_active(interiors.active_room == "outside")
 	_apply_v10_ui_skin()
-	ui.show_message("v1.0 Visual Overhaul: new terrain, water, trees, buildings, farmer art, NPC polish and icon-based controls.")
+	ui.show_message("v1.1 Art Pass: ultrawide view, compact HUD, refined farmer and denser countryside.")
 
 func _set_room_state(room: String) -> void:
 	super._set_room_state(room)
@@ -27,19 +27,16 @@ func _set_room_state(room: String) -> void:
 		visual_polish.set_active(room == "outside")
 
 func _apply_v10_ui_skin() -> void:
-	# Replace prototype hotbar letters with hand-drawn game icons.
 	var tool_count: int = mini(ui.tool_buttons.size(), TOOL_ICONS.size())
 	for i in range(tool_count):
 		var b: Button = ui.tool_buttons[i]
 		b.icon = TOOL_ICONS[i]
 		b.text = ""
 		b.expand_icon = false
-		b.add_theme_constant_override("icon_max_width", 34)
-		b.add_theme_stylebox_override("normal", _button_box(Color("#4c382bdd"), Color("#cda465"), 10, 2))
-		b.add_theme_stylebox_override("hover", _button_box(Color("#624735ee"), Color("#efd18d"), 10, 2))
-		b.add_theme_stylebox_override("pressed", _button_box(Color("#35271fee"), Color("#fff0b4"), 10, 3))
-
-	# Give all direct mobile/menu buttons a deeper, less prototype-looking surface.
+		b.add_theme_constant_override("icon_max_width", 29)
+		b.add_theme_stylebox_override("normal", _button_box(Color("#45362bdd"), Color("#b9915a"), 9, 2))
+		b.add_theme_stylebox_override("hover", _button_box(Color("#5a4535ee"), Color("#efd18d"), 9, 2))
+		b.add_theme_stylebox_override("pressed", _button_box(Color("#30261fee"), Color("#fff0b4"), 9, 3))
 	_reskin_buttons(ui)
 	_reskin_buttons(inventory_ui)
 	if animal_panel:
@@ -57,9 +54,9 @@ func _reskin_buttons(root: Node) -> void:
 		if child is Button:
 			var b: Button = child as Button
 			if not ui.tool_buttons.has(b):
-				b.add_theme_stylebox_override("normal", _button_box(Color("#59402fef"), Color("#b98b50"), 10, 2))
-				b.add_theme_stylebox_override("hover", _button_box(Color("#71523bec"), Color("#e0bb76"), 10, 2))
-				b.add_theme_stylebox_override("pressed", _button_box(Color("#3e2f26f2"), Color("#f4d795"), 10, 3))
+				b.add_theme_stylebox_override("normal", _button_box(Color("#514033e8"), Color("#ae8956"), 9, 2))
+				b.add_theme_stylebox_override("hover", _button_box(Color("#66503bec"), Color("#e0bb76"), 9, 2))
+				b.add_theme_stylebox_override("pressed", _button_box(Color("#392e27f2"), Color("#f4d795"), 9, 3))
 				b.add_theme_color_override("font_color", Color("#fff0d0"))
 				b.add_theme_color_override("font_hover_color", Color.WHITE)
 				b.add_theme_color_override("font_pressed_color", Color.WHITE)
@@ -74,6 +71,6 @@ func _button_box(fill: Color, border: Color, radius: int, border_width: int) -> 
 	s.corner_radius_top_right = radius
 	s.corner_radius_bottom_left = radius
 	s.corner_radius_bottom_right = radius
-	s.shadow_color = Color(0.05,0.03,0.02,0.38)
-	s.shadow_size = 5
+	s.shadow_color = Color(0.05,0.03,0.02,0.32)
+	s.shadow_size = 4
 	return s
