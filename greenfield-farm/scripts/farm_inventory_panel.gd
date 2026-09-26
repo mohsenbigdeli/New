@@ -35,6 +35,15 @@ func _ready() -> void:
 	layer = 14
 	_build_bag_button()
 	_build_panel()
+	get_viewport().size_changed.connect(_layout_for_viewport)
+	call_deferred("_layout_for_viewport")
+
+func _layout_for_viewport() -> void:
+	var view_size: Vector2 = get_viewport().get_visible_rect().size
+	if bag_button:
+		bag_button.position = Vector2(view_size.x-74.0,47.0)
+	if panel:
+		panel.position = Vector2((view_size.x-panel.size.x)*0.5,(view_size.y-panel.size.y)*0.5)
 
 func _style_box(fill: Color, border: Color, radius: int = 12, width: int = 2) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -72,15 +81,14 @@ func _label(parent: Node, pos: Vector2, size: Vector2, text: String, font_size: 
 func _build_bag_button() -> void:
 	bag_button = Button.new()
 	bag_button.text = "BAG"
-	bag_button.position = Vector2(1192,58)
-	bag_button.size = Vector2(70,38)
+	bag_button.size = Vector2(62,30)
 	_style_button(bag_button, Color("#6f8650"))
+	bag_button.add_theme_font_size_override("font_size",10)
 	add_child(bag_button)
 	bag_button.pressed.connect(_on_bag_pressed)
 
 func _build_panel() -> void:
 	panel = Panel.new()
-	panel.position = Vector2(286,24)
 	panel.size = Vector2(708,672)
 	panel.add_theme_stylebox_override("panel", _style_box(Color("#2b2119f2"), Color("#c89b5b"), 18, 3))
 	panel.visible = false
@@ -141,7 +149,7 @@ func _build_panel() -> void:
 		to_bag.pressed.connect(_transfer.bind(key, "to_bag"))
 		right_buttons[key] = to_bag
 
-	var footer := _label(panel, Vector2(28,628), Vector2(650,30), "Farm storage now accepts crops, animal products, fish, ore, stone and bait.", 11, Color("#d6bb8d"))
+	var footer := _label(panel, Vector2(28,628), Vector2(650,30), "Farm storage accepts crops, animal products, fish, ore, stone and bait.", 11, Color("#d6bb8d"))
 	footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _on_bag_pressed() -> void:
