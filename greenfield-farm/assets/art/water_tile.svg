@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-<defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53a9c8"/><stop offset="1" stop-color="#3f87ad"/></linearGradient></defs>
-<rect width="64" height="64" fill="url(#a)"/>
-<path d="M-5 12c10-5 18-4 27 0s16 4 26 0 17-4 26 0" fill="none" stroke="#8fd5e4" stroke-width="3" stroke-linecap="round" opacity=".72"/>
-<path d="M-8 30c9-4 17-4 25 0s15 4 24 0 17-4 26 0" fill="none" stroke="#2f779c" stroke-width="3" stroke-linecap="round" opacity=".38"/>
-<path d="M-6 48c11-4 19-3 28 1 8 3 16 3 25-1s17-4 25 0" fill="none" stroke="#7bc7db" stroke-width="2.2" stroke-linecap="round" opacity=".62"/>
-<path d="M8 20c5 2 10 2 15 0M37 39c5 2 10 2 15 0M16 56c4 1 8 1 12 0" fill="none" stroke="#c9f0f2" stroke-width="1.8" stroke-linecap="round" opacity=".65"/>
-<g fill="#d8f7f4" opacity=".65"><ellipse cx="51" cy="17" rx="2.2" ry="1"/><ellipse cx="9" cy="41" rx="1.8" ry=".8"/><ellipse cx="34" cy="8" rx="1.7" ry=".7"/></g>
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#77c4cf"/><stop offset=".55" stop-color="#5aa9bd"/><stop offset="1" stop-color="#438aa8"/></linearGradient></defs>
+<rect width="64" height="64" fill="url(#w)"/>
+<path d="M0 10c8 3 14 3 22 0s15-3 22 0 13 3 20 0" fill="none" stroke="#d7f1eb" stroke-width="2" opacity=".55"/>
+<path d="M6 26c7 2 12 2 18-1 7-3 13-3 20 0 5 2 10 3 16 1" fill="none" stroke="#c6ebe6" stroke-width="1.8" opacity=".48"/>
+<path d="M0 43c9-3 16-3 25 0 7 2 14 2 21-1 6-2 11-2 18 0" fill="none" stroke="#d8f4ea" stroke-width="2.2" opacity=".42"/>
+<path d="M12 56c8-2 14-1 20 1 8 2 14 2 22-1" fill="none" stroke="#9dd9db" stroke-width="1.5" opacity=".55"/>
+<ellipse cx="15" cy="18" rx="9" ry="3" fill="#d9faf0" opacity=".12"/><ellipse cx="49" cy="35" rx="11" ry="4" fill="#eefdf6" opacity=".09"/>
+<path d="M3 4c6 3 10 3 16 1M39 4c7 3 13 3 21 0" stroke="#ffffff" stroke-width="1.2" opacity=".15" fill="none"/>
 </svg>
