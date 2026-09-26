@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-<defs><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d7bd86"/><stop offset="1" stop-color="#c5a46d"/></linearGradient></defs>
+<defs><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9c28c"/><stop offset="1" stop-color="#b99a67"/></linearGradient></defs>
 <rect width="64" height="64" fill="url(#p)"/>
-<path d="M0 12c13-6 26-4 38-1s19 3 26 0v13c-10 3-20 1-30-2S13 19 0 24z" fill="#e2c995" opacity=".28"/>
-<path d="M0 45c10-3 20-1 31 2 13 4 24 2 33-1v14c-13 3-25 1-36-2S10 56 0 59z" fill="#b48f5d" opacity=".17"/>
-<g fill="#9b794f" opacity=".72"><ellipse cx="9" cy="17" rx="3" ry="2"/><ellipse cx="30" cy="11" rx="2.6" ry="1.6"/><ellipse cx="51" cy="24" rx="3.2" ry="2"/><ellipse cx="18" cy="38" rx="2.4" ry="1.5"/><ellipse cx="43" cy="47" rx="3.3" ry="1.9"/><ellipse cx="58" cy="56" rx="2.3" ry="1.4"/></g>
-<g fill="#ead6aa" opacity=".9"><ellipse cx="22" cy="22" rx="2.2" ry="1.4"/><ellipse cx="39" cy="32" rx="2.8" ry="1.6"/><ellipse cx="11" cy="54" rx="2.6" ry="1.5"/><ellipse cx="55" cy="9" rx="2.1" ry="1.2"/></g>
-<g stroke="#a98858" stroke-width="1" opacity=".45"><path d="M5 30c6 2 12 1 18-1"/><path d="M34 17c7 2 14 2 22 0"/><path d="M27 57c8-2 14-2 23 0"/></g>
-<g fill="#735f43" opacity=".35"><circle cx="5" cy="6" r=".9"/><circle cx="34" cy="39" r=".9"/><circle cx="61" cy="35" r="1"/><circle cx="25" cy="50" r=".8"/></g>
+<path d="M0 9c13 4 20-2 31 1 11 3 21 3 33-1v8c-14 3-24 3-36 0-10-2-18 3-28 0z" fill="#ead9aa" opacity=".32"/>
+<path d="M0 48c12-4 20 2 31-1 11-3 20-2 33 2v15H0z" fill="#92774f" opacity=".12"/>
+<g fill="#8f7b5e" opacity=".55"><ellipse cx="10" cy="18" rx="2.2" ry="1.2"/><ellipse cx="31" cy="8" rx="1.8" ry="1"/><ellipse cx="50" cy="26" rx="2.8" ry="1.4"/><ellipse cx="19" cy="45" rx="2.4" ry="1.2"/><ellipse cx="41" cy="53" rx="1.8" ry="1"/><ellipse cx="60" cy="42" rx="1.4" ry=".8"/></g>
+<g stroke="#f2e5bd" stroke-linecap="round" opacity=".35"><path d="M4 33c7-3 12-3 19-1"/><path d="M33 37c9-2 15-2 24 1"/></g>
+<path d="M7 4l1 5m2-5-1 5M55 59l1-5m2 4-1-5" stroke="#73915b" stroke-width="1.2" opacity=".45"/>
 </svg>
