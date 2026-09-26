@@ -1,13 +1,22 @@
 extends "res://scripts/main_v10.gd"
 
+var plot_polish: FarmPlotPolish
+
 func _ready() -> void:
 	super()
+	plot_polish = FarmPlotPolish.new()
+	plot_polish.name = "PlotPolish"
+	add_child(plot_polish)
+	plot_polish.setup(farm)
+	plot_polish.set_active(interiors.active_room == "outside")
 	_apply_v11_composition()
 	get_viewport().size_changed.connect(_apply_v11_composition)
 	ui.show_message("v1.1 Art Pass: wider framing, compact HUD, smaller touch controls and cleaner composition.")
 
 func _set_room_state(room: String) -> void:
 	super._set_room_state(room)
+	if plot_polish:
+		plot_polish.set_active(room == "outside")
 	if player and player.camera and room == "outside":
 		player.camera.zoom = Vector2(1.05, 1.05)
 		player.camera.reset_smoothing()
