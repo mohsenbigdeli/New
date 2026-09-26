@@ -1,1 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260" shape-rendering="crispEdges"><rect x="35" y="92" width="330" height="142" fill="#e1c67f"/><path d="M18 94L72 34h256l54 60v28H18z" fill="#7f4c36"/><path d="M34 90l48-44h236l48 44z" fill="#9d6142"/><path d="M60 57h280M44 76h312" stroke="#70412e" stroke-width="5" opacity=".55"/><rect x="53" y="110" width="294" height="38" fill="#70472f"/><rect x="64" y="116" width="272" height="26" fill="#f0d59a"/><text x="200" y="136" font-family="sans-serif" font-size="20" text-anchor="middle" fill="#5b3c29" font-weight="700">WILLOW GENERAL STORE</text><rect x="163" y="150" width="74" height="84" fill="#724930"/><rect x="175" y="158" width="50" height="76" fill="#86583a"/><circle cx="213" cy="194" r="5" fill="#e9c567"/><rect x="65" y="158" width="72" height="58" fill="#8bc2d4"/><rect x="263" y="158" width="72" height="58" fill="#8bc2d4"/><path d="M101 158v58M65 187h72M299 158v58M263 187h72" stroke="#f1e1b6" stroke-width="6"/><rect x="18" y="234" width="364" height="13" fill="#89603c"/><rect x="0" y="247" width="400" height="13" fill="#6aa052"/><rect x="20" y="196" width="34" height="38" fill="#8d603d"/><path d="M22 201h30M22 211h30M22 221h30" stroke="#b88655" stroke-width="3"/><circle cx="347" cy="229" r="17" fill="#52974a"/><circle cx="355" cy="222" r="12" fill="#66a958"/><circle cx="350" cy="217" r="4" fill="#f0c66b"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
+<defs>
+ <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e6d6ad"/><stop offset="1" stop-color="#cbb17d"/></linearGradient>
+ <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5f7f61"/><stop offset="1" stop-color="#35563f"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7f2ed"/><stop offset="1" stop-color="#78b0c2"/></linearGradient>
+</defs>
+<ellipse cx="200" cy="246" rx="178" ry="12" fill="#213624" opacity=".23"/>
+<rect x="36" y="88" width="328" height="145" rx="4" fill="url(#wall)"/>
+<path d="M18 94L78 34h244l60 60-9 25H27z" fill="#294d38"/>
+<path d="M28 88L88 42h224l60 46-9 16H39z" fill="url(#roof)"/>
+<g stroke="#86a67b" stroke-width="3" opacity=".5"><path d="M56 78h288"/><path d="M78 62h244"/><path d="M105 46h191"/></g>
+<!-- sign -->
+<rect x="117" y="73" width="166" height="48" rx="8" fill="#6f4b33"/><rect x="124" y="80" width="152" height="34" rx="5" fill="#d7b66e"/><path d="M139 104h123" stroke="#7a5536" stroke-width="3"/><path d="M146 91h108" stroke="#f4dd9e" stroke-width="4" opacity=".7"/>
+<!-- awning -->
+<path d="M55 120h290l-15 34H70z" fill="#f2e1b5"/><g fill="#b75c4f"><path d="M55 120h48l-7 34H70z"/><path d="M151 120h48l-2 34h-43z"/><path d="M247 120h48l7 34h-48z"/></g>
+<!-- front -->
+<rect x="72" y="154" width="86" height="61" rx="3" fill="#684c38"/><rect x="80" y="162" width="70" height="45" fill="url(#glass)"/><path d="M115 162v45M80 184h70" stroke="#f4ead4" stroke-width="4"/>
+<rect x="242" y="154" width="86" height="61" rx="3" fill="#684c38"/><rect x="250" y="162" width="70" height="45" fill="url(#glass)"/><path d="M285 162v45M250 184h70" stroke="#f4ead4" stroke-width="4"/>
+<rect x="164" y="147" width="72" height="86" rx="3" fill="#674330"/><rect x="174" y="157" width="52" height="76" fill="#83573b"/><rect x="181" y="165" width="38" height="28" fill="url(#glass)"/><path d="M200 165v28" stroke="#f6ead2" stroke-width="4"/><circle cx="216" cy="201" r="4.5" fill="#e8c367"/>
+<!-- crates -->
+<g><rect x="47" y="215" width="54" height="26" fill="#8e613d"/><rect x="52" y="219" width="44" height="17" fill="#ad794a"/><circle cx="62" cy="215" r="8" fill="#d9b64e"/><circle cx="78" cy="213" r="8" fill="#7fa957"/><circle cx="91" cy="217" r="7" fill="#c8734b"/>
+<rect x="299" y="215" width="54" height="26" fill="#8e613d"/><rect x="304" y="219" width="44" height="17" fill="#ad794a"/><circle cx="315" cy="214" r="8" fill="#82a956"/><circle cx="331" cy="213" r="8" fill="#d6b449"/><circle cx="343" cy="217" r="7" fill="#b66d62"/></g>
+<rect x="34" y="233" width="332" height="10" fill="#776b5d"/>
+</svg>
