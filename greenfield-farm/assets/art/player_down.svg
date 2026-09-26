@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="88" viewBox="0 0 64 88" shape-rendering="crispEdges"><rect x="20" y="67" width="9" height="16" fill="#44392f"/><rect x="35" y="67" width="9" height="16" fill="#44392f"/><rect x="17" y="40" width="30" height="34" rx="3" fill="#3f7c9b"/><rect x="22" y="38" width="20" height="15" fill="#79a95c"/><rect x="13" y="43" width="7" height="25" fill="#efbd92"/><rect x="44" y="43" width="7" height="25" fill="#efbd92"/><rect x="19" y="19" width="26" height="24" fill="#efbd92"/><rect x="18" y="15" width="28" height="11" fill="#694533"/><rect x="22" y="12" width="20" height="8" fill="#7b5037"/><rect x="13" y="9" width="38" height="7" fill="#d5a54e"/><rect x="18" y="5" width="28" height="7" fill="#e7bb61"/><rect x="24" y="28" width="4" height="4" fill="#302923"/><rect x="36" y="28" width="4" height="4" fill="#302923"/><rect x="29" y="35" width="7" height="3" fill="#b96f61"/><rect x="22" y="48" width="6" height="22" fill="#315f7d"/><rect x="36" y="48" width="6" height="22" fill="#315f7d"/><rect x="27" y="50" width="10" height="12" fill="#6ba1b9"/><rect x="29" y="52" width="6" height="3" fill="#d6c17f"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="88" viewBox="0 0 64 88">
+<defs><linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4f93af"/><stop offset="1" stop-color="#32657f"/></linearGradient></defs>
+<ellipse cx="32" cy="82" rx="18" ry="4" fill="#1b241e" opacity=".25"/>
+<!-- boots/legs --> <path d="M20 63h10l-1 17-10 2zM34 63h10l2 19-11-2z" fill="#4a3a31"/><path d="M18 79h13v5H17zM34 79h13l1 5H34z" fill="#2f2926"/>
+<!-- body --> <path d="M18 39c4-4 9-6 14-6s10 2 14 6l-2 27H20z" fill="url(#shirt)"/><path d="M23 46h18v20H23z" fill="#325d74"/><path d="M27 49h10v11H27z" fill="#6ba8ba"/><path d="M28 51h8v3h-8z" fill="#e4c46d"/>
+<!-- arms --> <path d="M18 42c-4 2-6 6-6 12v13h7l3-22z" fill="#e8b58b"/><path d="M46 42c4 2 6 6 6 12v13h-7l-3-22z" fill="#e8b58b"/>
+<!-- neck/head --> <rect x="28" y="31" width="8" height="8" rx="3" fill="#e5ae84"/><ellipse cx="32" cy="24" rx="15" ry="16" fill="#efbd91"/>
+<!-- hair --> <path d="M18 22c1-12 8-18 15-18 9 0 15 6 15 17-5-5-10-7-16-7s-10 2-14 8z" fill="#634431"/><path d="M19 20c3-6 8-9 13-9s10 3 14 8l-2-8c-4-5-8-7-13-7-7 0-12 5-12 16z" fill="#79513a"/>
+<!-- straw hat --> <ellipse cx="32" cy="10" rx="22" ry="5" fill="#c99443"/><path d="M20 9c1-8 5-9 12-9s12 2 13 9z" fill="#e3b35a"/><path d="M22 7h21" stroke="#f1d184" stroke-width="2"/>
+<!-- face --> <ellipse cx="26" cy="25" rx="2" ry="2.6" fill="#342d29"/><ellipse cx="38" cy="25" rx="2" ry="2.6" fill="#342d29"/><path d="M29 32c2 1 4 1 6 0" fill="none" stroke="#b8685f" stroke-width="2" stroke-linecap="round"/>
+<path d="M21 24c1-2 3-3 5-3M38 21c2 0 4 1 5 3" stroke="#5d4032" stroke-width="1.5" fill="none"/>
+<!-- shirt accents --> <path d="M21 40l6 5M43 40l-6 5" stroke="#86bfd0" stroke-width="2" opacity=".6"/>
+</svg>
