@@ -28,6 +28,13 @@ var joystick: FarmJoystick
 var toast_panel: Panel
 var toast_timer := 0.0
 
+var info_panel: Panel
+var energy_panel: Panel
+var quest_panel: Panel
+var hotbar_panel: Panel
+var save_button: Button
+var load_button: Button
+var action_button: Button
 var shop_panel: Panel
 var shop_money_label: Label
 var shop_inventory_label: Label
@@ -40,6 +47,8 @@ func _ready() -> void:
 	_build_mobile_controls()
 	_build_context_prompt()
 	_build_shop()
+	get_viewport().size_changed.connect(_layout_for_viewport)
+	call_deferred("_layout_for_viewport")
 
 func _process(delta: float) -> void:
 	if toast_timer > 0.0:
@@ -61,7 +70,7 @@ func _panel_style(fill: Color, border: Color, radius: int = 12, border_width: in
 	return style
 
 func _button_style(fill: Color, border: Color, radius: int = 10) -> StyleBoxFlat:
-	var style := _panel_style(fill, border, radius, 2)
+	var style: StyleBoxFlat = _panel_style(fill, border, radius, 2)
 	style.shadow_size = 3
 	return style
 
@@ -85,8 +94,8 @@ func _make_label(parent: Node, pos: Vector2, font_size: int, color := Color("#ff
 	return label
 
 func _style_button(button: Button, accent := Color("#a76c3f"), radius := 10) -> void:
-	button.add_theme_stylebox_override("normal", _button_style(Color("#60442fdd"), Color("#d3a25f"), radius))
-	button.add_theme_stylebox_override("hover", _button_style(Color("#77543aee"), Color("#f0c97e"), radius))
+	button.add_theme_stylebox_override("normal", _button_style(Color("#514031df"), Color("#c49a62"), radius))
+	button.add_theme_stylebox_override("hover", _button_style(Color("#66503bec"), Color("#eed08e"), radius))
 	button.add_theme_stylebox_override("pressed", _button_style(accent.darkened(0.18), Color("#ffe3a8"), radius))
 	button.add_theme_color_override("font_color", Color("#fff3d2"))
 	button.add_theme_color_override("font_hover_color", Color.WHITE)
@@ -96,110 +105,132 @@ func _style_button(button: Button, accent := Color("#a76c3f"), radius := 10) -> 
 	button.add_theme_constant_override("shadow_offset_y", 1)
 
 func _build_compact_hud() -> void:
-	var info := _make_panel(Rect2(16,14,420,78), Color("#2f241bd9"), Color("#b9894d"), 13)
-	var title := _make_label(info, Vector2(14,7), 12, Color("#d9b870"))
+	info_panel = _make_panel(Rect2(12,10,350,58), Color("#2a2119d4"), Color("#b9894d"), 12)
+	var title := _make_label(info_panel, Vector2(12,5), 10, Color("#d9b870"))
 	title.text = "GREENFIELD FARM"
-	day_label = _make_label(info, Vector2(14,27), 19)
-	time_label = _make_label(info, Vector2(128,27), 19)
-	money_label = _make_label(info, Vector2(226,27), 19, Color("#ffd46c"))
-	weather_label = _make_label(info, Vector2(319,27), 15)
-	inventory_label = _make_label(info, Vector2(14,54), 11, Color("#ead7b3"))
-	inventory_label.size = Vector2(395,18)
+	day_label = _make_label(info_panel, Vector2(12,20), 17)
+	time_label = _make_label(info_panel, Vector2(111,20), 17)
+	money_label = _make_label(info_panel, Vector2(199,20), 17, Color("#ffd46c"))
+	weather_label = _make_label(info_panel, Vector2(273,22), 12)
+	inventory_label = _make_label(info_panel, Vector2(12,42), 9, Color("#ead7b3"))
+	inventory_label.size = Vector2(330,14)
 
-	var energy_panel := _make_panel(Rect2(450,14,388,78), Color("#2f241bd9"), Color("#9d7b49"), 13)
-	energy_label = _make_label(energy_panel, Vector2(18,9), 13, Color("#f0d7a2"))
-	shipping_label = _make_label(energy_panel, Vector2(224,9), 12, Color("#f6c96f"))
+	energy_panel = _make_panel(Rect2(372,10,300,58), Color("#2a2119d4"), Color("#907647"), 12)
+	energy_label = _make_label(energy_panel, Vector2(14,6), 10, Color("#f0d7a2"))
+	shipping_label = _make_label(energy_panel, Vector2(212,6), 10, Color("#f6c96f"))
 	energy_bar = ProgressBar.new()
-	energy_bar.position = Vector2(18,36)
-	energy_bar.size = Vector2(352,22)
+	energy_bar.position = Vector2(14,29)
+	energy_bar.size = Vector2(272,17)
 	energy_bar.min_value = 0
 	energy_bar.max_value = 100
 	energy_bar.show_percentage = false
 	var bg := StyleBoxFlat.new()
-	bg.bg_color = Color("#1c1712")
-	bg.corner_radius_top_left = 9
-	bg.corner_radius_top_right = 9
-	bg.corner_radius_bottom_left = 9
-	bg.corner_radius_bottom_right = 9
+	bg.bg_color = Color("#17130f")
+	bg.corner_radius_top_left = 8
+	bg.corner_radius_top_right = 8
+	bg.corner_radius_bottom_left = 8
+	bg.corner_radius_bottom_right = 8
 	energy_fill_style = StyleBoxFlat.new()
 	energy_fill_style.bg_color = Color("#78b85c")
-	energy_fill_style.corner_radius_top_left = 9
-	energy_fill_style.corner_radius_top_right = 9
-	energy_fill_style.corner_radius_bottom_left = 9
-	energy_fill_style.corner_radius_bottom_right = 9
+	energy_fill_style.corner_radius_top_left = 8
+	energy_fill_style.corner_radius_top_right = 8
+	energy_fill_style.corner_radius_bottom_left = 8
+	energy_fill_style.corner_radius_bottom_right = 8
 	energy_bar.add_theme_stylebox_override("background", bg)
 	energy_bar.add_theme_stylebox_override("fill", energy_fill_style)
 	energy_panel.add_child(energy_bar)
 
-	var quest := _make_panel(Rect2(852,14,250,78), Color("#3e2c20dc"), Color("#bd9155"), 13)
-	var qtitle := _make_label(quest, Vector2(12,8), 12, Color("#f3ca79"))
-	qtitle.text = "TOWN REQUEST"
-	quest_label = _make_label(quest, Vector2(12,29), 12, Color("#f3e1c2"))
-	quest_label.size = Vector2(225,40)
+	quest_panel = _make_panel(Rect2(684,10,260,58), Color("#33271dd8"), Color("#a98250"), 12)
+	var qtitle := _make_label(quest_panel, Vector2(11,5), 10, Color("#f3ca79"))
+	qtitle.text = "REQUEST"
+	quest_label = _make_label(quest_panel, Vector2(11,21), 10, Color("#f3e1c2"))
+	quest_label.size = Vector2(238,30)
 	quest_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
-	var save := Button.new()
-	save.text = "SAVE"
-	save.position = Vector2(1115,17)
-	save.size = Vector2(70,36)
-	save.add_theme_font_size_override("font_size",12)
-	_style_button(save)
-	add_child(save)
-	save.pressed.connect(_on_save_button_pressed)
+	save_button = Button.new()
+	save_button.text = "SAVE"
+	save_button.size = Vector2(62,30)
+	save_button.add_theme_font_size_override("font_size",10)
+	_style_button(save_button)
+	add_child(save_button)
+	save_button.pressed.connect(_on_save_button_pressed)
 
-	var load := Button.new()
-	load.text = "LOAD"
-	load.position = Vector2(1192,17)
-	load.size = Vector2(70,36)
-	load.add_theme_font_size_override("font_size",12)
-	_style_button(load)
-	add_child(load)
-	load.pressed.connect(_on_load_button_pressed)
+	load_button = Button.new()
+	load_button.text = "LOAD"
+	load_button.size = Vector2(62,30)
+	load_button.add_theme_font_size_override("font_size",10)
+	_style_button(load_button)
+	add_child(load_button)
+	load_button.pressed.connect(_on_load_button_pressed)
 
-	toast_panel = _make_panel(Rect2(340,104,600,38), Color("#f3dfb4e8"), Color("#795432"), 11)
-	message_label = _make_label(toast_panel, Vector2(15,7), 13, Color("#3e2c1f"))
-	message_label.size = Vector2(570,24)
+	toast_panel = _make_panel(Rect2(360,78,560,32), Color("#f4dfb7e8"), Color("#795432"), 10)
+	message_label = _make_label(toast_panel, Vector2(12,5), 11, Color("#3e2c1f"))
+	message_label.size = Vector2(536,21)
 	message_label.add_theme_color_override("font_shadow_color", Color(1,1,1,0))
 	toast_panel.visible = false
 
 func _build_hotbar() -> void:
-	var names := ["HOE", "TURNIP", "CARROT", "CORN", "WATER", "HARVEST"]
-	var short := ["H", "T", "C", "C", "W", "+"]
-	var p := _make_panel(Rect2(346,651,588,60), Color("#261d17d9"), Color("#aa7d47"), 13)
+	var names: Array[String] = ["HOE", "TURNIP", "CARROT", "CORN", "WATER", "HARVEST"]
+	hotbar_panel = _make_panel(Rect2(403,662,474,50), Color("#211a15cc"), Color("#a57d4d"), 12)
 	for i in range(names.size()):
 		var b := Button.new()
-		b.text = "%s\n%s" % [short[i], names[i]]
-		b.position = Vector2(7 + i*96, 6)
-		b.size = Vector2(90,48)
-		b.add_theme_font_size_override("font_size",11)
+		b.text = names[i]
+		b.position = Vector2(5 + i*78, 5)
+		b.size = Vector2(74,40)
+		b.add_theme_font_size_override("font_size",9)
 		_style_button(b, Color("#9b6a3d"), 9)
 		b.pressed.connect(_on_tool_button_pressed.bind(i))
-		p.add_child(b)
+		hotbar_panel.add_child(b)
 		tool_buttons.append(b)
 
 func _build_mobile_controls() -> void:
 	joystick = FarmJoystick.new()
-	joystick.position = Vector2(22,545)
-	joystick.size = Vector2(154,154)
+	joystick.size = Vector2(126,126)
 	add_child(joystick)
 	joystick.vector_changed.connect(_on_joystick_vector)
 
-	var action := Button.new()
-	action.text = "USE"
-	action.position = Vector2(1140,574)
-	action.size = Vector2(116,116)
-	action.add_theme_font_size_override("font_size",20)
-	_style_button(action, Color("#b66f3f"), 54)
-	action.modulate = Color(1,1,1,0.94)
-	add_child(action)
-	action.pressed.connect(_on_action_button_pressed)
+	action_button = Button.new()
+	action_button.text = "USE"
+	action_button.size = Vector2(88,88)
+	action_button.add_theme_font_size_override("font_size",16)
+	_style_button(action_button, Color("#b66f3f"), 40)
+	action_button.modulate = Color(1,1,1,0.90)
+	add_child(action_button)
+	action_button.pressed.connect(_on_action_button_pressed)
 
 func _build_context_prompt() -> void:
-	context_panel = _make_panel(Rect2(450,607,380,34), Color("#1f1a15c9"), Color("#9d7a4d"), 12)
-	context_label = _make_label(context_panel, Vector2(12,6), 13, Color("#f4e4c2"))
-	context_label.size = Vector2(356,22)
+	context_panel = _make_panel(Rect2(480,621,320,30), Color("#1b1713c4"), Color("#90734c"), 11)
+	context_label = _make_label(context_panel, Vector2(10,5), 11, Color("#f4e4c2"))
+	context_label.size = Vector2(300,20)
 	context_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	context_panel.visible = false
+
+func _layout_for_viewport() -> void:
+	var view_size: Vector2 = get_viewport().get_visible_rect().size
+	var w: float = view_size.x
+	var h: float = view_size.y
+	if info_panel:
+		info_panel.position = Vector2(12,10)
+	if energy_panel:
+		energy_panel.position = Vector2(374,10)
+	if quest_panel:
+		quest_panel.position = Vector2(maxf(688.0, w - 446.0),10)
+	if save_button:
+		save_button.position = Vector2(w-142.0,11.0)
+	if load_button:
+		load_button.position = Vector2(w-74.0,11.0)
+	if toast_panel:
+		toast_panel.position = Vector2((w-toast_panel.size.x)*0.5,76.0)
+	if hotbar_panel:
+		hotbar_panel.position = Vector2((w-hotbar_panel.size.x)*0.5,h-hotbar_panel.size.y-8.0)
+	if joystick:
+		joystick.position = Vector2(18.0,h-144.0)
+	if action_button:
+		action_button.position = Vector2(w-108.0,h-112.0)
+	if context_panel:
+		context_panel.position = Vector2((w-context_panel.size.x)*0.5,h-96.0)
+	if shop_panel:
+		shop_panel.position = Vector2((w-shop_panel.size.x)*0.5,(h-shop_panel.size.y)*0.5)
 
 func _build_shop() -> void:
 	shop_panel = Panel.new()
@@ -311,10 +342,7 @@ func close_shop() -> void:
 
 func refresh_shop(current_money: int, seed_prices: Dictionary, sell_prices: Dictionary, produce: Dictionary) -> void:
 	shop_money_label.text = "%dg" % current_money
-	shop_inventory_label.text = "Harvest  Turnip %d   Carrot %d   Corn %d\nSell      %dg        %dg        %dg" % [
-		int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0)),
-		int(sell_prices.get("turnip",0)), int(sell_prices.get("carrot",0)), int(sell_prices.get("corn",0))
-	]
+	shop_inventory_label.text = "Harvest  Turnip %d   Carrot %d   Corn %d\nSell      %dg        %dg        %dg" % [int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0)), int(sell_prices.get("turnip",0)), int(sell_prices.get("carrot",0)), int(sell_prices.get("corn",0))]
 	for crop in ["turnip","carrot","corn"]:
 		var b := shop_panel.get_node_or_null("Buy_%s" % crop) as Button
 		if b:
@@ -327,7 +355,7 @@ func update_status(season_name: String, season_day: int, minute_of_day: int, cur
 	time_label.text = "%02d:%02d" % [hour, minute]
 	money_label.text = "%dg" % current_money
 	weather_label.text = current_weather
-	energy_label.text = "ENERGY  %d / 100" % energy
+	energy_label.text = "ENERGY %d" % energy
 	shipping_label.text = "BIN %dg" % shipping_value
 	energy_bar.value = energy
 	if energy_fill_style:
@@ -337,16 +365,10 @@ func update_status(season_name: String, season_day: int, minute_of_day: int, cur
 			energy_fill_style.bg_color = Color("#d6a34f")
 		else:
 			energy_fill_style.bg_color = Color("#78b85c")
-	inventory_label.text = "Seeds  T:%d  C:%d  Corn:%d     Harvest  %d / %d / %d" % [
-		int(seeds.get("turnip",0)), int(seeds.get("carrot",0)), int(seeds.get("corn",0)),
-		int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0))
-	]
+	inventory_label.text = "Seeds T:%d  C:%d  Corn:%d   Harvest %d/%d/%d" % [int(seeds.get("turnip",0)), int(seeds.get("carrot",0)), int(seeds.get("corn",0)), int(produce.get("turnip",0)), int(produce.get("carrot",0)), int(produce.get("corn",0))]
 	quest_label.text = quest_text
 	for i in range(tool_buttons.size()):
-		if i == selected:
-			tool_buttons[i].modulate = Color("#ffe39a")
-		else:
-			tool_buttons[i].modulate = Color(1,1,1,0.94)
+		tool_buttons[i].modulate = Color("#ffe39a") if i == selected else Color(1,1,1,0.94)
 
 func set_context_hint(text: String) -> void:
 	if not context_panel or not context_label:
