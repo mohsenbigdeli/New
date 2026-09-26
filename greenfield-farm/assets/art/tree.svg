@@ -1,16 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="144" height="180" viewBox="0 0 144 180">
 <defs>
- <linearGradient id="tr" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#76513d"/><stop offset=".5" stop-color="#9b704e"/><stop offset="1" stop-color="#654332"/></linearGradient>
- <radialGradient id="leaf" cx=".38" cy=".28" r=".75"><stop stop-color="#9bc66b"/><stop offset=".45" stop-color="#6cab57"/><stop offset="1" stop-color="#3f7749"/></radialGradient>
+ <linearGradient id="tr" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#674735"/><stop offset=".42" stop-color="#9b6b47"/><stop offset=".72" stop-color="#7f563d"/><stop offset="1" stop-color="#56392d"/></linearGradient>
+ <radialGradient id="l1" cx=".38" cy=".25" r=".78"><stop stop-color="#b3d577"/><stop offset=".38" stop-color="#7db25b"/><stop offset="1" stop-color="#3f7446"/></radialGradient>
+ <radialGradient id="l2" cx=".42" cy=".30" r=".82"><stop stop-color="#9ec96b"/><stop offset=".48" stop-color="#689b51"/><stop offset="1" stop-color="#345f3c"/></radialGradient>
 </defs>
-<ellipse cx="72" cy="165" rx="43" ry="9" fill="#20331f" opacity=".20"/>
-<path d="M61 78c1 23-3 49-10 76 8 4 14 5 21 2 7 4 14 3 22-2-8-25-11-51-9-77z" fill="url(#tr)" stroke="#51392f" stroke-width="3"/>
-<path d="M66 91c-13 9-23 18-31 31M83 93c10 7 19 15 28 27" stroke="#76513d" stroke-width="7" stroke-linecap="round"/>
-<path d="M69 86c-5 22-6 41-5 60M83 87c-2 19 0 38 4 58" stroke="#c29462" stroke-width="3" opacity=".42" fill="none"/>
-<g fill="url(#leaf)" stroke="#355f3b" stroke-width="2.2">
- <ellipse cx="36" cy="72" rx="28" ry="29"/><ellipse cx="58" cy="45" rx="33" ry="34"/><ellipse cx="92" cy="46" rx="34" ry="35"/><ellipse cx="112" cy="76" rx="27" ry="29"/><ellipse cx="74" cy="78" rx="39" ry="34"/>
+<ellipse cx="72" cy="166" rx="45" ry="10" fill="#1d2e1c" opacity=".20"/>
+<ellipse cx="72" cy="163" rx="31" ry="6" fill="#45603b" opacity=".12"/>
+<!-- trunk -->
+<path d="M61 74c3 26 1 52-5 80 8 4 14 5 20 1 8 4 16 3 23-3-9-27-12-54-9-81z" fill="url(#tr)" stroke="#4d352b" stroke-width="3" stroke-linejoin="round"/>
+<path d="M66 84c-12 10-23 22-32 36M87 88c11 8 21 18 30 30" fill="none" stroke="#75503a" stroke-width="7" stroke-linecap="round"/>
+<path d="M69 86c-5 21-7 42-5 62M82 84c-2 22 1 42 6 62" fill="none" stroke="#c08b59" stroke-width="3" opacity=".36" stroke-linecap="round"/>
+<path d="M58 151c8-5 16-7 23-5 6-2 12-1 18 3" stroke="#5f4534" stroke-width="3" opacity=".45" fill="none"/>
+<!-- layered irregular canopy -->
+<path d="M17 74c-2-17 8-30 23-35 3-17 17-28 34-28 13-10 35-7 45 7 16 0 27 11 28 27 12 8 15 24 8 36-8 14-22 18-38 15-11 11-29 14-43 7-17 8-37 2-44-12-8-2-12-8-13-17z" fill="url(#l1)" stroke="#355f3a" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M27 70c1-14 10-23 23-26 3-13 14-21 28-20 12-8 29-5 36 5 13 1 21 10 21 22 10 6 11 18 5 27-8 10-21 12-33 8-9 9-23 10-35 5-14 6-29 2-35-8-6-2-9-7-10-13z" fill="url(#l2)" opacity=".82"/>
+<!-- hand-painted leaf masses -->
+<g fill="#c4dc83" opacity=".30">
+ <ellipse cx="47" cy="39" rx="16" ry="10" transform="rotate(-14 47 39)"/>
+ <ellipse cx="86" cy="28" rx="18" ry="11" transform="rotate(8 86 28)"/>
+ <ellipse cx="112" cy="54" rx="15" ry="9" transform="rotate(17 112 54)"/>
+ <ellipse cx="61" cy="77" rx="18" ry="9" transform="rotate(-8 61 77)"/>
 </g>
-<g fill="#b7d77b" opacity=".42"><ellipse cx="48" cy="37" rx="11" ry="8"/><ellipse cx="86" cy="28" rx="13" ry="9"/><ellipse cx="30" cy="66" rx="8" ry="7"/><ellipse cx="101" cy="63" rx="12" ry="8"/></g>
-<g fill="#2f6941" opacity=".36"><ellipse cx="54" cy="85" rx="14" ry="8"/><ellipse cx="105" cy="88" rx="13" ry="8"/><ellipse cx="80" cy="66" rx="11" ry="7"/></g>
-<g fill="#e7c86e" opacity=".7"><circle cx="46" cy="58" r="2.5"/><circle cx="96" cy="53" r="2"/><circle cx="76" cy="88" r="2.2"/></g>
+<g fill="#285f3b" opacity=".24">
+ <ellipse cx="40" cy="83" rx="17" ry="9"/><ellipse cx="91" cy="76" rx="20" ry="10"/><ellipse cx="119" cy="82" rx="13" ry="7"/>
+</g>
+<!-- branch glimpses -->
+<path d="M51 69c10 6 16 12 22 20M94 66c-8 7-14 13-19 23" stroke="#6f4d39" stroke-width="3" opacity=".35" stroke-linecap="round"/>
+<!-- fruit/light flecks -->
+<g fill="#ecd372" opacity=".72"><circle cx="46" cy="58" r="2.3"/><circle cx="97" cy="52" r="2.1"/><circle cx="76" cy="86" r="2.2"/><circle cx="119" cy="67" r="1.8"/></g>
+<g fill="#f0b9c8" opacity=".45"><circle cx="58" cy="47" r="1.8"/><circle cx="108" cy="42" r="1.7"/></g>
+<!-- soft leaf edge accents -->
+<path d="M29 61c7-12 17-18 30-19M76 24c13-4 25-2 36 6M109 83c9 1 17-1 24-7" fill="none" stroke="#d2e69c" stroke-width="2" opacity=".22" stroke-linecap="round"/>
 </svg>
