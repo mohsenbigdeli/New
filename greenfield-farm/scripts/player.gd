@@ -24,25 +24,25 @@ var equipped_tool := 0
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
 	var capsule := CapsuleShape2D.new()
-	capsule.radius = 17
-	capsule.height = 46
+	capsule.radius = 16
+	capsule.height = 43
 	shape.shape = capsule
 	shape.position = Vector2(0, 13)
 	add_child(shape)
 
 	character_sprite = Sprite2D.new()
 	character_sprite.texture = TEX_DOWN
-	character_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	character_sprite.position = Vector2(0, -10)
+	character_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	character_sprite.position = Vector2(0, -9)
 	character_sprite.z_index = 2
-	character_sprite.scale = Vector2(1.30, 1.30)
+	character_sprite.scale = Vector2(1.18, 1.18)
 	add_child(character_sprite)
 
 	camera = Camera2D.new()
 	camera.enabled = true
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 8.5
-	camera.zoom = Vector2(1.16, 1.16)
+	camera.zoom = Vector2(1.10, 1.10)
 	camera.limit_left = 0
 	camera.limit_top = 0
 	camera.limit_right = int(world_size.x)
@@ -90,15 +90,15 @@ func _update_sprite() -> void:
 	var bob := 0.0
 	var sway := 0.0
 	if is_walking:
-		bob = absf(sin(walk_time)) * 3.0
-		sway = sin(walk_time) * 0.022
-	character_sprite.position = Vector2(0, -10 - bob)
+		bob = absf(sin(walk_time)) * 2.2
+		sway = sin(walk_time) * 0.016
+	character_sprite.position = Vector2(0, -9 - bob)
 	character_sprite.rotation = sway
-	character_sprite.scale = Vector2(1.30, 1.30)
+	character_sprite.scale = Vector2(1.18, 1.18)
 	if action_flash > 0.0:
 		var t := action_flash / 0.22
-		character_sprite.scale = Vector2(1.34 + 0.05*(1.0-t), 1.24)
-		character_sprite.rotation += sin(t * PI) * 0.06 * signf(facing.x if absf(facing.x) > 0.2 else 1.0)
+		character_sprite.scale = Vector2(1.22 + 0.04*(1.0-t), 1.13)
+		character_sprite.rotation += sin(t * PI) * 0.05 * signf(facing.x if absf(facing.x) > 0.2 else 1.0)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if controls_locked:
@@ -119,7 +119,7 @@ func set_controls_locked(locked: bool) -> void:
 		virtual_move = Vector2.ZERO
 		velocity = Vector2.ZERO
 
-func set_world_bounds(size: Vector2, zoom_value: float = 1.16) -> void:
+func set_world_bounds(size: Vector2, zoom_value: float = 1.10) -> void:
 	world_size = size
 	if camera:
 		camera.limit_left = 0
@@ -143,10 +143,10 @@ func request_action() -> void:
 	can_act = true
 
 func _draw() -> void:
-	_draw_shadow(Vector2(0, 32), Vector2(28, 9), Color(0,0,0,0.24))
-	var marker_alpha := 0.62 if action_flash > 0.0 else 0.20
+	_draw_shadow(Vector2(0, 31), Vector2(24, 7), Color(0,0,0,0.20))
+	var marker_alpha := 0.55 if action_flash > 0.0 else 0.16
 	var target := facing.normalized()*43.0 + Vector2(0,7)
-	draw_circle(target, 4.0, Color(1,0.95,0.75,marker_alpha))
+	draw_circle(target, 3.5, Color(1,0.95,0.75,marker_alpha))
 	if action_flash > 0.0:
 		_draw_tool_action()
 
