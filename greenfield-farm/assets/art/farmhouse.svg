@@ -1,37 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="430" height="260" viewBox="0 0 430 260">
 <defs>
- <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1dfb7"/><stop offset="1" stop-color="#d7bc82"/></linearGradient>
- <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b95f49"/><stop offset="1" stop-color="#7b3f38"/></linearGradient>
- <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c7edf0"/><stop offset="1" stop-color="#6ca9c6"/></linearGradient>
+ <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f0d7ab"/><stop offset="1" stop-color="#d4b07b"/></linearGradient>
+ <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9f5d4e"/><stop offset="1" stop-color="#6d3f3f"/></linearGradient>
+ <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#8a5d3d"/><stop offset=".5" stop-color="#b47a4d"/><stop offset="1" stop-color="#76503a"/></linearGradient>
 </defs>
-<ellipse cx="215" cy="245" rx="192" ry="13" fill="#253726" opacity=".24"/>
-<rect x="42" y="91" width="346" height="139" rx="4" fill="url(#wall)"/>
-<rect x="53" y="102" width="324" height="118" fill="none" stroke="#c6a66f" stroke-width="3" opacity=".7"/>
-<path d="M17 95L91 24h249l73 71-10 28H28z" fill="#703a35"/>
-<path d="M28 89L99 31h232l70 58-12 17H40z" fill="url(#roof)"/>
-<g fill="none" stroke="#d78767" stroke-width="3" opacity=".52"><path d="M56 78h318"/><path d="M76 61h278"/><path d="M102 43h224"/></g>
-<g fill="#6e3833" opacity=".55"><path d="M53 82h32l16 13H69z"/><path d="M139 45h42l14 13h-43z"/><path d="M249 45h41l15 13h-43z"/><path d="M333 75h34l14 13h-35z"/></g>
-<rect x="302" y="14" width="34" height="58" rx="3" fill="#76503f"/><rect x="309" y="8" width="20" height="11" rx="2" fill="#50372e"/>
-<path d="M309 27h20M309 40h20M309 53h20" stroke="#9b735a" stroke-width="2" opacity=".65"/>
-<!-- porch -->
-<rect x="148" y="197" width="136" height="34" fill="#9a7048"/><rect x="139" y="225" width="154" height="10" rx="3" fill="#6f4d35"/>
-<path d="M151 207h130M151 219h130" stroke="#b88a59" stroke-width="3" opacity=".8"/>
-<!-- door -->
-<rect x="174" y="128" width="80" height="99" rx="3" fill="#654331"/><rect x="184" y="138" width="60" height="89" rx="2" fill="#85583b"/>
-<rect x="193" y="147" width="42" height="30" rx="2" fill="url(#glass)"/><path d="M214 147v30M193 162h42" stroke="#efe3c6" stroke-width="4"/>
-<rect x="194" y="187" width="40" height="27" rx="2" fill="#73482f"/><circle cx="233" cy="184" r="5" fill="#f0c96d"/>
-<!-- windows -->
+<ellipse cx="215" cy="238" rx="188" ry="18" fill="#22351f" opacity=".18"/>
+<path d="M55 98c22-21 53-31 89-33 30-37 87-55 139-31 28 13 50 33 66 59 17 2 31 6 42 13l-19 35H70z" fill="url(#roof)" stroke="#59383a" stroke-width="5" stroke-linejoin="round"/>
+<path d="M82 123h268v105H82z" fill="url(#wall)" stroke="#78583f" stroke-width="4"/>
+<path d="M99 141c65 5 132 5 199 0" stroke="#f7e5bc" stroke-width="3" opacity=".35"/>
+<path d="M121 66c23-28 57-45 94-45 43 0 82 19 105 52" fill="none" stroke="#c17a5f" stroke-width="9" opacity=".55" stroke-linecap="round"/>
+<path d="M61 105c72 14 139 12 205-1 47-9 86-8 123 5" fill="none" stroke="#c38169" stroke-width="6" opacity=".38"/>
+<rect x="189" y="147" width="55" height="81" rx="8" fill="url(#wood)" stroke="#5f412f" stroke-width="4"/>
+<path d="M205 149v78M227 149v78" stroke="#d29a62" stroke-width="2" opacity=".5"/>
+<circle cx="232" cy="188" r="4" fill="#e8c879"/>
 <g>
- <rect x="70" y="127" width="72" height="61" rx="3" fill="#6c513d"/><rect x="77" y="134" width="58" height="47" fill="url(#glass)"/>
- <path d="M106 134v47M77 157h58" stroke="#f7edd4" stroke-width="5"/>
- <path d="M82 139l18 0" stroke="#ffffff" stroke-width="3" opacity=".55"/>
- <rect x="288" y="127" width="72" height="61" rx="3" fill="#6c513d"/><rect x="295" y="134" width="58" height="47" fill="url(#glass)"/>
- <path d="M324 134v47M295 157h58" stroke="#f7edd4" stroke-width="5"/>
- <path d="M300 139h18" stroke="#ffffff" stroke-width="3" opacity=".55"/>
+ <rect x="105" y="150" width="56" height="49" rx="8" fill="#6ea8b1" stroke="#5a4e42" stroke-width="4"/>
+ <path d="M133 151v47M106 174h54" stroke="#e6e0c8" stroke-width="3"/>
+ <rect x="271" y="150" width="56" height="49" rx="8" fill="#6ea8b1" stroke="#5a4e42" stroke-width="4"/>
+ <path d="M299 151v47M272 174h54" stroke="#e6e0c8" stroke-width="3"/>
+ <path d="M109 156c11-5 23-6 35-2M275 156c12-5 24-5 37-1" stroke="#d9f0de" stroke-width="3" opacity=".55"/>
 </g>
-<!-- stone foundation -->
-<rect x="40" y="225" width="350" height="17" fill="#766c5d"/><g fill="#9a8f7c"><rect x="48" y="228" width="42" height="10" rx="4"/><rect x="99" y="228" width="35" height="10" rx="4"/><rect x="300" y="228" width="36" height="10" rx="4"/><rect x="344" y="228" width="38" height="10" rx="4"/></g>
-<!-- plants -->
-<g><rect x="58" y="215" width="26" height="18" rx="3" fill="#9a5e3e"/><circle cx="64" cy="211" r="13" fill="#4b8b4a"/><circle cx="78" cy="207" r="15" fill="#5ca154"/><circle cx="69" cy="201" r="4" fill="#f4c46c"/>
-<rect x="348" y="215" width="26" height="18" rx="3" fill="#9a5e3e"/><circle cx="354" cy="210" r="13" fill="#4b8b4a"/><circle cx="366" cy="205" r="15" fill="#5ca154"/><circle cx="361" cy="200" r="4" fill="#eda4b8"/></g>
+<path d="M54 116c13 4 24 4 36 1M344 119c13 5 25 4 37 0" stroke="#efe1b9" stroke-width="3" opacity=".45"/>
+<rect x="315" y="43" width="31" height="55" rx="4" fill="#85583f" stroke="#5d4033" stroke-width="4"/>
+<path d="M320 49h20" stroke="#d59a6a" stroke-width="3" opacity=".5"/>
+<g fill="#5f964f"><circle cx="88" cy="216" r="14"/><circle cx="101" cy="212" r="12"/><circle cx="334" cy="215" r="15"/><circle cx="348" cy="211" r="11"/></g>
+<g fill="#f1c8d0"><circle cx="92" cy="210" r="3"/><circle cx="103" cy="219" r="2.5"/><circle cx="340" cy="208" r="3"/></g>
+<path d="M80 228c22-5 45-5 68 0M272 228c22-5 44-5 66 0" stroke="#806b52" stroke-width="3" opacity=".35"/>
 </svg>
