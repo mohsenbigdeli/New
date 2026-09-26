@@ -6,11 +6,11 @@ signal vector_changed(direction: Vector2)
 var direction := Vector2.ZERO
 var active_touch := -1
 var knob_position := Vector2.ZERO
-var radius := 58.0
-var knob_radius := 25.0
+var radius := 46.0
+var knob_radius := 20.0
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(150, 150)
+	custom_minimum_size = Vector2(120, 120)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	knob_position = size * 0.5
 	queue_redraw()
@@ -69,15 +69,15 @@ func _reset() -> void:
 
 func _draw() -> void:
 	var center: Vector2 = size * 0.5
-	draw_circle(center + Vector2(0, 5), radius + 13.0, Color(0.07, 0.05, 0.03, 0.20))
-	draw_circle(center, radius + 10.0, Color(0.18, 0.13, 0.09, 0.48))
-	draw_circle(center, radius + 4.0, Color(0.78, 0.66, 0.46, 0.32))
-	draw_circle(center, radius, Color(0.18, 0.26, 0.14, 0.50))
+	draw_circle(center + Vector2(0, 4), radius + 10.0, Color(0.07, 0.05, 0.03, 0.17))
+	draw_circle(center, radius + 7.0, Color(0.18, 0.13, 0.09, 0.40))
+	draw_circle(center, radius + 2.0, Color(0.78, 0.66, 0.46, 0.24))
+	draw_circle(center, radius, Color(0.18, 0.26, 0.14, 0.42))
 	var directions: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
 	for v: Vector2 in directions:
-		var p: Vector2 = center + v * 42.0
-		draw_circle(p, 3.5, Color(1, 0.94, 0.76, 0.42))
-	draw_circle(knob_position + Vector2(0, 3), knob_radius + 3.0, Color(0.05, 0.04, 0.03, 0.28))
-	draw_circle(knob_position, knob_radius + 2.0, Color(0.92, 0.79, 0.53, 0.88))
-	draw_circle(knob_position, knob_radius - 4.0, Color(0.34, 0.48, 0.25, 0.96))
-	draw_circle(knob_position - Vector2(6, 7), 5.0, Color(1, 1, 0.88, 0.22))
+		var p: Vector2 = center + v * 33.0
+		draw_circle(p, 2.7, Color(1, 0.94, 0.76, 0.32))
+	draw_circle(knob_position + Vector2(0, 2), knob_radius + 2.0, Color(0.05, 0.04, 0.03, 0.22))
+	draw_circle(knob_position, knob_radius + 1.0, Color(0.92, 0.79, 0.53, 0.78))
+	draw_circle(knob_position, knob_radius - 4.0, Color(0.34, 0.48, 0.25, 0.90))
+	draw_circle(knob_position - Vector2(5, 6), 4.0, Color(1, 1, 0.88, 0.16))
