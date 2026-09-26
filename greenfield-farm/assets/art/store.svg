@@ -1,24 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
-<defs>
- <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e6d6ad"/><stop offset="1" stop-color="#cbb17d"/></linearGradient>
- <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5f7f61"/><stop offset="1" stop-color="#35563f"/></linearGradient>
- <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7f2ed"/><stop offset="1" stop-color="#78b0c2"/></linearGradient>
-</defs>
-<ellipse cx="200" cy="246" rx="178" ry="12" fill="#213624" opacity=".23"/>
-<rect x="36" y="88" width="328" height="145" rx="4" fill="url(#wall)"/>
-<path d="M18 94L78 34h244l60 60-9 25H27z" fill="#294d38"/>
-<path d="M28 88L88 42h224l60 46-9 16H39z" fill="url(#roof)"/>
-<g stroke="#86a67b" stroke-width="3" opacity=".5"><path d="M56 78h288"/><path d="M78 62h244"/><path d="M105 46h191"/></g>
-<!-- sign -->
-<rect x="117" y="73" width="166" height="48" rx="8" fill="#6f4b33"/><rect x="124" y="80" width="152" height="34" rx="5" fill="#d7b66e"/><path d="M139 104h123" stroke="#7a5536" stroke-width="3"/><path d="M146 91h108" stroke="#f4dd9e" stroke-width="4" opacity=".7"/>
-<!-- awning -->
-<path d="M55 120h290l-15 34H70z" fill="#f2e1b5"/><g fill="#b75c4f"><path d="M55 120h48l-7 34H70z"/><path d="M151 120h48l-2 34h-43z"/><path d="M247 120h48l7 34h-48z"/></g>
-<!-- front -->
-<rect x="72" y="154" width="86" height="61" rx="3" fill="#684c38"/><rect x="80" y="162" width="70" height="45" fill="url(#glass)"/><path d="M115 162v45M80 184h70" stroke="#f4ead4" stroke-width="4"/>
-<rect x="242" y="154" width="86" height="61" rx="3" fill="#684c38"/><rect x="250" y="162" width="70" height="45" fill="url(#glass)"/><path d="M285 162v45M250 184h70" stroke="#f4ead4" stroke-width="4"/>
-<rect x="164" y="147" width="72" height="86" rx="3" fill="#674330"/><rect x="174" y="157" width="52" height="76" fill="#83573b"/><rect x="181" y="165" width="38" height="28" fill="url(#glass)"/><path d="M200 165v28" stroke="#f6ead2" stroke-width="4"/><circle cx="216" cy="201" r="4.5" fill="#e8c367"/>
-<!-- crates -->
-<g><rect x="47" y="215" width="54" height="26" fill="#8e613d"/><rect x="52" y="219" width="44" height="17" fill="#ad794a"/><circle cx="62" cy="215" r="8" fill="#d9b64e"/><circle cx="78" cy="213" r="8" fill="#7fa957"/><circle cx="91" cy="217" r="7" fill="#c8734b"/>
-<rect x="299" y="215" width="54" height="26" fill="#8e613d"/><rect x="304" y="219" width="44" height="17" fill="#ad794a"/><circle cx="315" cy="214" r="8" fill="#82a956"/><circle cx="331" cy="213" r="8" fill="#d6b449"/><circle cx="343" cy="217" r="7" fill="#b66d62"/></g>
-<rect x="34" y="233" width="332" height="10" fill="#776b5d"/>
+<defs><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7d6aa"/><stop offset="1" stop-color="#c6aa78"/></linearGradient><linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6f8b68"/><stop offset="1" stop-color="#435e4d"/></linearGradient></defs>
+<ellipse cx="200" cy="238" rx="172" ry="17" fill="#20331f" opacity=".17"/>
+<path d="M48 96c22-28 60-42 98-42 24-26 62-40 99-31 43 10 77 36 96 73 14 1 27 5 36 11l-18 33H61z" fill="url(#roof)" stroke="#3b5143" stroke-width="5"/>
+<rect x="72" y="120" width="256" height="108" rx="4" fill="url(#wall)" stroke="#6f5b44" stroke-width="4"/>
+<path d="M76 137h248" stroke="#f1e3be" stroke-width="3" opacity=".35"/>
+<rect x="164" y="151" width="72" height="77" rx="7" fill="#8b6044" stroke="#5b4034" stroke-width="4"/>
+<path d="M199 152v76" stroke="#c58c5a" stroke-width="3" opacity=".45"/>
+<circle cx="223" cy="189" r="4" fill="#edd187"/>
+<g><rect x="94" y="151" width="51" height="43" rx="7" fill="#75aab0" stroke="#5a5145" stroke-width="4"/><path d="M119 152v41M95 173h49" stroke="#e7e2ca" stroke-width="3"/><rect x="254" y="151" width="51" height="43" rx="7" fill="#75aab0" stroke="#5a5145" stroke-width="4"/><path d="M279 152v41M255 173h49" stroke="#e7e2ca" stroke-width="3"/></g>
+<rect x="122" y="91" width="156" height="41" rx="12" fill="#6e4d35" stroke="#4d3a2d" stroke-width="4"/>
+<text x="200" y="117" font-size="18" font-family="sans-serif" text-anchor="middle" fill="#f4dfaa">WILLOW GOODS</text>
+<path d="M82 131c24 9 52 9 77 0 25 9 52 9 77 0 24 9 51 9 77 0" fill="none" stroke="#b86e5a" stroke-width="11" opacity=".75"/>
+<path d="M84 131c24 9 52 9 77 0M238 131c23 8 50 8 74 0" fill="none" stroke="#ead6a4" stroke-width="5" opacity=".9"/>
+<g fill="#60904f"><circle cx="83" cy="216" r="14"/><circle cx="96" cy="212" r="10"/><circle cx="306" cy="216" r="13"/><circle cx="319" cy="212" r="10"/></g>
+<g fill="#f0c872"><circle cx="87" cy="208" r="2.5"/><circle cx="313" cy="207" r="2.5"/></g>
 </svg>
