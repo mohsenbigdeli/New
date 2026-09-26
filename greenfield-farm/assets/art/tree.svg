@@ -1,1 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="144" height="180" viewBox="0 0 144 180" shape-rendering="crispEdges"><ellipse cx="73" cy="166" rx="39" ry="9" fill="#000" opacity=".14"/><rect x="62" y="92" width="21" height="65" fill="#754a2f"/><rect x="68" y="93" width="8" height="65" fill="#97613a"/><path d="M62 120l-19 20h14l12-9zM83 114l23 18H91l-12-7z" fill="#754a2f"/><circle cx="72" cy="72" r="47" fill="#3f8f49"/><circle cx="44" cy="76" r="31" fill="#4da255"/><circle cx="99" cy="78" r="34" fill="#4a9b51"/><circle cx="72" cy="43" r="35" fill="#58aa5b"/><circle cx="91" cy="48" r="27" fill="#69b764"/><circle cx="51" cy="48" r="26" fill="#62b05f"/><path d="M38 67h15v9H38zM78 27h17v9H78zM91 85h18v8H91zM55 93h14v8H55z" fill="#78c46d" opacity=".7"/><circle cx="47" cy="61" r="4" fill="#d86f63"/><circle cx="95" cy="63" r="4" fill="#d86f63"/><circle cx="71" cy="53" r="4" fill="#e4b96a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="180" viewBox="0 0 144 180">
+<defs>
+ <linearGradient id="tr" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7a4f32"/><stop offset="1" stop-color="#4d3427"/></linearGradient>
+ <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6ab35b"/><stop offset="1" stop-color="#367b43"/></linearGradient>
+</defs>
+<ellipse cx="73" cy="165" rx="43" ry="10" fill="#203621" opacity=".24"/>
+<path d="M61 92h24l-5 67H65z" fill="url(#tr)"/>
+<path d="M68 102c-11 4-18 10-24 20M77 108c12 3 21 9 29 19" fill="none" stroke="#5b3b2b" stroke-width="8" stroke-linecap="round"/>
+<path d="M68 113l8 0m-9 16h11m-13 15h13" stroke="#a0734a" stroke-width="3" opacity=".42"/>
+<g fill="url(#leaf)">
+ <circle cx="44" cy="71" r="31"/><circle cx="72" cy="48" r="37"/><circle cx="103" cy="71" r="32"/>
+ <circle cx="61" cy="83" r="35"/><circle cx="87" cy="88" r="33"/><circle cx="35" cy="94" r="23"/><circle cx="112" cy="96" r="23"/>
+</g>
+<g fill="#7bc56a" opacity=".78"><circle cx="51" cy="50" r="17"/><circle cx="80" cy="31" r="18"/><circle cx="105" cy="61" r="15"/><circle cx="63" cy="78" r="13"/></g>
+<g fill="#2f6c39" opacity=".72"><circle cx="35" cy="84" r="17"/><circle cx="87" cy="102" r="18"/><circle cx="116" cy="86" r="15"/></g>
+<g fill="#9edb7d" opacity=".62"><ellipse cx="42" cy="58" rx="8" ry="4"/><ellipse cx="75" cy="41" rx="10" ry="5"/><ellipse cx="101" cy="70" rx="8" ry="4"/></g>
+<g fill="#e59b53"><circle cx="53" cy="89" r="4"/><circle cx="91" cy="69" r="4"/></g>
+</svg>
