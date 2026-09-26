@@ -1,0 +1,75 @@
+extends "res://scripts/main_v09.gd"
+
+const TOOL_ICONS: Array[Texture2D] = [
+	preload("res://assets/art/icon_hoe.svg"),
+	preload("res://assets/art/icon_turnip.svg"),
+	preload("res://assets/art/icon_carrot.svg"),
+	preload("res://assets/art/icon_corn.svg"),
+	preload("res://assets/art/icon_water.svg"),
+	preload("res://assets/art/icon_harvest.svg")
+]
+
+var visual_polish: FarmVisualPolish
+
+func _ready() -> void:
+	super()
+	visual_polish = FarmVisualPolish.new()
+	visual_polish.name = "VisualPolish"
+	add_child(visual_polish)
+	visual_polish.setup(farm)
+	visual_polish.set_active(interiors.active_room == "outside")
+	_apply_v10_ui_skin()
+	ui.show_message("v1.0 Visual Overhaul: new terrain, water, trees, buildings, farmer art, NPC polish and icon-based controls.")
+
+func _set_room_state(room: String) -> void:
+	super._set_room_state(room)
+	if visual_polish:
+		visual_polish.set_active(room == "outside")
+
+func _apply_v10_ui_skin() -> void:
+	# Replace prototype hotbar letters with hand-drawn game icons.
+	for i in range(mini(ui.tool_buttons.size(), TOOL_ICONS.size())):
+		var b := ui.tool_buttons[i]
+		b.icon = TOOL_ICONS[i]
+		b.text = ""
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 34)
+		b.add_theme_stylebox_override("normal", _button_box(Color("#4c382bdd"), Color("#cda465"), 10, 2))
+		b.add_theme_stylebox_override("hover", _button_box(Color("#624735ee"), Color("#efd18d"), 10, 2))
+		b.add_theme_stylebox_override("pressed", _button_box(Color("#35271fee"), Color("#fff0b4"), 10, 3))
+
+	# Give all direct mobile/menu buttons a deeper, less prototype-looking surface.
+	_reskin_buttons(ui)
+	_reskin_buttons(inventory_ui)
+	if animal_panel:
+		_reskin_buttons(animal_panel)
+	if crafting_panel:
+		_reskin_buttons(crafting_panel)
+	if fishing_panel:
+		_reskin_buttons(fishing_panel)
+
+func _reskin_buttons(root: Node) -> void:
+	for child in root.get_children():
+		if child is Button:
+			var b := child as Button
+			if b not in ui.tool_buttons:
+				b.add_theme_stylebox_override("normal", _button_box(Color("#59402fef"), Color("#b98b50"), 10, 2))
+				b.add_theme_stylebox_override("hover", _button_box(Color("#71523bec"), Color("#e0bb76"), 10, 2))
+				b.add_theme_stylebox_override("pressed", _button_box(Color("#3e2f26f2"), Color("#f4d795"), 10, 3))
+				b.add_theme_color_override("font_color", Color("#fff0d0"))
+				b.add_theme_color_override("font_hover_color", Color.WHITE)
+				b.add_theme_color_override("font_pressed_color", Color.WHITE)
+		_reskin_buttons(child)
+
+func _button_box(fill: Color, border: Color, radius: int, border_width: int) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = fill
+	s.border_color = border
+	s.set_border_width_all(border_width)
+	s.corner_radius_top_left = radius
+	s.corner_radius_top_right = radius
+	s.corner_radius_bottom_left = radius
+	s.corner_radius_bottom_right = radius
+	s.shadow_color = Color(0.05,0.03,0.02,0.38)
+	s.shadow_size = 5
+	return s
