@@ -52,6 +52,7 @@ jobs:
         shell: bash
         run: |
           GODOT="$HOME/.local/share/godot/godot_executable/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path greenfield-farm --script res://tests/player_motion.gd
           "$GODOT" --headless --path greenfield-farm --quit-after 180 2>&1 | tee runtime.log
           if grep -E "SCRIPT ERROR|Parse Error|Invalid call|Invalid access|ERROR:" runtime.log | grep -v "cannot connect to daemon"; then
             echo "Runtime errors detected"
@@ -69,13 +70,13 @@ jobs:
             echo "No APK found"
             exit 1
           fi
-          cp "$APK" artifact/GreenfieldFarm-v2.4-debug.apk
-          ls -lh artifact/GreenfieldFarm-v2.4-debug.apk
+          cp "$APK" artifact/GreenfieldFarm-v2.4.1-debug.apk
+          ls -lh artifact/GreenfieldFarm-v2.4.1-debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GreenfieldFarm-v2.4-Android
-          path: artifact/GreenfieldFarm-v2.4-debug.apk
+          name: GreenfieldFarm-v2.4.1-Android
+          path: artifact/GreenfieldFarm-v2.4.1-debug.apk
           if-no-files-found: error
           retention-days: 14

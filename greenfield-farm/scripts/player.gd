@@ -15,6 +15,8 @@ var can_act := true
 var controls_locked := false
 var world_size := Vector2(2304, 1536)
 var walk_time := 0.0
+const WALK_SEQUENCE: Array[int] = [1, 0, 2, 0]
+const WALK_FRAME_DISTANCE := 28.0
 var is_walking := false
 var character_sprite: Sprite2D
 var camera: Camera2D
@@ -62,6 +64,7 @@ func _physics_process(delta: float) -> void:
 	if controls_locked:
 		velocity = Vector2.ZERO
 		is_walking = false
+		walk_time = 0.0
 		_update_sprite()
 		queue_redraw()
 		return
@@ -70,18 +73,23 @@ func _physics_process(delta: float) -> void:
 	var y := int(Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - int(Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
 	var keyboard := Vector2(x, y)
 	var dir := keyboard if keyboard.length() > 0.01 else virtual_move
-	is_walking = dir.length() > 0.01
-	if is_walking:
-		dir = dir.normalized()
-		facing = dir
-		walk_time += delta * 8.0
+	if dir.length() > 0.12:
+		dir = dir.limit_length(1.0)
+		facing = dir.normalized()
 	else:
-		walk_time = 0.0
+		dir = Vector2.ZERO
 
 	velocity = dir * speed
+	var previous_position := position
 	move_and_slide()
 	position.x = clamp(position.x, 42.0, world_size.x - 42.0)
 	position.y = clamp(position.y, 56.0, world_size.y - 48.0)
+	var distance := position.distance_to(previous_position)
+	is_walking = distance > 0.001
+	if is_walking:
+		walk_time = fmod(walk_time + distance / WALK_FRAME_DISTANCE, float(WALK_SEQUENCE.size()))
+	else:
+		walk_time = 0.0
 	_update_sprite()
 	queue_redraw()
 
@@ -106,7 +114,7 @@ func _update_sprite() -> void:
 		var col := 0
 		if is_walking:
 			# Actual authored walking poses. No UV warping, no fake leg bending.
-			col = 1 + (int(floor(walk_time)) % 3)
+			col = mini(WALK_SEQUENCE[int(floor(walk_time)) % WALK_SEQUENCE.size()], custom_sheet_hframes - 1)
 		character_sprite.frame_coords = Vector2i(col, row)
 		character_sprite.position = Vector2(0, -20)
 		character_sprite.scale = custom_character_scale
@@ -128,11 +136,6 @@ func _update_sprite() -> void:
 			character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
 		character_sprite.position = Vector2(0, -9)
 		character_sprite.scale = Vector2(1.18, 1.18)
-
-	# Real frame animation supplies the gait. Keep only a tiny vertical settle so
-	# the feet remain planted instead of the entire illustration rocking around.
-	if custom_character_sheet and is_walking:
-		character_sprite.position.y -= 0.6 if (int(floor(walk_time)) % 2 == 0) else 0.0
 
 	if action_flash > 0.0:
 		var t := action_flash / 0.22
