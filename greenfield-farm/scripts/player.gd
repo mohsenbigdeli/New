@@ -13,12 +13,16 @@ uniform float walk_phase = 0.0;
 uniform float walk_amount = 0.0;
 void fragment() {
     vec2 uv = UV;
-    float lower = smoothstep(0.64, 0.91, uv.y);
-    float side = uv.x < 0.5 ? -1.0 : 1.0;
-    float step_value = sin(walk_phase + (side > 0.0 ? 3.14159265 : 0.0));
-    float ankle = smoothstep(0.72, 0.98, uv.y);
-    uv.x += step_value * 0.032 * lower * walk_amount;
-    uv.y += (1.0 - abs(step_value)) * 0.007 * ankle * walk_amount;
+    float lower = smoothstep(0.56, 0.96, uv.y);
+    float ankle = smoothstep(0.68, 0.995, uv.y);
+    float left_mask = 1.0 - smoothstep(0.46, 0.54, uv.x);
+    float right_mask = smoothstep(0.46, 0.54, uv.x);
+    float step_value = sin(walk_phase);
+    float left_step = max(step_value, 0.0);
+    float right_step = max(-step_value, 0.0);
+    uv.x += step_value * 0.072 * lower * walk_amount * (right_mask - left_mask);
+    uv.y -= (left_step * left_mask + right_step * right_mask) * 0.034 * ankle * walk_amount;
+    uv.y += (1.0 - abs(step_value)) * 0.010 * lower * walk_amount;
     COLOR = texture(TEXTURE, uv) * COLOR;
 }
 """
@@ -93,7 +97,7 @@ func _physics_process(delta: float) -> void:
 	if is_walking:
 		dir = dir.normalized()
 		facing = dir
-		walk_time += delta * 9.5
+		walk_time += delta * 8.0
 	else:
 		walk_time = 0.0
 
@@ -125,8 +129,8 @@ func _update_sprite() -> void:
 	var bob := 0.0
 	var sway := 0.0
 	if is_walking:
-		bob = absf(sin(walk_time)) * 1.5
-		sway = sin(walk_time) * 0.010
+		bob = absf(sin(walk_time)) * 2.4
+		sway = sin(walk_time) * 0.018
 	character_sprite.position = Vector2(0, -9 - bob)
 	character_sprite.rotation = sway
 	character_sprite.scale = custom_character_scale if custom_character_texture else Vector2(1.18, 1.18)
