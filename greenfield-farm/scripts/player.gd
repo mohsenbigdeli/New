@@ -7,6 +7,21 @@ const TEX_DOWN: Texture2D = preload("res://assets/art/player_down.svg")
 const TEX_UP: Texture2D = preload("res://assets/art/player_up.svg")
 const TEX_LEFT: Texture2D = preload("res://assets/art/player_left.svg")
 const TEX_RIGHT: Texture2D = preload("res://assets/art/player_right.svg")
+const WALK_SHADER_CODE := """
+shader_type canvas_item;
+uniform float walk_phase = 0.0;
+uniform float walk_amount = 0.0;
+void fragment() {
+    vec2 uv = UV;
+    float lower = smoothstep(0.64, 0.91, uv.y);
+    float side = uv.x < 0.5 ? -1.0 : 1.0;
+    float step_value = sin(walk_phase + (side > 0.0 ? 3.14159265 : 0.0));
+    float ankle = smoothstep(0.72, 0.98, uv.y);
+    uv.x += step_value * 0.032 * lower * walk_amount;
+    uv.y += (1.0 - abs(step_value)) * 0.007 * ankle * walk_amount;
+    COLOR = texture(TEXTURE, uv) * COLOR;
+}
+"""
 
 var speed := 285.0
 var facing := Vector2.DOWN
@@ -22,6 +37,7 @@ var action_flash := 0.0
 var equipped_tool := 0
 var custom_character_texture: Texture2D
 var custom_character_scale := Vector2(1.18,1.18)
+var watercolor_walk_material: ShaderMaterial
 
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
@@ -39,6 +55,13 @@ func _ready() -> void:
 	character_sprite.z_index = 2
 	character_sprite.scale = Vector2(1.18, 1.18)
 	add_child(character_sprite)
+
+	var walk_shader := Shader.new()
+	walk_shader.code = WALK_SHADER_CODE
+	watercolor_walk_material = ShaderMaterial.new()
+	watercolor_walk_material.shader = walk_shader
+	watercolor_walk_material.set_shader_parameter("walk_phase",0.0)
+	watercolor_walk_material.set_shader_parameter("walk_amount",0.0)
 
 	camera = Camera2D.new()
 	camera.enabled = true
@@ -70,7 +93,7 @@ func _physics_process(delta: float) -> void:
 	if is_walking:
 		dir = dir.normalized()
 		facing = dir
-		walk_time += delta * 9.0
+		walk_time += delta * 9.5
 	else:
 		walk_time = 0.0
 
@@ -87,7 +110,12 @@ func _update_sprite() -> void:
 	if custom_character_texture:
 		character_sprite.texture = custom_character_texture
 		character_sprite.flip_h = facing.x < -0.15
+		character_sprite.material = watercolor_walk_material
+		if watercolor_walk_material:
+			watercolor_walk_material.set_shader_parameter("walk_phase",walk_time)
+			watercolor_walk_material.set_shader_parameter("walk_amount",1.0 if is_walking else 0.0)
 	else:
+		character_sprite.material = null
 		character_sprite.flip_h = false
 		if absf(facing.x) > absf(facing.y):
 			character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
@@ -97,8 +125,8 @@ func _update_sprite() -> void:
 	var bob := 0.0
 	var sway := 0.0
 	if is_walking:
-		bob = absf(sin(walk_time)) * 2.2
-		sway = sin(walk_time) * 0.016
+		bob = absf(sin(walk_time)) * 1.5
+		sway = sin(walk_time) * 0.010
 	character_sprite.position = Vector2(0, -9 - bob)
 	character_sprite.rotation = sway
 	character_sprite.scale = custom_character_scale if custom_character_texture else Vector2(1.18, 1.18)
@@ -116,6 +144,8 @@ func set_custom_character_texture(texture: Texture2D, scale_value: Vector2 = Vec
 func clear_custom_character_texture() -> void:
 	custom_character_texture = null
 	custom_character_scale = Vector2(1.18,1.18)
+	if character_sprite:
+		character_sprite.material = null
 	_update_sprite()
 
 func _unhandled_key_input(event: InputEvent) -> void:
