@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="376" viewBox="0 0 520 376">
+<defs><filter id="w"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="3" seed="13" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/><feGaussianBlur stdDeviation=".18"/></filter><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7e2cf"/><stop offset="1" stop-color="#c8c4b4"/></linearGradient><linearGradient id="roof"><stop stop-color="#7487a2"/><stop offset="1" stop-color="#546780"/></linearGradient></defs>
+<g filter="url(#w)">
+<ellipse cx="260" cy="342" rx="186" ry="19" fill="#465064" opacity=".19"/>
+<path d="M86 178 L150 124 L150 89 L370 89 L370 124 L434 178 L402 198 H118 Z" fill="url(#roof)" stroke="#555468" stroke-width="8"/>
+<path d="M130 174 H390 V328 H130 Z" fill="url(#wall)" stroke="#736b62" stroke-width="7"/>
+<rect x="224" y="213" width="72" height="115" rx="6" fill="#765344" stroke="#514138" stroke-width="7"/>
+<g fill="#90b3c4" stroke="#5f6b73" stroke-width="6"><rect x="157" y="218" width="54" height="58" rx="7"/><rect x="309" y="218" width="54" height="58" rx="7"/></g>
+<path d="M168 178 H352 L332 137 H188 Z" fill="#d9d3c3" stroke="#6e675f" stroke-width="6"/>
+<circle cx="260" cy="156" r="32" fill="#f4e9c6" stroke="#5c5d66" stroke-width="6"/><path d="M260 156v-16M260 156l13 7" stroke="#514d4b" stroke-width="4"/>
+<path d="M147 328h226M161 340h198" stroke="#a9a18e" stroke-width="10"/>
+<g fill="#71895d"><circle cx="120" cy="306" r="22"/><circle cx="400" cy="306" r="22"/></g>
+<path d="M112 115v86M408 115v86" stroke="#6e5540" stroke-width="5"/><path d="M112 118l48 14-48 18z" fill="#c66e5f"/><path d="M408 118l-48 14 48 18z" fill="#d6b45c"/>
+</g></svg>
