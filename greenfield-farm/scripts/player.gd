@@ -7,25 +7,6 @@ const TEX_DOWN: Texture2D = preload("res://assets/art/player_down.svg")
 const TEX_UP: Texture2D = preload("res://assets/art/player_up.svg")
 const TEX_LEFT: Texture2D = preload("res://assets/art/player_left.svg")
 const TEX_RIGHT: Texture2D = preload("res://assets/art/player_right.svg")
-const WALK_SHADER_CODE := """
-shader_type canvas_item;
-uniform float walk_phase = 0.0;
-uniform float walk_amount = 0.0;
-void fragment() {
-    vec2 uv = UV;
-    float lower = smoothstep(0.56, 0.96, uv.y);
-    float ankle = smoothstep(0.68, 0.995, uv.y);
-    float left_mask = 1.0 - smoothstep(0.46, 0.54, uv.x);
-    float right_mask = smoothstep(0.46, 0.54, uv.x);
-    float step_value = sin(walk_phase);
-    float left_step = max(step_value, 0.0);
-    float right_step = max(-step_value, 0.0);
-    uv.x += step_value * 0.072 * lower * walk_amount * (right_mask - left_mask);
-    uv.y -= (left_step * left_mask + right_step * right_mask) * 0.034 * ankle * walk_amount;
-    uv.y += (1.0 - abs(step_value)) * 0.010 * lower * walk_amount;
-    COLOR = texture(TEXTURE, uv) * COLOR;
-}
-"""
 
 var speed := 285.0
 var facing := Vector2.DOWN
@@ -39,9 +20,12 @@ var character_sprite: Sprite2D
 var camera: Camera2D
 var action_flash := 0.0
 var equipped_tool := 0
+
 var custom_character_texture: Texture2D
+var custom_character_sheet: Texture2D
+var custom_sheet_hframes := 1
+var custom_sheet_vframes := 1
 var custom_character_scale := Vector2(1.18,1.18)
-var watercolor_walk_material: ShaderMaterial
 
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
@@ -59,13 +43,6 @@ func _ready() -> void:
 	character_sprite.z_index = 2
 	character_sprite.scale = Vector2(1.18, 1.18)
 	add_child(character_sprite)
-
-	var walk_shader := Shader.new()
-	walk_shader.code = WALK_SHADER_CODE
-	watercolor_walk_material = ShaderMaterial.new()
-	watercolor_walk_material.shader = walk_shader
-	watercolor_walk_material.set_shader_parameter("walk_phase",0.0)
-	watercolor_walk_material.set_shader_parameter("walk_amount",0.0)
 
 	camera = Camera2D.new()
 	camera.enabled = true
@@ -108,48 +85,80 @@ func _physics_process(delta: float) -> void:
 	_update_sprite()
 	queue_redraw()
 
+func _sheet_row_for_facing() -> int:
+	if absf(facing.x) > absf(facing.y):
+		return 1 if facing.x > 0.0 else 2
+	return 0 if facing.y >= 0.0 else 3
+
 func _update_sprite() -> void:
 	if not character_sprite:
 		return
-	if custom_character_texture:
+
+	character_sprite.material = null
+	character_sprite.flip_h = false
+	character_sprite.rotation = 0.0
+
+	if custom_character_sheet:
+		character_sprite.texture = custom_character_sheet
+		character_sprite.hframes = custom_sheet_hframes
+		character_sprite.vframes = custom_sheet_vframes
+		var row := _sheet_row_for_facing()
+		var col := 0
+		if is_walking:
+			# Actual authored walking poses. No UV warping, no fake leg bending.
+			col = 1 + (int(floor(walk_time)) % 3)
+		character_sprite.frame_coords = Vector2i(col, row)
+		character_sprite.position = Vector2(0, -20)
+		character_sprite.scale = custom_character_scale
+	elif custom_character_texture:
+		character_sprite.hframes = 1
+		character_sprite.vframes = 1
+		character_sprite.frame = 0
 		character_sprite.texture = custom_character_texture
 		character_sprite.flip_h = facing.x < -0.15
-		character_sprite.material = watercolor_walk_material
-		if watercolor_walk_material:
-			watercolor_walk_material.set_shader_parameter("walk_phase",walk_time)
-			watercolor_walk_material.set_shader_parameter("walk_amount",1.0 if is_walking else 0.0)
+		character_sprite.position = Vector2(0, -9)
+		character_sprite.scale = custom_character_scale
 	else:
-		character_sprite.material = null
-		character_sprite.flip_h = false
+		character_sprite.hframes = 1
+		character_sprite.vframes = 1
+		character_sprite.frame = 0
 		if absf(facing.x) > absf(facing.y):
 			character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
 		else:
 			character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
+		character_sprite.position = Vector2(0, -9)
+		character_sprite.scale = Vector2(1.18, 1.18)
 
-	var bob := 0.0
-	var sway := 0.0
-	if is_walking:
-		bob = absf(sin(walk_time)) * 2.4
-		sway = sin(walk_time) * 0.018
-	character_sprite.position = Vector2(0, -9 - bob)
-	character_sprite.rotation = sway
-	character_sprite.scale = custom_character_scale if custom_character_texture else Vector2(1.18, 1.18)
+	# Real frame animation supplies the gait. Keep only a tiny vertical settle so
+	# the feet remain planted instead of the entire illustration rocking around.
+	if custom_character_sheet and is_walking:
+		character_sprite.position.y -= 0.6 if (int(floor(walk_time)) % 2 == 0) else 0.0
+
 	if action_flash > 0.0:
 		var t := action_flash / 0.22
-		var base_scale := custom_character_scale if custom_character_texture else Vector2(1.18,1.18)
-		character_sprite.scale = Vector2(base_scale.x * (1.03 + 0.03*(1.0-t)), base_scale.y * 0.97)
-		character_sprite.rotation += sin(t * PI) * 0.05 * signf(facing.x if absf(facing.x) > 0.2 else 1.0)
+		var base_scale := custom_character_scale if (custom_character_texture or custom_character_sheet) else Vector2(1.18,1.18)
+		character_sprite.scale = Vector2(base_scale.x * (1.02 + 0.02*(1.0-t)), base_scale.y * 0.985)
 
 func set_custom_character_texture(texture: Texture2D, scale_value: Vector2 = Vector2(1.0,1.0)) -> void:
+	custom_character_sheet = null
 	custom_character_texture = texture
+	custom_character_scale = scale_value
+	_update_sprite()
+
+func set_custom_character_sheet(texture: Texture2D, hframes_value: int, vframes_value: int, scale_value: Vector2 = Vector2(1.0,1.0)) -> void:
+	custom_character_texture = null
+	custom_character_sheet = texture
+	custom_sheet_hframes = maxi(1, hframes_value)
+	custom_sheet_vframes = maxi(1, vframes_value)
 	custom_character_scale = scale_value
 	_update_sprite()
 
 func clear_custom_character_texture() -> void:
 	custom_character_texture = null
+	custom_character_sheet = null
+	custom_sheet_hframes = 1
+	custom_sheet_vframes = 1
 	custom_character_scale = Vector2(1.18,1.18)
-	if character_sprite:
-		character_sprite.material = null
 	_update_sprite()
 
 func _unhandled_key_input(event: InputEvent) -> void:
