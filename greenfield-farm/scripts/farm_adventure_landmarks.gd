@@ -4,6 +4,7 @@ class_name FarmAdventureLandmarks
 const MINE_ENTRANCE := Vector2(1900,1290)
 const POND_FISH_SPOT := Vector2(1535,565)
 const RIVER_FISH_SPOT := Vector2(2040,655)
+const MINE_ART: Texture2D = preload("res://assets/art/v20/watercolor_mine.svg")
 
 var active := true
 var t := 0.0
@@ -26,31 +27,20 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if not active:
 		return
-	# Softer mine entrance to match the painted exterior world.
-	_draw_ellipse(MINE_ENTRANCE+Vector2(0,56),Vector2(72,16),Color(0.05,0.05,0.04,0.18))
-	draw_circle(MINE_ENTRANCE+Vector2(0,10),64,Color("#4b4a45"))
-	draw_circle(MINE_ENTRANCE,55,Color("#232528"))
-	draw_rect(Rect2(MINE_ENTRANCE.x-49,MINE_ENTRANCE.y,98,69),Color("#232528"),true)
-	for dx in [-36,-12,12,36]:
-		draw_line(MINE_ENTRANCE+Vector2(dx,-36),MINE_ENTRANCE+Vector2(dx,58),Color("#78583d"),6)
-	draw_line(MINE_ENTRANCE+Vector2(-54,-14),MINE_ENTRANCE+Vector2(54,-14),Color("#95704c"),8)
+	# v2.0: authored watercolor mine replaces the old procedural cave bars/circles.
+	var mine_rect := Rect2(MINE_ENTRANCE-Vector2(125,120),Vector2(250,208))
+	_draw_ellipse(MINE_ENTRANCE+Vector2(0,71),Vector2(82,15),Color(0.05,0.05,0.04,0.16))
+	draw_texture_rect(MINE_ART,mine_rect,false,Color.WHITE)
 
-	_draw_fishing_marker_v19(POND_FISH_SPOT)
-	_draw_fishing_marker_v19(RIVER_FISH_SPOT)
+	_draw_fishing_marker_v20(POND_FISH_SPOT)
+	_draw_fishing_marker_v20(RIVER_FISH_SPOT)
 
-func _draw_fishing_marker_v19(pos: Vector2) -> void:
-	# v1.9 removes the large gray placeholder panel. A tiny floating bobber and
-	# slim wood post communicate the fishing spot without breaking the watercolor art.
-	var bob: float = sin(t*2.2 + pos.x*0.01) * 2.2
-	draw_line(pos+Vector2(-9,-30),pos+Vector2(-1,9+bob),Color("#75523a"),2.5)
-	draw_circle(pos+Vector2(0,10+bob),6.0,Color("#e36f58"))
-	draw_circle(pos+Vector2(0,8+bob),3.0,Color("#f8edd0"))
-	draw_line(pos+Vector2(26,-17),pos+Vector2(26,18),Color("#6b4d36"),4.0)
-	# little fish-shaped plaque
-	var plaque: Rect2 = Rect2(pos+Vector2(12,-29),Vector2(38,17))
-	draw_rect(plaque,Color(0.67,0.52,0.32,0.82),true)
-	draw_circle(pos+Vector2(27,-21),3.4,Color("#4e7880"))
-	draw_colored_polygon(PackedVector2Array([pos+Vector2(30,-21),pos+Vector2(37,-25),pos+Vector2(37,-17)]),Color("#4e7880"))
+func _draw_fishing_marker_v20(pos: Vector2) -> void:
+	# Tiny unobtrusive bobber only; no UI-like panel beside the painted pond.
+	var bob: float = sin(t*2.2 + pos.x*0.01) * 2.0
+	draw_line(pos+Vector2(-8,-25),pos+Vector2(-1,8+bob),Color("#74543c"),2.2)
+	draw_circle(pos+Vector2(0,9+bob),5.2,Color("#df745c"))
+	draw_circle(pos+Vector2(0,7+bob),2.5,Color("#f6e8c8"))
 
 func _draw_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
