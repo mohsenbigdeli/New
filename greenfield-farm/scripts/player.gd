@@ -20,6 +20,8 @@ var character_sprite: Sprite2D
 var camera: Camera2D
 var action_flash := 0.0
 var equipped_tool := 0
+var custom_character_texture: Texture2D
+var custom_character_scale := Vector2(1.18,1.18)
 
 func _ready() -> void:
 	var shape := CollisionShape2D.new()
@@ -82,10 +84,15 @@ func _physics_process(delta: float) -> void:
 func _update_sprite() -> void:
 	if not character_sprite:
 		return
-	if absf(facing.x) > absf(facing.y):
-		character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
+	if custom_character_texture:
+		character_sprite.texture = custom_character_texture
+		character_sprite.flip_h = facing.x < -0.15
 	else:
-		character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
+		character_sprite.flip_h = false
+		if absf(facing.x) > absf(facing.y):
+			character_sprite.texture = TEX_RIGHT if facing.x > 0.0 else TEX_LEFT
+		else:
+			character_sprite.texture = TEX_DOWN if facing.y >= 0.0 else TEX_UP
 
 	var bob := 0.0
 	var sway := 0.0
@@ -94,11 +101,22 @@ func _update_sprite() -> void:
 		sway = sin(walk_time) * 0.016
 	character_sprite.position = Vector2(0, -9 - bob)
 	character_sprite.rotation = sway
-	character_sprite.scale = Vector2(1.18, 1.18)
+	character_sprite.scale = custom_character_scale if custom_character_texture else Vector2(1.18, 1.18)
 	if action_flash > 0.0:
 		var t := action_flash / 0.22
-		character_sprite.scale = Vector2(1.22 + 0.04*(1.0-t), 1.13)
+		var base_scale := custom_character_scale if custom_character_texture else Vector2(1.18,1.18)
+		character_sprite.scale = Vector2(base_scale.x * (1.03 + 0.03*(1.0-t)), base_scale.y * 0.97)
 		character_sprite.rotation += sin(t * PI) * 0.05 * signf(facing.x if absf(facing.x) > 0.2 else 1.0)
+
+func set_custom_character_texture(texture: Texture2D, scale_value: Vector2 = Vector2(1.0,1.0)) -> void:
+	custom_character_texture = texture
+	custom_character_scale = scale_value
+	_update_sprite()
+
+func clear_custom_character_texture() -> void:
+	custom_character_texture = null
+	custom_character_scale = Vector2(1.18,1.18)
+	_update_sprite()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if controls_locked:
