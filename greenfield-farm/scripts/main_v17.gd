@@ -28,20 +28,12 @@ func _set_room_state(room: String) -> void:
 	if room == "outside" and player and player.camera:
 		player.camera.zoom = Vector2(0.94,0.94)
 		player.camera.reset_smoothing()
-
-func _process(delta: float) -> void:
-	super(delta)
 	_apply_v17_farmer()
 
 func _apply_v17_farmer() -> void:
-	if not player or not player.character_sprite:
+	if not player:
 		return
-	player.character_sprite.texture = FARMER_V17
-	player.character_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	player.character_sprite.scale = Vector2(0.88,0.88)
-	# One authored painted pose is used for this art pass; mirroring at least gives
-	# left/right movement a visual response while preserving all gameplay logic.
-	player.character_sprite.flip_h = player.facing.x < -0.15
+	player.set_custom_character_texture(FARMER_V17,Vector2(0.88,0.88))
 
 func _apply_v17_ui() -> void:
 	if not ui:
