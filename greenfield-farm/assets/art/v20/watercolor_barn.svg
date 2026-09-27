@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="376" viewBox="0 0 520 376">
+<defs><filter id="w"><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="3" seed="8" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.8"/><feGaussianBlur stdDeviation=".22"/></filter><linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a94f43"/><stop offset="1" stop-color="#7f352f"/></linearGradient></defs>
+<g filter="url(#w)">
+<ellipse cx="260" cy="342" rx="182" ry="20" fill="#4f5737" opacity=".22"/>
+<path d="M87 175 Q128 72 260 55 Q390 73 434 175 L398 198 L120 198 Z" fill="#6d382d" stroke="#4f342b" stroke-width="8"/>
+<path d="M116 176 H404 V330 Q260 350 116 330 Z" fill="url(#red)" stroke="#5f3b31" stroke-width="8"/>
+<rect x="196" y="212" width="128" height="120" rx="5" fill="#5e392c" stroke="#40271f" stroke-width="8"/>
+<path d="M202 220 L318 324 M318 220 L202 324 M260 214v118" stroke="#c89263" stroke-width="9" opacity=".95"/>
+<rect x="145" y="216" width="42" height="54" rx="5" fill="#8cb7bd" stroke="#e8d5b3" stroke-width="6"/><rect x="335" y="216" width="42" height="54" rx="5" fill="#8cb7bd" stroke="#e8d5b3" stroke-width="6"/>
+<circle cx="260" cy="149" r="38" fill="#dfd3ae" stroke="#5b4637" stroke-width="7"/><path d="M260 118v62M229 149h62" stroke="#87654a" stroke-width="5"/>
+<g fill="#d7b85d" stroke="#a27f42" stroke-width="3"><ellipse cx="134" cy="322" rx="31" ry="14"/><ellipse cx="160" cy="329" rx="31" ry="14"/><ellipse cx="388" cy="324" rx="33" ry="15"/></g>
+<g fill="#6d9655"><circle cx="109" cy="305" r="20"/><circle cx="411" cy="306" r="21"/></g>
+</g></svg>
