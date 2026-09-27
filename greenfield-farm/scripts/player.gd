@@ -15,6 +15,7 @@ var can_act := true
 var controls_locked := false
 var world_size := Vector2(2304, 1536)
 var walk_time := 0.0
+var walk_visual_hold := 0.0
 var is_walking := false
 var character_sprite: Sprite2D
 var camera: Camera2D
@@ -62,6 +63,8 @@ func _physics_process(delta: float) -> void:
 	if controls_locked:
 		velocity = Vector2.ZERO
 		is_walking = false
+		walk_visual_hold = 0.0
+		walk_time = 0.0
 		_update_sprite()
 		queue_redraw()
 		return
@@ -75,8 +78,11 @@ func _physics_process(delta: float) -> void:
 		dir = dir.normalized()
 		facing = dir
 		walk_time += delta * 8.0
+		walk_visual_hold = 0.12
 	else:
-		walk_time = 0.0
+		walk_visual_hold = maxf(0.0, walk_visual_hold - delta)
+		if walk_visual_hold <= 0.0:
+			walk_time = 0.0
 
 	velocity = dir * speed
 	move_and_slide()
@@ -84,6 +90,9 @@ func _physics_process(delta: float) -> void:
 	position.y = clamp(position.y, 56.0, world_size.y - 48.0)
 	_update_sprite()
 	queue_redraw()
+
+func is_walk_visual_active() -> bool:
+	return is_walking or walk_visual_hold > 0.0
 
 func _sheet_row_for_facing() -> int:
 	if absf(facing.x) > absf(facing.y):
@@ -97,6 +106,7 @@ func _update_sprite() -> void:
 	character_sprite.material = null
 	character_sprite.flip_h = false
 	character_sprite.rotation = 0.0
+	var visual_walk := is_walk_visual_active()
 
 	if custom_character_sheet:
 		character_sprite.texture = custom_character_sheet
@@ -104,8 +114,7 @@ func _update_sprite() -> void:
 		character_sprite.vframes = custom_sheet_vframes
 		var row := _sheet_row_for_facing()
 		var col := 0
-		if is_walking:
-			# Actual authored walking poses. No UV warping, no fake leg bending.
+		if visual_walk:
 			col = 1 + (int(floor(walk_time)) % 3)
 		character_sprite.frame_coords = Vector2i(col, row)
 		character_sprite.position = Vector2(0, -20)
@@ -129,10 +138,8 @@ func _update_sprite() -> void:
 		character_sprite.position = Vector2(0, -9)
 		character_sprite.scale = Vector2(1.18, 1.18)
 
-	# Real frame animation supplies the gait. Keep only a tiny vertical settle so
-	# the feet remain planted instead of the entire illustration rocking around.
-	if custom_character_sheet and is_walking:
-		character_sprite.position.y -= 0.6 if (int(floor(walk_time)) % 2 == 0) else 0.0
+	if custom_character_sheet and visual_walk:
+		character_sprite.position.y -= 0.8 if (int(floor(walk_time)) % 2 == 0) else 0.0
 
 	if action_flash > 0.0:
 		var t := action_flash / 0.22
@@ -159,6 +166,7 @@ func clear_custom_character_texture() -> void:
 	custom_sheet_hframes = 1
 	custom_sheet_vframes = 1
 	custom_character_scale = Vector2(1.18,1.18)
+	walk_visual_hold = 0.0
 	_update_sprite()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -179,6 +187,7 @@ func set_controls_locked(locked: bool) -> void:
 	if locked:
 		virtual_move = Vector2.ZERO
 		velocity = Vector2.ZERO
+		walk_visual_hold = 0.0
 
 func set_world_bounds(size: Vector2, zoom_value: float = 1.10) -> void:
 	world_size = size
