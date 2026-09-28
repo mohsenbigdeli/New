@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="512" viewBox="0 0 384 512">
+<defs>
+  <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6c89f"/><stop offset="1" stop-color="#d98f67"/></linearGradient>
+  <linearGradient id="denim" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#79b3c6"/><stop offset="1" stop-color="#3f7892"/></linearGradient>
+  <linearGradient id="hat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1cf78"/><stop offset="1" stop-color="#b57d36"/></linearGradient>
+  <linearGradient id="boot" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#75513a"/><stop offset="1" stop-color="#382820"/></linearGradient>
+  <filter id="soft"><feGaussianBlur stdDeviation=".35"/></filter>
+
+  <g id="shadow"><ellipse cx="48" cy="116" rx="24" ry="5" fill="#244532" opacity=".23" filter="url(#soft)"/></g>
+
+  <g id="upper-front">
+    <path d="M28 58 Q34 48 48 48 Q62 48 68 58 L64 87 L32 87 Z" fill="url(#denim)" stroke="#315f72" stroke-width="1.4"/>
+    <path d="M32 60 Q23 69 25 83 L31 90 L37 84 L35 61 ZM64 61 L59 84 L65 90 L72 82 Q73 69 68 58Z" fill="url(#skin)" stroke="#9d6049" stroke-width="1"/>
+    <circle cx="48" cy="31" r="20" fill="url(#skin)" stroke="#7e5039" stroke-width="1.5"/>
+    <path d="M30 29 Q34 10 48 9 Q63 10 67 29 Q58 22 48 22 Q38 22 30 29Z" fill="#654431"/>
+    <ellipse cx="48" cy="11" rx="30" ry="7" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M32 12 Q35 1 48 1 Q61 1 64 12Z" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M34 9 Q48 12 62 9" stroke="#a34d3f" stroke-width="2.5" fill="none"/>
+    <ellipse cx="41" cy="31" rx="2" ry="2.8" fill="#282522"/><ellipse cx="55" cy="31" rx="2" ry="2.8" fill="#282522"/>
+    <path d="M42 40 Q48 45 54 40" stroke="#ae6259" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M37 59 H59 M39 63 V81 M57 63 V81" stroke="#d4e5d9" stroke-width="1.4" opacity=".65"/>
+    <circle cx="42" cy="72" r="1.6" fill="#e3c56c"/><circle cx="54" cy="72" r="1.6" fill="#e3c56c"/>
+  </g>
+
+  <g id="upper-side">
+    <path d="M31 58 Q38 48 51 49 Q63 52 67 62 L62 87 L34 87 Z" fill="url(#denim)" stroke="#315f72" stroke-width="1.4"/>
+    <path d="M61 61 Q73 67 77 78 L73 87 L66 84 L57 65 ZM34 61 Q27 70 29 82 L35 88 L40 82 L38 62Z" fill="url(#skin)" stroke="#9d6049" stroke-width="1"/>
+    <ellipse cx="52" cy="31" rx="19" ry="20" fill="url(#skin)" stroke="#7e5039" stroke-width="1.5"/>
+    <path d="M34 29 Q38 11 52 10 Q65 13 69 29 Q60 23 51 23 Q42 23 34 29Z" fill="#654431"/>
+    <ellipse cx="49" cy="11" rx="30" ry="7" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M34 12 Q37 1 49 1 Q62 1 65 12Z" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M36 9 Q49 12 62 9" stroke="#a34d3f" stroke-width="2.5" fill="none"/>
+    <ellipse cx="59" cy="31" rx="2" ry="2.8" fill="#282522"/>
+    <path d="M60 40 Q65 42 68 38" stroke="#ae6259" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M40 59 H58 M42 63 V81 M56 63 V81" stroke="#d4e5d9" stroke-width="1.4" opacity=".65"/>
+  </g>
+
+  <g id="upper-back">
+    <path d="M28 58 Q34 48 48 48 Q62 48 68 58 L64 87 L32 87 Z" fill="url(#denim)" stroke="#315f72" stroke-width="1.4"/>
+    <path d="M32 60 Q23 69 25 83 L31 90 L37 84 L35 61 ZM64 61 L59 84 L65 90 L72 82 Q73 69 68 58Z" fill="url(#skin)" stroke="#9d6049" stroke-width="1"/>
+    <circle cx="48" cy="31" r="20" fill="url(#skin)" stroke="#7e5039" stroke-width="1.5"/>
+    <path d="M29 34 Q30 11 48 9 Q66 11 67 34 Q58 42 48 42 Q38 42 29 34Z" fill="#654431"/>
+    <ellipse cx="48" cy="11" rx="30" ry="7" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M32 12 Q35 1 48 1 Q61 1 64 12Z" fill="url(#hat)" stroke="#78542e" stroke-width="1.5"/>
+    <path d="M34 9 Q48 12 62 9" stroke="#a34d3f" stroke-width="2.5" fill="none"/>
+    <path d="M37 59 H59 M39 63 V81 M57 63 V81" stroke="#d4e5d9" stroke-width="1.4" opacity=".55"/>
+  </g>
+
+  <g id="legs-idle">
+    <path d="M34 83 L44 83 L43 106 L33 106 Z M52 83 L62 83 L63 106 L53 106 Z" fill="#465a65"/>
+    <path d="M30 103 Q38 99 46 103 L45 112 H28 Q28 106 30 103 Z M51 103 Q59 99 66 103 Q69 106 68 112 H51Z" fill="url(#boot)"/>
+  </g>
+  <g id="legs-a">
+    <path d="M35 82 L46 83 L40 107 L30 105 Z M51 83 L61 81 L68 103 L58 107 Z" fill="#465a65"/>
+    <path d="M24 102 Q34 98 43 103 L41 112 H21 Q21 106 24 102 Z M57 101 Q64 99 71 102 L77 108 L59 112Z" fill="url(#boot)"/>
+  </g>
+  <g id="legs-b">
+    <path d="M35 83 L45 81 L52 104 L42 107 Z M50 82 L61 83 L56 107 L46 105 Z" fill="#465a65"/>
+    <path d="M37 101 Q44 99 51 102 L57 108 L39 112Z M53 102 Q62 98 72 103 Q75 106 74 112 H54Z" fill="url(#boot)"/>
+  </g>
+  <g id="legs-contact">
+    <path d="M34 83 L44 83 L42 106 L32 106 Z M52 83 L62 83 L64 106 L54 106 Z" fill="#465a65"/>
+    <path d="M27 103 Q36 100 45 103 L44 112 H25 Q25 106 27 103 Z M52 103 Q61 100 69 103 L72 110 H53Z" fill="url(#boot)"/>
+  </g>
+</defs>
+
+<!-- DOWN -->
+<g transform="translate(0 0)"><use href="#shadow"/><use href="#legs-idle"/><use href="#upper-front"/></g>
+<g transform="translate(96 0)"><use href="#shadow"/><use href="#legs-a"/><use href="#upper-front"/></g>
+<g transform="translate(192 0)"><use href="#shadow"/><use href="#legs-b"/><use href="#upper-front"/></g>
+<g transform="translate(288 0)"><use href="#shadow"/><use href="#legs-contact"/><use href="#upper-front"/></g>
+
+<!-- RIGHT -->
+<g transform="translate(0 128)"><use href="#shadow"/><use href="#legs-idle"/><use href="#upper-side"/></g>
+<g transform="translate(96 128)"><use href="#shadow"/><use href="#legs-a"/><use href="#upper-side"/></g>
+<g transform="translate(192 128)"><use href="#shadow"/><use href="#legs-b"/><use href="#upper-side"/></g>
+<g transform="translate(288 128)"><use href="#shadow"/><use href="#legs-contact"/><use href="#upper-side"/></g>
+
+<!-- LEFT -->
+<g transform="translate(96 256) scale(-1 1)"><use href="#shadow"/><use href="#legs-idle"/><use href="#upper-side"/></g>
+<g transform="translate(192 256) scale(-1 1)"><use href="#shadow"/><use href="#legs-a"/><use href="#upper-side"/></g>
+<g transform="translate(288 256) scale(-1 1)"><use href="#shadow"/><use href="#legs-b"/><use href="#upper-side"/></g>
+<g transform="translate(384 256) scale(-1 1)"><use href="#shadow"/><use href="#legs-contact"/><use href="#upper-side"/></g>
+
+<!-- UP -->
+<g transform="translate(0 384)"><use href="#shadow"/><use href="#legs-idle"/><use href="#upper-back"/></g>
+<g transform="translate(96 384)"><use href="#shadow"/><use href="#legs-a"/><use href="#upper-back"/></g>
+<g transform="translate(192 384)"><use href="#shadow"/><use href="#legs-b"/><use href="#upper-back"/></g>
+<g transform="translate(288 384)"><use href="#shadow"/><use href="#legs-contact"/><use href="#upper-back"/></g>
+</svg>
