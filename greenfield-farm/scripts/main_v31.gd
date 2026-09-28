@@ -2,7 +2,7 @@ extends "res://scripts/main_v30.gd"
 
 # v3.1 replaces the almost-static v2.4 runtime sheet with an authored 4x4
 # farmer sheet whose leg silhouettes visibly change on every stride.
-const FARMER_WALK_SHEET_V31: Texture2D = preload("res://assets/art/v31/farmer_walk_sheet.png")
+const FARMER_WALK_SHEET_V31: Texture2D = preload("res://assets/art/v31/farmer_walk_sheet.svg")
 var v31_walk_sequence: Array[int] = [1, 3, 2, 3]
 
 func _ready() -> void:
