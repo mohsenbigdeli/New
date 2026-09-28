@@ -63,14 +63,14 @@ jobs:
             echo "No APK found"
             exit 1
           fi
-          cp "$APK" artifact/GreenfieldFarm-v4.1-debug.apk
-          ls -lh artifact/GreenfieldFarm-v4.1-debug.apk
+          cp "$APK" artifact/GreenfieldFarm-v5.0-rebuild-debug.apk
+          ls -lh artifact/GreenfieldFarm-v5.0-rebuild-debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GreenfieldFarm-v4.1-Android
-          path: artifact/GreenfieldFarm-v4.1-debug.apk
+          name: GreenfieldFarm-v5.0-Rebuild-Android
+          path: artifact/GreenfieldFarm-v5.0-rebuild-debug.apk
           if-no-files-found: error
           retention-days: 14
 
