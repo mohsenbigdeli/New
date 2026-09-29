@@ -1,13 +1,22 @@
 extends Area2D
 class_name FreshPlot
 
+const FARM := preload("res://assets/pro/kenney/tiny_farm.png")
+
 @onready var soil: Sprite2D = $Soil
 @onready var crop: Sprite2D = $Crop
 
 var state := 0
 var grow_time := 0.0
 
+func _atlas(col: int, row: int) -> AtlasTexture:
+	var atlas := AtlasTexture.new()
+	atlas.atlas = FARM
+	atlas.region = Rect2(col * 16, row * 16, 16, 16)
+	return atlas
+
 func _ready() -> void:
+	soil.texture = _atlas(3, 4)
 	_update_visual()
 
 func _process(delta: float) -> void:
@@ -22,42 +31,32 @@ func interact() -> Dictionary:
 		0:
 			state = 1
 			_update_visual()
-			return {"message":"Soil tilled. USE again to plant a turnip."}
+			return {"message":"The soil is ready."}
 		1:
 			state = 2
 			_update_visual()
-			return {"message":"Turnip planted. Water it with USE."}
+			return {"message":"Seeds planted."}
 		2:
 			state = 3
 			grow_time = 0.0
 			_update_visual()
-			return {"message":"Watered. The turnip will grow in a few seconds."}
+			return {"message":"Watered. Give it a moment to grow."}
 		3:
-			return {"message":"The turnip is still growing…"}
+			return {"message":"Still growing…"}
 		4:
 			state = 0
 			grow_time = 0.0
 			_update_visual()
-			return {"message":"Turnip harvested!", "harvest":1}
+			return {"message":"Harvested!", "harvest":1}
 	return {}
 
 func _update_visual() -> void:
+	soil.visible = state >= 1
 	crop.visible = state >= 2
 	match state:
-		0:
-			soil.modulate = Color("#c8ad7f")
-			crop.visible = false
-		1:
-			soil.modulate = Color.WHITE
 		2:
-			soil.modulate = Color("#f3e7ca")
-			crop.scale = Vector2(0.16, 0.16)
-			crop.modulate = Color("#9bc77b")
+			crop.texture = _atlas(4, 1)
 		3:
-			soil.modulate = Color("#b4c4b0")
-			crop.scale = Vector2(0.25, 0.25)
-			crop.modulate = Color("#80b966")
+			crop.texture = _atlas(5, 2)
 		4:
-			soil.modulate = Color.WHITE
-			crop.scale = Vector2(0.38, 0.38)
-			crop.modulate = Color.WHITE
+			crop.texture = _atlas(8, 2)

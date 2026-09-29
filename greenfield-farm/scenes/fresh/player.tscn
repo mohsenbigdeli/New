@@ -1,38 +1,38 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource path="res://scripts/fresh/player.gd" type="Script" id="1_player"]
-[ext_resource path="res://assets/art/v17/watercolor_farmer.png" type="Texture2D" id="2_farmer"]
-[ext_resource path="res://assets/art/fresh/npc_shadow.svg" type="Texture2D" id="3_shadow"]
+[ext_resource path="res://assets/pro/kenney/player_walk.png" type="Texture2D" id="2_player"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
-radius = 13.0
-height = 38.0
+radius = 10.0
+height = 25.0
 
 [sub_resource type="CircleShape2D" id="Circle_interact"]
-radius = 82.0
+radius = 60.0
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 8
 script = ExtResource("1_player")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 7)
+position = Vector2(0, 9)
 shape = SubResource("Capsule_player")
 
-[node name="Shadow" type="Sprite2D" parent="."]
+[node name="Shadow" type="Polygon2D" parent="."]
 z_index = -1
-position = Vector2(0, 10)
-texture = ExtResource("3_shadow")
-scale = Vector2(0.84, 0.84)
+position = Vector2(0, 16)
+polygon = PackedVector2Array(-13, -2, 13, -2, 17, 1, 13, 4, -13, 4, -17, 1)
+color = Color(0.12, 0.09, 0.10, 0.28)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -34)
-texture = ExtResource("2_farmer")
-scale = Vector2(1.10, 1.10)
+position = Vector2(0, -5)
+texture = ExtResource("2_player")
+region_enabled = true
+region_rect = Rect2(0, 0, 48, 48)
 texture_filter = 1
 
 [node name="InteractionDetector" type="Area2D" parent="."]
-position = Vector2(0, -4)
+position = Vector2(0, 2)
 collision_layer = 0
 collision_mask = 2
 monitoring = true
@@ -42,10 +42,9 @@ monitorable = false
 shape = SubResource("Circle_interact")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.48, 1.48)
-position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+zoom = Vector2(1, 1)
+position_smoothing_enabled = false
 limit_left = 0
 limit_top = 0
-limit_right = 1600
-limit_bottom = 1050
+limit_right = 1920
+limit_bottom = 1056

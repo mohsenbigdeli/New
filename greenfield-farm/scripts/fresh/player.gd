@@ -8,12 +8,13 @@ signal interaction_result(data: Dictionary)
 
 var touch_move := Vector2.ZERO
 var facing := Vector2.DOWN
-var speed := 185.0
-var walk_phase := 0.0
-const SPRITE_REST := Vector2(0, -34)
+var speed := 172.0
+var walk_clock := 0.0
+
+const FRAME_SIZE := Vector2(48, 48)
 
 func _ready() -> void:
-	sprite.position = SPRITE_REST
+	sprite.region_rect = Rect2(Vector2.ZERO, FRAME_SIZE)
 
 func _physics_process(delta: float) -> void:
 	var keyboard := Vector2(
@@ -23,11 +24,13 @@ func _physics_process(delta: float) -> void:
 	var move := keyboard if keyboard.length() > 0.05 else touch_move
 	if move.length() > 1.0:
 		move = move.normalized()
+
 	velocity = move * speed
 	if move.length() > 0.05:
 		facing = move.normalized()
 	move_and_slide()
-	_update_visual(move, delta)
+	global_position = global_position.round()
+	_update_animation(move, delta)
 
 func set_touch_move(value: Vector2) -> void:
 	touch_move = value.limit_length(1.0)
@@ -43,21 +46,19 @@ func interact() -> void:
 			best = area
 			best_distance = d
 	if best == null:
-		interaction_result.emit({"message":"Nothing nearby needs attention."})
+		interaction_result.emit({"message":"Nothing to use here."})
 		return
 	var result = best.interact()
 	if result is Dictionary:
 		interaction_result.emit(result)
 
-func _update_visual(move: Vector2, delta: float) -> void:
-	if absf(facing.x) > 0.18:
+func _update_animation(move: Vector2, delta: float) -> void:
+	if absf(facing.x) > 0.20:
 		sprite.flip_h = facing.x < 0.0
 	if move.length() > 0.05:
-		walk_phase += delta * 10.0
-		sprite.position = SPRITE_REST + Vector2(0, sin(walk_phase) * 2.4)
-		sprite.rotation = sin(walk_phase * 0.5) * 0.018
+		walk_clock += delta
+		var frame := int(floor(walk_clock * 7.0)) % 2
+		sprite.region_rect = Rect2(Vector2(frame * 48, 0), FRAME_SIZE)
 	else:
-		walk_phase = 0.0
-		var weight := minf(1.0, delta * 12.0)
-		sprite.position = sprite.position.lerp(SPRITE_REST, weight)
-		sprite.rotation = lerpf(sprite.rotation, 0.0, weight)
+		walk_clock = 0.0
+		sprite.region_rect = Rect2(Vector2.ZERO, FRAME_SIZE)

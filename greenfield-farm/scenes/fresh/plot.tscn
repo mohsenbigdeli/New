@@ -1,11 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource path="res://scripts/fresh/plot.gd" type="Script" id="1_plot"]
-[ext_resource path="res://assets/art/icon_turnip.svg" type="Texture2D" id="2_turnip"]
-[ext_resource path="res://assets/art/fresh/plot_watercolor.svg" type="Texture2D" id="3_soil"]
 
 [sub_resource type="RectangleShape2D" id="Rect_plot"]
-size = Vector2(112, 82)
+size = Vector2(54, 54)
 
 [node name="Plot" type="Area2D"]
 collision_layer = 2
@@ -13,14 +11,15 @@ collision_mask = 0
 script = ExtResource("1_plot")
 
 [node name="Soil" type="Sprite2D" parent="."]
-texture = ExtResource("3_soil")
+visible = false
+scale = Vector2(3, 3)
 texture_filter = 1
 
 [node name="Crop" type="Sprite2D" parent="."]
-position = Vector2(0, -8)
-texture = ExtResource("2_turnip")
-scale = Vector2(0.22, 0.22)
 visible = false
+position = Vector2(0, -4)
+scale = Vector2(3, 3)
+texture_filter = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("Rect_plot")

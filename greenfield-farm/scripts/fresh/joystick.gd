@@ -41,7 +41,12 @@ func _set_knob(local_pos: Vector2) -> void:
 
 func _draw() -> void:
 	var center := size * 0.5
-	draw_circle(center, RADIUS + 11.0, Color(0.10, 0.16, 0.09, 0.12))
-	draw_circle(center, RADIUS, Color(0.96, 0.90, 0.72, 0.21))
-	draw_circle(center + knob, 18.0, Color(0.98, 0.91, 0.67, 0.66))
-	draw_arc(center, RADIUS + 3.0, 0.0, TAU, 36, Color(0.28, 0.36, 0.18, 0.20), 2.0)
+	var edge := Color(0.17, 0.12, 0.14, 0.74)
+	var face := Color(0.98, 0.84, 0.53, 0.50)
+	var knob_color := Color(1.0, 0.94, 0.75, 0.88)
+	draw_rect(Rect2(center + Vector2(-18, -54), Vector2(36, 36)), edge)
+	draw_rect(Rect2(center + Vector2(-18, 18), Vector2(36, 36)), edge)
+	draw_rect(Rect2(center + Vector2(-54, -18), Vector2(36, 36)), edge)
+	draw_rect(Rect2(center + Vector2(18, -18), Vector2(36, 36)), edge)
+	draw_rect(Rect2(center + Vector2(-18, -18), Vector2(36, 36)), face)
+	draw_rect(Rect2(center + knob - Vector2(10, 10), Vector2(20, 20)), knob_color)
