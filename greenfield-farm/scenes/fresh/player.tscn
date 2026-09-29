@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource path="res://scripts/fresh/player.gd" type="Script" id="1_player"]
 [ext_resource path="res://assets/art/v17/watercolor_farmer.png" type="Texture2D" id="2_farmer"]
+[ext_resource path="res://assets/art/fresh/npc_shadow.svg" type="Texture2D" id="3_shadow"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 13.0
@@ -18,10 +19,16 @@ script = ExtResource("1_player")
 position = Vector2(0, 7)
 shape = SubResource("Capsule_player")
 
+[node name="Shadow" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(0, 10)
+texture = ExtResource("3_shadow")
+scale = Vector2(0.84, 0.84)
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -34)
 texture = ExtResource("2_farmer")
-scale = Vector2(1.05, 1.05)
+scale = Vector2(1.08, 1.08)
 texture_filter = 1
 
 [node name="InteractionDetector" type="Area2D" parent="."]
@@ -35,9 +42,9 @@ monitorable = false
 shape = SubResource("Circle_interact")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.32, 1.32)
+zoom = Vector2(1.38, 1.38)
 position_smoothing_enabled = true
-position_smoothing_speed = 7.0
+position_smoothing_speed = 7.5
 limit_left = 0
 limit_top = 0
 limit_right = 2000

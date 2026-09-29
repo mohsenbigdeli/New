@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource path="res://scenes/fresh/player.tscn" type="PackedScene" id="1_player"]
 [ext_resource path="res://scenes/fresh/plot.tscn" type="PackedScene" id="2_plot"]
@@ -9,7 +9,9 @@
 [ext_resource path="res://assets/art/v17/watercolor_lina.png" type="Texture2D" id="7_lina"]
 [ext_resource path="res://assets/art/v17/watercolor_marnie.png" type="Texture2D" id="8_marnie"]
 [ext_resource path="res://scripts/fresh/interactable.gd" type="Script" id="9_interact"]
-[ext_resource path="res://assets/art/fresh/meadow_world.svg" type="Texture2D" id="10_meadow"]
+[ext_resource path="res://assets/art/fresh/meadow_world_v2.svg" type="Texture2D" id="10_meadow"]
+[ext_resource path="res://assets/art/fresh/garden_patch.svg" type="Texture2D" id="11_garden"]
+[ext_resource path="res://assets/art/fresh/npc_shadow.svg" type="Texture2D" id="12_shadow"]
 
 [sub_resource type="RectangleShape2D" id="HouseShape"]
 size = Vector2(430, 170)
@@ -27,7 +29,7 @@ size = Vector2(2000, 40)
 size = Vector2(40, 1300)
 
 [sub_resource type="CircleShape2D" id="InteractShape"]
-radius = 48.0
+radius = 54.0
 
 [node name="World" type="Node2D"]
 y_sort_enabled = true
@@ -38,18 +40,24 @@ position = Vector2(1000, 650)
 texture = ExtResource("10_meadow")
 texture_filter = 1
 
+[node name="GardenPatch" type="Sprite2D" parent="."]
+z_index = -4
+position = Vector2(500, 884)
+texture = ExtResource("11_garden")
+texture_filter = 1
+
 [node name="Pond" type="Sprite2D" parent="."]
 z_index = -2
 position = Vector2(1570, 575)
 texture = ExtResource("4_pond")
-scale = Vector2(1.95, 1.95)
+scale = Vector2(1.86, 1.86)
 texture_filter = 1
 
 [node name="House" type="Sprite2D" parent="."]
 position = Vector2(390, 305)
 y_sort_origin = 130
 texture = ExtResource("3_house")
-scale = Vector2(2.45, 2.45)
+scale = Vector2(2.35, 2.35)
 texture_filter = 1
 
 [node name="Trees" type="Node2D" parent="."]
@@ -109,24 +117,6 @@ y_sort_origin = 55
 texture = ExtResource("5_tree")
 scale = Vector2(1.55, 1.55)
 
-[node name="GardenFenceTop" type="Line2D" parent="."]
-z_index = -1
-points = PackedVector2Array(230, 715, 735, 715)
-width = 10.0
-default_color = Color(0.42, 0.28, 0.15, 0.92)
-
-[node name="GardenFenceLeft" type="Line2D" parent="."]
-z_index = -1
-points = PackedVector2Array(230, 715, 230, 1070)
-width = 10.0
-default_color = Color(0.42, 0.28, 0.15, 0.92)
-
-[node name="GardenFenceBottom" type="Line2D" parent="."]
-z_index = -1
-points = PackedVector2Array(230, 1070, 735, 1070)
-width = 10.0
-default_color = Color(0.42, 0.28, 0.15, 0.92)
-
 [node name="Rowan" type="Area2D" parent="."]
 position = Vector2(1090, 620)
 collision_layer = 2
@@ -134,19 +124,25 @@ collision_mask = 0
 script = ExtResource("9_interact")
 message = "Rowan: Morning! The east road leads past the pond. I heard someone saw a huge fish there yesterday."
 
+[node name="Shadow" type="Sprite2D" parent="Rowan"]
+z_index = -1
+position = Vector2(0, 9)
+texture = ExtResource("12_shadow")
+scale = Vector2(0.82, 0.82)
+
 [node name="Sprite2D" type="Sprite2D" parent="Rowan"]
-position = Vector2(0, -34)
+position = Vector2(0, -38)
 texture = ExtResource("6_rowan")
-scale = Vector2(0.86, 0.86)
+scale = Vector2(1.02, 1.02)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rowan"]
 shape = SubResource("InteractShape")
 
 [node name="Name" type="Label" parent="Rowan"]
-position = Vector2(-29, 22)
+position = Vector2(-28, 28)
 text = "ROWAN"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.86)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_font_sizes/font_size = 10
 
 [node name="Lina" type="Area2D" parent="."]
 position = Vector2(1320, 860)
@@ -155,19 +151,25 @@ collision_mask = 0
 script = ExtResource("9_interact")
 message = "Lina: The pond is clearest before noon. Bring a rod someday and I'll show you my favorite spot."
 
+[node name="Shadow" type="Sprite2D" parent="Lina"]
+z_index = -1
+position = Vector2(0, 9)
+texture = ExtResource("12_shadow")
+scale = Vector2(0.78, 0.78)
+
 [node name="Sprite2D" type="Sprite2D" parent="Lina"]
-position = Vector2(0, -33)
+position = Vector2(0, -37)
 texture = ExtResource("7_lina")
-scale = Vector2(0.84, 0.84)
+scale = Vector2(1.00, 1.00)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Lina"]
 shape = SubResource("InteractShape")
 
 [node name="Name" type="Label" parent="Lina"]
-position = Vector2(-21, 22)
+position = Vector2(-20, 28)
 text = "LINA"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.86)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_font_sizes/font_size = 10
 
 [node name="Marnie" type="Area2D" parent="."]
 position = Vector2(1095, 1040)
@@ -176,19 +178,25 @@ collision_mask = 0
 script = ExtResource("9_interact")
 message = "Marnie: Those six beds are yours now. Plant something good and bring me your first turnip."
 
+[node name="Shadow" type="Sprite2D" parent="Marnie"]
+z_index = -1
+position = Vector2(0, 9)
+texture = ExtResource("12_shadow")
+scale = Vector2(0.78, 0.78)
+
 [node name="Sprite2D" type="Sprite2D" parent="Marnie"]
-position = Vector2(0, -33)
+position = Vector2(0, -37)
 texture = ExtResource("8_marnie")
-scale = Vector2(0.84, 0.84)
+scale = Vector2(1.00, 1.00)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Marnie"]
 shape = SubResource("InteractShape")
 
 [node name="Name" type="Label" parent="Marnie"]
-position = Vector2(-27, 22)
+position = Vector2(-27, 28)
 text = "MARNIE"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.86)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_font_sizes/font_size = 10
 
 [node name="Plots" type="Node2D" parent="."]
 
@@ -211,13 +219,13 @@ position = Vector2(505, 930)
 position = Vector2(645, 930)
 
 [node name="FarmLabel" type="Label" parent="."]
-position = Vector2(285, 668)
+position = Vector2(300, 694)
 text = "HOME GARDEN"
-theme_override_colors/font_color = Color(0.18, 0.25, 0.12, 0.88)
+theme_override_colors/font_color = Color(0.18, 0.25, 0.12, 0.82)
 theme_override_colors/font_shadow_color = Color(1, 0.95, 0.75, 0.55)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 15
 
 [node name="Collisions" type="Node2D" parent="."]
 

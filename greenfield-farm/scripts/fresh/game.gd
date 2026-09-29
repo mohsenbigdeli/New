@@ -3,16 +3,18 @@ extends Node2D
 @onready var player: FreshPlayer = $World/Player
 @onready var joystick = $HUD/Joystick
 @onready var use_button: Button = $HUD/UseButton
+@onready var message_box: Panel = $HUD/MessageBox
 @onready var message_label: Label = $HUD/MessageBox/Message
 @onready var crop_label: Label = $HUD/CropCard/CropCount
 
 var harvested_turnips := 0
+var message_serial := 0
 
 func _ready() -> void:
 	joystick.move_changed.connect(player.set_touch_move)
 	use_button.pressed.connect(player.interact)
 	player.interaction_result.connect(_on_interaction_result)
-	_show_message("Welcome home. Six garden beds are ready for your first crop.")
+	_show_message("Six garden beds are ready. Till, plant, water, then harvest your first turnip.", 4.6)
 	_update_crop_label()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -24,10 +26,27 @@ func _on_interaction_result(data: Dictionary) -> void:
 	if data.has("harvest"):
 		harvested_turnips += int(data["harvest"])
 		_update_crop_label()
-	_show_message(String(data.get("message", "")))
+	var text := String(data.get("message", ""))
+	if not text.is_empty():
+		_show_message(text)
 
-func _show_message(text: String) -> void:
+func _show_message(text: String, hold_seconds: float = 3.7) -> void:
+	if text.is_empty():
+		return
+	message_serial += 1
+	var serial := message_serial
 	message_label.text = text
+	message_box.visible = true
+	message_box.modulate.a = 1.0
+	await get_tree().create_timer(hold_seconds).timeout
+	if serial != message_serial:
+		return
+	var tween := create_tween()
+	tween.tween_property(message_box, "modulate:a", 0.0, 0.30)
+	await tween.finished
+	if serial == message_serial:
+		message_box.visible = false
+		message_box.modulate.a = 1.0
 
 func _update_crop_label() -> void:
 	crop_label.text = "TURNIPS  %d" % harvested_turnips
