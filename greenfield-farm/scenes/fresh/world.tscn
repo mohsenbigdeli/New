@@ -1,0 +1,257 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource path="res://scenes/fresh/player.tscn" type="PackedScene" id="1_player"]
+[ext_resource path="res://scenes/fresh/plot.tscn" type="PackedScene" id="2_plot"]
+[ext_resource path="res://assets/art/v17/watercolor_house.png" type="Texture2D" id="3_house"]
+[ext_resource path="res://assets/art/v17/watercolor_pond.png" type="Texture2D" id="4_pond"]
+[ext_resource path="res://assets/art/v17/watercolor_tree.png" type="Texture2D" id="5_tree"]
+[ext_resource path="res://assets/art/v17/watercolor_rowan.png" type="Texture2D" id="6_rowan"]
+[ext_resource path="res://assets/art/v17/watercolor_lina.png" type="Texture2D" id="7_lina"]
+[ext_resource path="res://assets/art/v17/watercolor_marnie.png" type="Texture2D" id="8_marnie"]
+[ext_resource path="res://scripts/fresh/interactable.gd" type="Script" id="9_interact"]
+
+[sub_resource type="RectangleShape2D" id="HouseShape"]
+size = Vector2(320, 160)
+
+[sub_resource type="CircleShape2D" id="PondShape"]
+radius = 142.0
+
+[sub_resource type="CircleShape2D" id="TreeShape"]
+radius = 30.0
+
+[sub_resource type="RectangleShape2D" id="HBound"]
+size = Vector2(2200, 40)
+
+[sub_resource type="RectangleShape2D" id="VBound"]
+size = Vector2(40, 1400)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 48.0
+
+[node name="World" type="Node2D"]
+
+[node name="Ground" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 2200, 0, 2200, 1400, 0, 1400)
+color = Color(0.51, 0.72, 0.40, 1)
+
+[node name="RoadMain" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 360, 2200, 360, 2200, 470, 0, 470)
+color = Color(0.84, 0.71, 0.47, 1)
+
+[node name="RoadVillage" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(970, 360, 1080, 360, 1080, 1210, 970, 1210)
+color = Color(0.84, 0.71, 0.47, 1)
+
+[node name="VillageLane" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(970, 800, 2010, 800, 2010, 890, 970, 890)
+color = Color(0.84, 0.71, 0.47, 1)
+
+[node name="FarmMeadow" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(120, 620, 900, 620, 900, 1240, 120, 1240)
+color = Color(0.38, 0.64, 0.30, 0.28)
+
+[node name="House" type="Sprite2D" parent="."]
+position = Vector2(340, 245)
+texture = ExtResource("3_house")
+scale = Vector2(0.78, 0.78)
+texture_filter = 1
+
+[node name="Pond" type="Sprite2D" parent="."]
+position = Vector2(1580, 555)
+texture = ExtResource("4_pond")
+scale = Vector2(0.92, 0.92)
+texture_filter = 1
+
+[node name="Trees" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Tree1" type="Sprite2D" parent="Trees"]
+position = Vector2(90, 150)
+texture = ExtResource("5_tree")
+scale = Vector2(1.05, 1.05)
+
+[node name="Tree2" type="Sprite2D" parent="Trees"]
+position = Vector2(690, 180)
+texture = ExtResource("5_tree")
+scale = Vector2(0.95, 0.95)
+
+[node name="Tree3" type="Sprite2D" parent="Trees"]
+position = Vector2(910, 180)
+texture = ExtResource("5_tree")
+scale = Vector2(1.08, 1.08)
+
+[node name="Tree4" type="Sprite2D" parent="Trees"]
+position = Vector2(2050, 190)
+texture = ExtResource("5_tree")
+scale = Vector2(1.02, 1.02)
+
+[node name="Tree5" type="Sprite2D" parent="Trees"]
+position = Vector2(2080, 690)
+texture = ExtResource("5_tree")
+scale = Vector2(0.98, 0.98)
+
+[node name="Tree6" type="Sprite2D" parent="Trees"]
+position = Vector2(1950, 1280)
+texture = ExtResource("5_tree")
+scale = Vector2(1.08, 1.08)
+
+[node name="Tree7" type="Sprite2D" parent="Trees"]
+position = Vector2(930, 1310)
+texture = ExtResource("5_tree")
+scale = Vector2(0.98, 0.98)
+
+[node name="Tree8" type="Sprite2D" parent="Trees"]
+position = Vector2(100, 1280)
+texture = ExtResource("5_tree")
+scale = Vector2(1.05, 1.05)
+
+[node name="Rowan" type="Area2D" parent="."]
+position = Vector2(1270, 760)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("9_interact")
+message = "Rowan: This fresh start is small on purpose. Make the first six plots feel good before we expand."
+
+[node name="Sprite2D" type="Sprite2D" parent="Rowan"]
+position = Vector2(0, -44)
+texture = ExtResource("6_rowan")
+scale = Vector2(1.25, 1.25)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rowan"]
+shape = SubResource("InteractShape")
+
+[node name="Name" type="Label" parent="Rowan"]
+position = Vector2(-34, 22)
+text = "ROWAN"
+theme_override_font_sizes/font_size = 14
+
+[node name="Lina" type="Area2D" parent="."]
+position = Vector2(1470, 1010)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("9_interact")
+message = "Lina: The pond, paths and collisions are all real scene nodes now — no giant procedural overlay."
+
+[node name="Sprite2D" type="Sprite2D" parent="Lina"]
+position = Vector2(0, -42)
+texture = ExtResource("7_lina")
+scale = Vector2(1.22, 1.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Lina"]
+shape = SubResource("InteractShape")
+
+[node name="Name" type="Label" parent="Lina"]
+position = Vector2(-25, 22)
+text = "LINA"
+theme_override_font_sizes/font_size = 14
+
+[node name="Marnie" type="Area2D" parent="."]
+position = Vector2(1790, 1020)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("9_interact")
+message = "Marnie: Harvest a turnip, then we can build the next system on a clean foundation."
+
+[node name="Sprite2D" type="Sprite2D" parent="Marnie"]
+position = Vector2(0, -42)
+texture = ExtResource("8_marnie")
+scale = Vector2(1.22, 1.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Marnie"]
+shape = SubResource("InteractShape")
+
+[node name="Name" type="Label" parent="Marnie"]
+position = Vector2(-32, 22)
+text = "MARNIE"
+theme_override_font_sizes/font_size = 14
+
+[node name="Plots" type="Node2D" parent="."]
+
+[node name="Plot1" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(300, 790)
+
+[node name="Plot2" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(450, 790)
+
+[node name="Plot3" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(600, 790)
+
+[node name="Plot4" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(300, 950)
+
+[node name="Plot5" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(450, 950)
+
+[node name="Plot6" parent="Plots" instance=ExtResource("2_plot")]
+position = Vector2(600, 950)
+
+[node name="FarmLabel" type="Label" parent="."]
+position = Vector2(180, 650)
+text = "SIX-PLOT GARDEN"
+theme_override_colors/font_color = Color(0.18, 0.28, 0.16, 0.9)
+theme_override_font_sizes/font_size = 20
+
+[node name="Collisions" type="Node2D" parent="."]
+
+[node name="HouseBody" type="StaticBody2D" parent="Collisions"]
+position = Vector2(340, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/HouseBody"]
+shape = SubResource("HouseShape")
+
+[node name="PondBody" type="StaticBody2D" parent="Collisions"]
+position = Vector2(1580, 565)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/PondBody"]
+shape = SubResource("PondShape")
+
+[node name="TreeBody1" type="StaticBody2D" parent="Collisions"]
+position = Vector2(90, 205)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody1"]
+shape = SubResource("TreeShape")
+
+[node name="TreeBody2" type="StaticBody2D" parent="Collisions"]
+position = Vector2(690, 235)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody2"]
+shape = SubResource("TreeShape")
+
+[node name="TreeBody3" type="StaticBody2D" parent="Collisions"]
+position = Vector2(910, 235)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody3"]
+shape = SubResource("TreeShape")
+
+[node name="TreeBody4" type="StaticBody2D" parent="Collisions"]
+position = Vector2(2050, 245)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody4"]
+shape = SubResource("TreeShape")
+
+[node name="TopBound" type="StaticBody2D" parent="Collisions"]
+position = Vector2(1100, -20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TopBound"]
+shape = SubResource("HBound")
+
+[node name="BottomBound" type="StaticBody2D" parent="Collisions"]
+position = Vector2(1100, 1420)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/BottomBound"]
+shape = SubResource("HBound")
+
+[node name="LeftBound" type="StaticBody2D" parent="Collisions"]
+position = Vector2(-20, 700)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/LeftBound"]
+shape = SubResource("VBound")
+
+[node name="RightBound" type="StaticBody2D" parent="Collisions"]
+position = Vector2(2220, 700)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/RightBound"]
+shape = SubResource("VBound")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(780, 690)
