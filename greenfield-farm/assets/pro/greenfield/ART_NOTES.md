@@ -1,0 +1,9 @@
+# Character art provenance
+
+Created for Greenfield Farm using the built-in image_gen tool, 2026-09-29.
+Saved project asset: assets/pro/greenfield/farmer_directions.png.
+The original generated PNG and its transparency are preserved. farmer_frames.json contains inspected alpha bounds used to align the feet when rendering individual frames. The generated canvas is 1254 x 1254; the game uses 313-pixel cells.
+Kenney environment art retains its existing CC0 attribution in ../kenney/THIRD_PARTY_ASSETS.md.
+
+## Generation prompt
+Create a production game character sprite sheet on a transparent background. EXACT 4 columns by 4 rows evenly spaced grid, 1024x1024 canvas. Each 256x256 cell contains the SAME small cozy pixel-art farmer full body, straw hat with brown band, terracotta red shirt, denim blue overalls, brown boots, warm tan skin. Authentic clean chunky 16-bit pixel art, limited palette, hard square pixels, no painterly gradients, no outlines around cells. Character is approximately 100 pixels wide and 160 pixels tall in each 256px cell, center x=128, bottom of feet y=220 in EVERY cell. Keep all frames the exact same scale and aligned. Row 1 faces DOWN toward camera: idle, left foot forward, passing/contact, right foot forward. Row 2 faces RIGHT profile: idle, left foot forward, passing/contact, right foot forward. Row 3 faces UP away from camera: idle, left foot forward, passing/contact, right foot forward. Row 4 faces LEFT profile: idle, left foot forward, passing/contact, right foot forward. Strong visibly different leg and opposing arm positions in walking frames. Top-down RPG perspective. This is a technical animation atlas, not a presentation. No text, labels, grid lines, props, floor, ground shadows, scenery, border, extra characters, or baked background. Exactly sixteen poses.

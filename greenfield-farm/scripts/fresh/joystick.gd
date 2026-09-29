@@ -1,52 +1,44 @@
 extends Control
-
 signal move_changed(value: Vector2)
-
 var touch_id := -1
+var mouse_active := false
 var knob := Vector2.ZERO
-const RADIUS := 40.0
-
+const RADIUS := 52.0
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	set_process_input(true)
-	queue_redraw()
-
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventScreenTouch:
-		if event.pressed and touch_id == -1:
-			touch_id = event.index
-			_set_knob(event.position)
-		elif not event.pressed and event.index == touch_id:
-			touch_id = -1
-			knob = Vector2.ZERO
-			move_changed.emit(Vector2.ZERO)
-			queue_redraw()
+	if event is InputEventScreenTouch and event.pressed and touch_id == -1:
+		touch_id = event.index
+		_set_knob(event.position)
+		accept_event()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and touch_id == -1:
+		mouse_active = true
+		_set_knob(event.position)
+		accept_event()
+func _input(event: InputEvent) -> void:
+	if not is_visible_in_tree():
+		return
+	if event is InputEventScreenTouch and not event.pressed and event.index == touch_id:
+		release()
 	elif event is InputEventScreenDrag and event.index == touch_id:
-		_set_knob(event.position)
-	elif event is InputEventMouseButton:
-		if event.pressed:
-			_set_knob(event.position)
-		else:
-			knob = Vector2.ZERO
-			move_changed.emit(Vector2.ZERO)
-			queue_redraw()
-	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		_set_knob(event.position)
-
-func _set_knob(local_pos: Vector2) -> void:
-	var center := size * 0.5
-	knob = (local_pos - center).limit_length(RADIUS)
+		_set_knob(event.position - global_position)
+	elif event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT and mouse_active:
+		release()
+	elif event is InputEventMouseMotion and mouse_active:
+		_set_knob(event.position - global_position)
+func release() -> void:
+	touch_id = -1
+	mouse_active = false
+	knob = Vector2.ZERO
+	move_changed.emit(Vector2.ZERO)
+	queue_redraw()
+func _set_knob(point: Vector2) -> void:
+	knob = (point - size * 0.5).limit_length(RADIUS)
 	move_changed.emit(knob / RADIUS)
 	queue_redraw()
-
 func _draw() -> void:
 	var center := size * 0.5
-	var edge := Color(0.17, 0.12, 0.14, 0.74)
-	var face := Color(0.98, 0.84, 0.53, 0.50)
-	var knob_color := Color(1.0, 0.94, 0.75, 0.88)
-	draw_rect(Rect2(center + Vector2(-18, -54), Vector2(36, 36)), edge)
-	draw_rect(Rect2(center + Vector2(-18, 18), Vector2(36, 36)), edge)
-	draw_rect(Rect2(center + Vector2(-54, -18), Vector2(36, 36)), edge)
-	draw_rect(Rect2(center + Vector2(18, -18), Vector2(36, 36)), edge)
-	draw_rect(Rect2(center + Vector2(-18, -18), Vector2(36, 36)), face)
-	draw_rect(Rect2(center + knob - Vector2(10, 10), Vector2(20, 20)), knob_color)
+	draw_circle(center, 70, Color("244234a8"))
+	draw_arc(center, 70, 0, TAU, 64, Color("dfd0a580"), 2, true)
+	draw_circle(center + knob, 28, Color("f2d494dc"))
+	draw_arc(center + knob, 28, 0, TAU, 32, Color("fff2c6"), 2, true)

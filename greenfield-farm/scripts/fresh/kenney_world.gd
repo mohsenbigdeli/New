@@ -9,6 +9,11 @@ const MAP_W := 40
 const MAP_H := 22
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# Match the pond and paddock visuals with real, solid boundaries.
+	_add_obstacle(Vector2(1180,270), Vector2(360,156))
+	_add_obstacle(Vector2(1392,984), Vector2(264,24))
+	_add_obstacle(Vector2(1680,984), Vector2(168,24))
 	queue_redraw()
 
 func _tile(texture: Texture2D, col: int, row: int, x: int, y: int) -> void:
@@ -36,14 +41,12 @@ func _draw() -> void:
 			if rng.randf() < 0.035:
 				_tile(TOWN, 2, 0, x, y)
 
-	_dirt_rect(0, 9, MAP_W, 3)
+	_dirt_rect(0, 9, MAP_W, 2)
 	_dirt_rect(7, 4, 3, 8)
 	_dirt_rect(18, 9, 3, 8)
 	_dirt_rect(31, 7, 3, 5)
 
-	for yy in range(3):
-		for xx in range(3):
-			_tile(FARM, 6 + xx, 7 + yy, 5 + xx, 2 + yy)
+	draw_texture_rect_region(TOWN,Rect2(240,96,144,192),Rect2(0,64,48,64))
 	_tile(TOWN, 1, 3, 6, 5)
 
 	_tile(TOWN, 8, 8, 14, 7)
@@ -58,18 +61,29 @@ func _draw() -> void:
 		Vector2i(36, 20), Vector2i(39, 19), Vector2i(22, 20)
 	]
 	for p in tree_spots:
-		var t: Vector2i = tree_tiles[rng.randi_range(0, tree_tiles.size() - 1)]
-		_tile(TOWN, t.x, t.y, p.x, p.y)
-
-	for p in [
-		Vector2i(12, 4), Vector2i(13, 4), Vector2i(22, 5), Vector2i(23, 5),
-		Vector2i(27, 4), Vector2i(29, 6), Vector2i(35, 5), Vector2i(4, 7),
-		Vector2i(11, 6), Vector2i(37, 13), Vector2i(2, 13), Vector2i(23, 18),
-		Vector2i(15, 19)
-	]:
-		_tile(TOWN, 6, 0, p.x, p.y)
-	for p in [Vector2i(12, 5), Vector2i(28, 5), Vector2i(37, 7), Vector2i(2, 16)]:
-		_tile(TOWN, 6, 2, p.x, p.y)
+		var foot := Vector2(p) * STEP + Vector2(24,24)
+		draw_set_transform(foot + Vector2(0,16), 0, Vector2(1,0.3))
+		draw_circle(Vector2.ZERO, 25, Color(0.08,0.2,0.12,0.15))
+		draw_set_transform(Vector2.ZERO)
+		var column := 4 if rng.randf() > 0.4 else 5
+		draw_texture_rect_region(TOWN,Rect2(foot-Vector2(24,68),Vector2(48,96)),Rect2(column*16,0,16,32))
+	# Flower borders and small clumps use whole sprites, not fragments of trees.
+	for i in range(30):
+		var pos := Vector2(130+i*22,615+sin(i*2.4)*8)
+		draw_texture_rect_region(TOWN,Rect2(pos,Vector2(24,24)),Rect2(32,0,16,16))
+	for i in range(18):
+		var pos := Vector2(800+sin(i*1.3)*24,190+i*13)
+		draw_texture_rect_region(FARM,Rect2(pos,Vector2(26,26)),Rect2(96,48,16,16))
+	# Stepped pixel shoreline, quiet blue water and lily pads.
+	draw_rect(Rect2(974,174,412,190),Color("6b965c"))
+	draw_rect(Rect2(990,186,380,168),Color("5f9e9b"))
+	draw_rect(Rect2(1002,198,356,144),Color("75b4ad"))
+	for i in range(9):
+		var pos := Vector2(1018+i*37,225+sin(i*1.7)*58)
+		draw_rect(Rect2(pos,Vector2(18,3)),Color("b1d5bd"))
+	for pos in [Vector2(1040,265),Vector2(1240,220),Vector2(1290,310)]:
+		draw_rect(Rect2(pos,Vector2(22,12)),Color("477b60"))
+		draw_rect(Rect2(pos+Vector2(7,-4),Vector2(8,7)),Color("f1c0ae"))
 
 	_dirt_rect(3, 13, 12, 7)
 	for spec in [
@@ -85,13 +99,13 @@ func _draw() -> void:
 	var fh := 8
 	for x in range(fx, fx + fw):
 		var top_col := 8 if x == fx else (10 if x == fx + fw - 1 else 9)
-		_tile(TOWN, top_col, 4, x, fy)
+		_tile(TOWN, top_col, 3, x, fy)
 		if x != 31 and x != 32:
 			var bottom_col := 8 if x == fx else (10 if x == fx + fw - 1 else 9)
-			_tile(TOWN, bottom_col, 6, x, fy + fh - 1)
+			_tile(TOWN, bottom_col, 5, x, fy + fh - 1)
 	for y in range(fy + 1, fy + fh - 1):
-		_tile(TOWN, 8, 5, fx, y)
-		_tile(TOWN, 10, 5, fx + fw - 1, y)
+		_tile(TOWN, 8, 4, fx, y)
+		_tile(TOWN, 10, 4, fx + fw - 1, y)
 	for p in [Vector2i(28, 15), Vector2i(34, 14), Vector2i(35, 18), Vector2i(29, 19)]:
 		_tile(TOWN, 1, 0, p.x, p.y)
 	_tile(FARM, 0, 10, 29, 16)
@@ -111,3 +125,13 @@ func _draw() -> void:
 		_tile(FARM, spec.z, spec.w, spec.x, spec.y)
 	_tile(FARM, 1, 6, 24, 7)
 	_tile(FARM, 0, 6, 25, 7)
+
+func _add_obstacle(center: Vector2, dimensions: Vector2) -> void:
+	var body := StaticBody2D.new()
+	body.position = center
+	var collision := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = dimensions
+	collision.shape = shape
+	body.add_child(collision)
+	add_child(body)
