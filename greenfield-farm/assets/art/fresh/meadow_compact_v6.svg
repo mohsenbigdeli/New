@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+<defs>
+ <radialGradient id="grass" cx="46%" cy="42%" r="78%"><stop offset="0" stop-color="#b5da82"/><stop offset=".55" stop-color="#98c96d"/><stop offset="1" stop-color="#77ad58"/></radialGradient>
+ <linearGradient id="path" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dfaa"/><stop offset="1" stop-color="#d3ad6d"/></linearGradient>
+ <radialGradient id="bush" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#b9db7e"/><stop offset=".58" stop-color="#77ad54"/><stop offset="1" stop-color="#4d8242"/></radialGradient>
+ <linearGradient id="rock"><stop offset="0" stop-color="#d8ccb0"/><stop offset="1" stop-color="#96937c"/></linearGradient>
+</defs>
+<rect width="1600" height="1050" fill="url(#grass)"/>
+<!-- broad painted washes -->
+<g opacity=".14" fill="#e8f0b8"><ellipse cx="240" cy="160" rx="230" ry="115"/><ellipse cx="715" cy="170" rx="255" ry="130"/><ellipse cx="1260" cy="165" rx="285" ry="125"/><ellipse cx="330" cy="870" rx="280" ry="125"/><ellipse cx="1120" cy="860" rx="300" ry="140"/></g>
+<g opacity=".08" fill="#376e40"><ellipse cx="-25" cy="520" rx="145" ry="350"/><ellipse cx="1625" cy="535" rx="150" ry="370"/><ellipse cx="800" cy="-20" rx="470" ry="95"/><ellipse cx="820" cy="1075" rx="550" ry="70"/></g>
+<!-- connected paths: house, village road, garden and pond -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-70 430 C240 414 420 420 585 447 C710 468 795 486 915 470 C1040 452 1165 410 1670 430" stroke="#aa7c48" stroke-width="118" opacity=".21"/>
+ <path d="M-70 420 C240 405 420 412 585 438 C710 459 795 477 915 461 C1040 443 1165 401 1670 421" stroke="url(#path)" stroke-width="94"/>
+ <path d="M-70 414 C240 398 420 406 585 431 C710 452 795 470 915 454 C1040 436 1165 395 1670 414" stroke="#faebc4" stroke-width="40" opacity=".32"/>
+ <path d="M690 440 C662 555 646 675 632 805 C622 895 616 980 612 1120" stroke="#aa7c48" stroke-width="86" opacity=".20"/>
+ <path d="M690 440 C662 555 646 675 632 805 C622 895 616 980 612 1120" stroke="url(#path)" stroke-width="65"/>
+ <path d="M1030 442 C1075 548 1107 650 1130 756 C1148 842 1165 930 1180 1120" stroke="#aa7c48" stroke-width="80" opacity=".20"/>
+ <path d="M1030 442 C1075 548 1107 650 1130 756 C1148 842 1165 930 1180 1120" stroke="url(#path)" stroke-width="60"/>
+ <path d="M320 350 C340 390 380 414 435 420" stroke="#b38654" stroke-width="58" opacity=".18"/>
+ <path d="M320 350 C340 390 380 414 435 420" stroke="url(#path)" stroke-width="44"/>
+</g>
+<!-- soft grass islands -->
+<g fill="#679b4e" opacity=".15"><ellipse cx="230" cy="575" rx="160" ry="70"/><ellipse cx="440" cy="890" rx="210" ry="80"/><ellipse cx="840" cy="245" rx="165" ry="70"/><ellipse cx="1295" cy="730" rx="190" ry="82"/><ellipse cx="1420" cy="265" rx="130" ry="58"/><ellipse cx="880" cy="895" rx="140" ry="62"/></g>
+<!-- bushes -->
+<g fill="url(#bush)" stroke="#4d7d40" stroke-width="3" stroke-opacity=".33">
+ <g transform="translate(165 565)"><ellipse cx="0" cy="0" rx="31" ry="21"/><ellipse cx="28" cy="4" rx="26" ry="19"/><ellipse cx="-25" cy="6" rx="23" ry="17"/></g>
+ <g transform="translate(760 210)"><ellipse cx="0" cy="0" rx="32" ry="22"/><ellipse cx="29" cy="5" rx="24" ry="18"/><ellipse cx="-26" cy="7" rx="25" ry="18"/></g>
+ <g transform="translate(1010 245)"><ellipse cx="0" cy="0" rx="34" ry="23"/><ellipse cx="31" cy="5" rx="26" ry="18"/><ellipse cx="-28" cy="7" rx="26" ry="19"/></g>
+ <g transform="translate(1450 660)"><ellipse cx="0" cy="0" rx="33" ry="22"/><ellipse cx="29" cy="4" rx="25" ry="18"/><ellipse cx="-26" cy="7" rx="24" ry="17"/></g>
+ <g transform="translate(915 940)"><ellipse cx="0" cy="0" rx="32" ry="22"/><ellipse cx="28" cy="4" rx="24" ry="18"/><ellipse cx="-25" cy="7" rx="23" ry="17"/></g>
+</g>
+<!-- rocks -->
+<g fill="url(#rock)" stroke="#878574" stroke-width="2" stroke-opacity=".42"><ellipse cx="230" cy="360" rx="14" ry="8"/><ellipse cx="248" cy="367" rx="8" ry="5"/><ellipse cx="935" cy="340" rx="13" ry="8"/><ellipse cx="952" cy="346" rx="8" ry="5"/><ellipse cx="1298" cy="715" rx="15" ry="9"/><ellipse cx="1318" cy="722" rx="8" ry="5"/><ellipse cx="770" cy="880" rx="14" ry="8"/><ellipse cx="788" cy="886" rx="8" ry="5"/></g>
+<!-- path pebbles -->
+<g fill="#a77d4d" opacity=".26"><ellipse cx="170" cy="420" rx="10" ry="4"/><ellipse cx="470" cy="429" rx="8" ry="3"/><ellipse cx="825" cy="469" rx="10" ry="4"/><ellipse cx="1130" cy="417" rx="9" ry="3"/><ellipse cx="1430" cy="414" rx="12" ry="4"/><ellipse cx="651" cy="635" rx="5" ry="11"/><ellipse cx="1120" cy="680" rx="5" ry="11"/></g>
+<!-- grass tufts -->
+<g fill="none" stroke="#4b8548" stroke-width="3" stroke-linecap="round" opacity=".66">
+ <path d="M120 300l-7-15m7 15 5-17m-5 17 14-11M410 260l-7-15m7 15 6-16m-6 16 14-10M610 320l-8-17m8 17 7-14m-7 14 15-10M890 300l-8-17m8 17 7-15m-7 15 15-10M1210 300l-8-16m8 16 6-17m-6 17 14-10M1490 340l-8-16m8 16 7-15m-7 15 14-10"/>
+ <path d="M160 760l-8-16m8 16 6-18m-6 18 15-11M810 700l-7-15m7 15 6-16m-6 16 14-10M1410 830l-8-16m8 16 5-18m-5 18 14-12M260 965l-7-16m7 16 6-16m-6 16 14-10M1010 850l-8-17m8 17 6-15m-6 15 15-10M1490 980l-8-18m8 18 8-14m-8 14 15-11"/>
+</g>
+<!-- flowers -->
+<g opacity=".88"><g fill="#fff0c0"><circle cx="185" cy="335" r="5"/><circle cx="540" cy="300" r="5"/><circle cx="915" cy="785" r="5"/><circle cx="1390" cy="860" r="5"/><circle cx="360" cy="950" r="5"/></g><g fill="#ed9eb5"><circle cx="195" cy="330" r="3"/><circle cx="550" cy="295" r="3"/><circle cx="925" cy="780" r="3"/><circle cx="1400" cy="855" r="3"/><circle cx="370" cy="945" r="3"/></g><g fill="#f5dc72"><circle cx="320" cy="185" r="4"/><circle cx="700" cy="260" r="4"/><circle cx="1335" cy="240" r="4"/><circle cx="1030" cy="960" r="4"/></g></g>
+<!-- leaf specks -->
+<g fill="#5d914d" opacity=".48"><ellipse cx="390" cy="490" rx="8" ry="3" transform="rotate(-25 390 490)"/><ellipse cx="760" cy="525" rx="7" ry="3" transform="rotate(24 760 525)"/><ellipse cx="1240" cy="475" rx="8" ry="3" transform="rotate(-18 1240 475)"/><ellipse cx="650" cy="760" rx="7" ry="3" transform="rotate(42 650 760)"/><ellipse cx="1132" cy="820" rx="7" ry="3" transform="rotate(-40 1132 820)"/></g>
+</svg>
