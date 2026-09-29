@@ -51,8 +51,8 @@ func interact() -> void:
 		interaction_result.emit(result)
 
 func _update_animation(move: Vector2) -> void:
-	var direction := _direction_name(facing)
-	var wanted := ("walk_" if move.length() > 0.05 else "idle_") + direction
+	var direction: String = _direction_name(facing)
+	var wanted: String = ("walk_" if move.length() > 0.05 else "idle_") + direction
 	if sprite.animation != wanted:
 		sprite.play(wanted)
 
@@ -64,15 +64,15 @@ func _direction_name(dir: Vector2) -> String:
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
-	var names := ["down", "right", "left", "up"]
+	var names: Array[String] = ["down", "right", "left", "up"]
 	for row in range(4):
-		var idle_name := "idle_" + names[row]
+		var idle_name: String = "idle_" + names[row]
 		frames.add_animation(idle_name)
 		frames.set_animation_loop(idle_name, true)
 		frames.set_animation_speed(idle_name, 1.0)
 		frames.add_frame(idle_name, _atlas_frame(0, row))
 
-		var walk_name := "walk_" + names[row]
+		var walk_name: String = "walk_" + names[row]
 		frames.add_animation(walk_name)
 		frames.set_animation_loop(walk_name, true)
 		frames.set_animation_speed(walk_name, 7.5)
