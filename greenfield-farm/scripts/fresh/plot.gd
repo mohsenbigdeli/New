@@ -1,7 +1,7 @@
 extends Area2D
 class_name FreshPlot
 
-@onready var soil: Polygon2D = $Soil
+@onready var soil: Sprite2D = $Soil
 @onready var crop: Sprite2D = $Crop
 
 var state := 0
@@ -45,19 +45,19 @@ func _update_visual() -> void:
 	crop.visible = state >= 2
 	match state:
 		0:
-			soil.color = Color("#6fa95d")
+			soil.modulate = Color("#c8ad7f")
 			crop.visible = false
 		1:
-			soil.color = Color("#8a5f3d")
+			soil.modulate = Color.WHITE
 		2:
-			soil.color = Color("#8a5f3d")
+			soil.modulate = Color("#f3e7ca")
 			crop.scale = Vector2(0.16, 0.16)
 			crop.modulate = Color("#9bc77b")
 		3:
-			soil.color = Color("#654b3e")
+			soil.modulate = Color("#b4c4b0")
 			crop.scale = Vector2(0.25, 0.25)
 			crop.modulate = Color("#80b966")
 		4:
-			soil.color = Color("#75523c")
+			soil.modulate = Color.WHITE
 			crop.scale = Vector2(0.38, 0.38)
 			crop.modulate = Color.WHITE
