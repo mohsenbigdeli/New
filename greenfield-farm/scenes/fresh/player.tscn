@@ -3,23 +3,23 @@
 [ext_resource path="res://scripts/fresh/player.gd" type="Script" id="1_player"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
-radius = 12.0
-height = 34.0
+radius = 13.0
+height = 38.0
 
 [sub_resource type="CircleShape2D" id="Circle_interact"]
-radius = 74.0
+radius = 86.0
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 8
 script = ExtResource("1_player")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 3)
+position = Vector2(0, 7)
 shape = SubResource("Capsule_player")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -20)
-scale = Vector2(1.72, 1.72)
+position = Vector2(0, -34)
+scale = Vector2(0.72, 0.72)
 texture_filter = 1
 
 [node name="InteractionDetector" type="Area2D" parent="."]
@@ -33,9 +33,9 @@ monitorable = false
 shape = SubResource("Circle_interact")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.06, 1.06)
+zoom = Vector2(1.32, 1.32)
 position_smoothing_enabled = true
-position_smoothing_speed = 6.0
+position_smoothing_speed = 7.0
 limit_left = 0
 limit_top = 0
 limit_right = 2000

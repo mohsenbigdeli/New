@@ -4,7 +4,7 @@ signal move_changed(value: Vector2)
 
 var touch_id := -1
 var knob := Vector2.ZERO
-const RADIUS := 62.0
+const RADIUS := 46.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -41,6 +41,7 @@ func _set_knob(local_pos: Vector2) -> void:
 
 func _draw() -> void:
 	var center := size * 0.5
-	draw_circle(center, RADIUS + 18.0, Color(0.12,0.18,0.12,0.20))
-	draw_circle(center, RADIUS, Color(0.94,0.91,0.76,0.28))
-	draw_circle(center + knob, 27.0, Color(0.97,0.92,0.72,0.74))
+	draw_circle(center, RADIUS + 13.0, Color(0.10, 0.16, 0.09, 0.16))
+	draw_circle(center, RADIUS, Color(0.96, 0.90, 0.72, 0.26))
+	draw_circle(center + knob, 21.0, Color(0.98, 0.91, 0.67, 0.72))
+	draw_arc(center, RADIUS + 4.0, 0.0, TAU, 36, Color(0.28, 0.36, 0.18, 0.25), 2.0)

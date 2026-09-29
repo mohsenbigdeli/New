@@ -4,7 +4,7 @@ extends Node2D
 @onready var joystick = $HUD/Joystick
 @onready var use_button: Button = $HUD/UseButton
 @onready var message_label: Label = $HUD/MessageBox/Message
-@onready var crop_label: Label = $HUD/TopBar/CropCount
+@onready var crop_label: Label = $HUD/CropCard/CropCount
 
 var harvested_turnips := 0
 
@@ -12,7 +12,7 @@ func _ready() -> void:
 	joystick.move_changed.connect(player.set_touch_move)
 	use_button.pressed.connect(player.interact)
 	player.interaction_result.connect(_on_interaction_result)
-	_show_message("Fresh Start: walk, explore, and use the six garden plots.")
+	_show_message("Welcome home. Six garden beds are ready for your first crop.")
 	_update_crop_label()
 
 func _unhandled_key_input(event: InputEvent) -> void:
