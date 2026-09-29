@@ -9,285 +9,242 @@
 [ext_resource path="res://assets/art/v17/watercolor_lina.png" type="Texture2D" id="7_lina"]
 [ext_resource path="res://assets/art/v17/watercolor_marnie.png" type="Texture2D" id="8_marnie"]
 [ext_resource path="res://scripts/fresh/interactable.gd" type="Script" id="9_interact"]
-[ext_resource path="res://assets/art/fresh/meadow_world_v2.svg" type="Texture2D" id="10_meadow"]
+[ext_resource path="res://assets/art/fresh/meadow_compact_v6.svg" type="Texture2D" id="10_meadow"]
 [ext_resource path="res://assets/art/fresh/garden_patch.svg" type="Texture2D" id="11_garden"]
 [ext_resource path="res://assets/art/fresh/npc_shadow.svg" type="Texture2D" id="12_shadow"]
 
 [sub_resource type="RectangleShape2D" id="HouseShape"]
-size = Vector2(430, 170)
+size = Vector2(410, 155)
 
 [sub_resource type="CircleShape2D" id="PondShape"]
-radius = 205.0
+radius = 175.0
 
 [sub_resource type="CircleShape2D" id="TreeShape"]
-radius = 32.0
+radius = 29.0
 
 [sub_resource type="RectangleShape2D" id="HBound"]
-size = Vector2(2000, 40)
+size = Vector2(1600, 40)
 
 [sub_resource type="RectangleShape2D" id="VBound"]
-size = Vector2(40, 1300)
+size = Vector2(40, 1050)
 
 [sub_resource type="CircleShape2D" id="InteractShape"]
-radius = 54.0
+radius = 50.0
 
 [node name="World" type="Node2D"]
 y_sort_enabled = true
 
 [node name="MeadowBackground" type="Sprite2D" parent="."]
 z_index = -10
-position = Vector2(1000, 650)
+position = Vector2(800, 525)
 texture = ExtResource("10_meadow")
 texture_filter = 1
 
 [node name="GardenPatch" type="Sprite2D" parent="."]
 z_index = -4
-position = Vector2(500, 884)
+position = Vector2(420, 725)
 texture = ExtResource("11_garden")
+scale = Vector2(0.82, 0.82)
 texture_filter = 1
 
 [node name="Pond" type="Sprite2D" parent="."]
 z_index = -2
-position = Vector2(1570, 575)
+position = Vector2(1240, 515)
 texture = ExtResource("4_pond")
-scale = Vector2(1.86, 1.86)
+scale = Vector2(1.66, 1.66)
 texture_filter = 1
 
 [node name="House" type="Sprite2D" parent="."]
-position = Vector2(390, 305)
+position = Vector2(300, 235)
 y_sort_origin = 130
 texture = ExtResource("3_house")
-scale = Vector2(2.35, 2.35)
+scale = Vector2(2.30, 2.30)
 texture_filter = 1
 
 [node name="Trees" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="Tree1" type="Sprite2D" parent="Trees"]
-position = Vector2(95, 190)
+position = Vector2(80, 175)
 y_sort_origin = 55
 texture = ExtResource("5_tree")
-scale = Vector2(1.75, 1.75)
-
+scale = Vector2(1.62, 1.62)
 [node name="Tree2" type="Sprite2D" parent="Trees"]
-position = Vector2(760, 180)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.62, 1.62)
-
-[node name="Tree3" type="Sprite2D" parent="Trees"]
-position = Vector2(965, 210)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.82, 1.82)
-
-[node name="Tree4" type="Sprite2D" parent="Trees"]
-position = Vector2(1900, 180)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.70, 1.70)
-
-[node name="Tree5" type="Sprite2D" parent="Trees"]
-position = Vector2(1920, 770)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.62, 1.62)
-
-[node name="Tree6" type="Sprite2D" parent="Trees"]
-position = Vector2(1800, 1210)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.78, 1.78)
-
-[node name="Tree7" type="Sprite2D" parent="Trees"]
-position = Vector2(1030, 1230)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.64, 1.64)
-
-[node name="Tree8" type="Sprite2D" parent="Trees"]
-position = Vector2(90, 1180)
-y_sort_origin = 55
-texture = ExtResource("5_tree")
-scale = Vector2(1.78, 1.78)
-
-[node name="Tree9" type="Sprite2D" parent="Trees"]
-position = Vector2(150, 720)
+position = Vector2(645, 135)
 y_sort_origin = 55
 texture = ExtResource("5_tree")
 scale = Vector2(1.55, 1.55)
+[node name="Tree3" type="Sprite2D" parent="Trees"]
+position = Vector2(900, 155)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.66, 1.66)
+[node name="Tree4" type="Sprite2D" parent="Trees"]
+position = Vector2(1510, 175)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.62, 1.62)
+[node name="Tree5" type="Sprite2D" parent="Trees"]
+position = Vector2(1490, 800)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.58, 1.58)
+[node name="Tree6" type="Sprite2D" parent="Trees"]
+position = Vector2(1030, 960)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.53, 1.53)
+[node name="Tree7" type="Sprite2D" parent="Trees"]
+position = Vector2(90, 925)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.57, 1.57)
+[node name="Tree8" type="Sprite2D" parent="Trees"]
+position = Vector2(1360, 940)
+y_sort_origin = 55
+texture = ExtResource("5_tree")
+scale = Vector2(1.44, 1.44)
 
 [node name="Rowan" type="Area2D" parent="."]
-position = Vector2(1090, 620)
+position = Vector2(815, 438)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("9_interact")
-message = "Rowan: Morning! The east road leads past the pond. I heard someone saw a huge fish there yesterday."
-
+message = "Rowan: Morning! I am heading toward the pond. The water is especially clear today."
 [node name="Shadow" type="Sprite2D" parent="Rowan"]
 z_index = -1
 position = Vector2(0, 9)
 texture = ExtResource("12_shadow")
 scale = Vector2(0.82, 0.82)
-
 [node name="Sprite2D" type="Sprite2D" parent="Rowan"]
 position = Vector2(0, -38)
 texture = ExtResource("6_rowan")
 scale = Vector2(1.02, 1.02)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rowan"]
 shape = SubResource("InteractShape")
-
 [node name="Name" type="Label" parent="Rowan"]
 position = Vector2(-28, 28)
 text = "ROWAN"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.68)
 theme_override_font_sizes/font_size = 10
 
 [node name="Lina" type="Area2D" parent="."]
-position = Vector2(1320, 860)
+position = Vector2(1085, 665)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("9_interact")
-message = "Lina: The pond is clearest before noon. Bring a rod someday and I'll show you my favorite spot."
-
+message = "Lina: I like this bend in the path. You can hear the frogs from here after sunset."
 [node name="Shadow" type="Sprite2D" parent="Lina"]
 z_index = -1
 position = Vector2(0, 9)
 texture = ExtResource("12_shadow")
 scale = Vector2(0.78, 0.78)
-
 [node name="Sprite2D" type="Sprite2D" parent="Lina"]
 position = Vector2(0, -37)
 texture = ExtResource("7_lina")
 scale = Vector2(1.00, 1.00)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Lina"]
 shape = SubResource("InteractShape")
-
 [node name="Name" type="Label" parent="Lina"]
 position = Vector2(-20, 28)
 text = "LINA"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.68)
 theme_override_font_sizes/font_size = 10
 
 [node name="Marnie" type="Area2D" parent="."]
-position = Vector2(1095, 1040)
+position = Vector2(685, 760)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("9_interact")
-message = "Marnie: Those six beds are yours now. Plant something good and bring me your first turnip."
-
+message = "Marnie: The beds are ready. Start with one row today; there is no need to rush the farm."
 [node name="Shadow" type="Sprite2D" parent="Marnie"]
 z_index = -1
 position = Vector2(0, 9)
 texture = ExtResource("12_shadow")
 scale = Vector2(0.78, 0.78)
-
 [node name="Sprite2D" type="Sprite2D" parent="Marnie"]
 position = Vector2(0, -37)
 texture = ExtResource("8_marnie")
 scale = Vector2(1.00, 1.00)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Marnie"]
 shape = SubResource("InteractShape")
-
 [node name="Name" type="Label" parent="Marnie"]
 position = Vector2(-27, 28)
 text = "MARNIE"
-theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.72)
+theme_override_colors/font_color = Color(0.19, 0.14, 0.09, 0.68)
 theme_override_font_sizes/font_size = 10
 
 [node name="Plots" type="Node2D" parent="."]
-
 [node name="Plot1" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(365, 800)
-
+position = Vector2(300, 655)
+scale = Vector2(0.86, 0.86)
 [node name="Plot2" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(505, 800)
-
+position = Vector2(420, 655)
+scale = Vector2(0.86, 0.86)
 [node name="Plot3" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(645, 800)
-
+position = Vector2(540, 655)
+scale = Vector2(0.86, 0.86)
 [node name="Plot4" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(365, 930)
-
+position = Vector2(300, 760)
+scale = Vector2(0.86, 0.86)
 [node name="Plot5" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(505, 930)
-
+position = Vector2(420, 760)
+scale = Vector2(0.86, 0.86)
 [node name="Plot6" parent="Plots" instance=ExtResource("2_plot")]
-position = Vector2(645, 930)
-
-[node name="FarmLabel" type="Label" parent="."]
-position = Vector2(300, 694)
-text = "HOME GARDEN"
-theme_override_colors/font_color = Color(0.18, 0.25, 0.12, 0.82)
-theme_override_colors/font_shadow_color = Color(1, 0.95, 0.75, 0.55)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 15
+position = Vector2(540, 760)
+scale = Vector2(0.86, 0.86)
 
 [node name="Collisions" type="Node2D" parent="."]
-
 [node name="HouseBody" type="StaticBody2D" parent="Collisions"]
-position = Vector2(390, 397)
-
+position = Vector2(300, 324)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/HouseBody"]
 shape = SubResource("HouseShape")
-
 [node name="PondBody" type="StaticBody2D" parent="Collisions"]
-position = Vector2(1570, 590)
-
+position = Vector2(1240, 525)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/PondBody"]
 shape = SubResource("PondShape")
 
 [node name="TreeBody1" type="StaticBody2D" parent="Collisions"]
-position = Vector2(95, 260)
-
+position = Vector2(80, 240)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody1"]
 shape = SubResource("TreeShape")
-
 [node name="TreeBody2" type="StaticBody2D" parent="Collisions"]
-position = Vector2(760, 245)
-
+position = Vector2(645, 200)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody2"]
 shape = SubResource("TreeShape")
-
 [node name="TreeBody3" type="StaticBody2D" parent="Collisions"]
-position = Vector2(965, 280)
-
+position = Vector2(900, 223)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody3"]
 shape = SubResource("TreeShape")
-
 [node name="TreeBody4" type="StaticBody2D" parent="Collisions"]
-position = Vector2(1900, 250)
-
+position = Vector2(1510, 242)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody4"]
+shape = SubResource("TreeShape")
+[node name="TreeBody5" type="StaticBody2D" parent="Collisions"]
+position = Vector2(1490, 865)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody5"]
+shape = SubResource("TreeShape")
+[node name="TreeBody6" type="StaticBody2D" parent="Collisions"]
+position = Vector2(1030, 1020)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TreeBody6"]
 shape = SubResource("TreeShape")
 
 [node name="TopBound" type="StaticBody2D" parent="Collisions"]
-position = Vector2(1000, -20)
-
+position = Vector2(800, -20)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/TopBound"]
 shape = SubResource("HBound")
-
 [node name="BottomBound" type="StaticBody2D" parent="Collisions"]
-position = Vector2(1000, 1320)
-
+position = Vector2(800, 1070)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/BottomBound"]
 shape = SubResource("HBound")
-
 [node name="LeftBound" type="StaticBody2D" parent="Collisions"]
-position = Vector2(-20, 650)
-
+position = Vector2(-20, 525)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/LeftBound"]
 shape = SubResource("VBound")
-
 [node name="RightBound" type="StaticBody2D" parent="Collisions"]
-position = Vector2(2020, 650)
-
+position = Vector2(1620, 525)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collisions/RightBound"]
 shape = SubResource("VBound")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(930, 760)
+position = Vector2(760, 610)
