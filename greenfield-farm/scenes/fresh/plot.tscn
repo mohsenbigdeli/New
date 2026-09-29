@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource path="res://scripts/fresh/plot.gd" type="Script" id="1_plot"]
+[ext_resource path="res://assets/art/icon_turnip.svg" type="Texture2D" id="2_turnip"]
+
+[sub_resource type="RectangleShape2D" id="Rect_plot"]
+size = Vector2(104, 76)
+
+[node name="Plot" type="Area2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_plot")
+
+[node name="Soil" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-54, -40, 54, -40, 54, 40, -54, 40)
+color = Color(0.435, 0.663, 0.365, 1)
+
+[node name="Crop" type="Sprite2D" parent="."]
+position = Vector2(0, -4)
+texture = ExtResource("2_turnip")
+scale = Vector2(0.16, 0.16)
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Rect_plot")
