@@ -10,6 +10,13 @@ const MAP_H := 22
 
 func _ready() -> void:
 	queue_redraw()
+	call_deferred("_spawn_props")
+
+func _atlas(texture: Texture2D, col: int, row: int) -> AtlasTexture:
+	var atlas := AtlasTexture.new()
+	atlas.atlas = texture
+	atlas.region = Rect2(col * SRC, row * SRC, SRC, SRC)
+	return atlas
 
 func _tile(texture: Texture2D, col: int, row: int, x: int, y: int) -> void:
 	draw_texture_rect_region(
@@ -27,87 +34,112 @@ func _dirt_rect(x0: int, y0: int, width: int, height: int) -> void:
 
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 42
+	rng.seed = 97
 
+	# Cohesive Kenney grass base with restrained variation.
 	for y in range(MAP_H):
 		for x in range(MAP_W):
-			var col := 1 if rng.randi_range(0, 5) == 0 else 0
+			var col := 1 if rng.randi_range(0, 7) == 0 else 0
 			_tile(TOWN, col, 0, x, y)
-			if rng.randf() < 0.035:
+			if rng.randf() < 0.025:
 				_tile(TOWN, 2, 0, x, y)
 
-	_dirt_rect(0, 9, MAP_W, 3)
-	_dirt_rect(7, 4, 3, 8)
-	_dirt_rect(18, 9, 3, 8)
-	_dirt_rect(31, 7, 3, 5)
+	# Village road and readable branches to each gameplay landmark.
+	_dirt_rect(0, 8, MAP_W, 3)
+	_dirt_rect(6, 4, 3, 7)
+	_dirt_rect(18, 8, 3, 6)
+	_dirt_rect(28, 6, 3, 5)
 
-	for yy in range(3):
-		for xx in range(3):
-			_tile(FARM, 6 + xx, 7 + yy, 5 + xx, 2 + yy)
-	_tile(TOWN, 1, 3, 6, 5)
+	# Working field: large enough to feel like a farm, compact enough for mobile.
+	_dirt_rect(3, 12, 13, 8)
 
-	_tile(TOWN, 8, 8, 14, 7)
-	_tile(TOWN, 11, 7, 16, 7)
+	# Small ranch / animal corner.
+	_dirt_rect(26, 13, 11, 7)
 
-	var tree_tiles := [Vector2i(3, 0), Vector2i(4, 0), Vector2i(5, 0), Vector2i(3, 2), Vector2i(4, 2)]
+func _spawn_props() -> void:
+	var world := get_parent()
+	if world == null:
+		return
+
+	# Farmhouse/barn and market tent are multi-tile objects sorted at their feet.
+	_add_building(world, FARM, 6, 7, 3, 3, 5, 2, "Farmhouse")
+	_add_building(world, FARM, 9, 6, 3, 5, 28, 1, "MarketTent")
+
+	# Landmark props tied to gameplay interactions.
+	_add_prop(world, FARM, 1, 6, 19, 6, "Well", 0, true)
+	_add_prop(world, FARM, 4, 6, 14, 12, "ShippingBin", 0, true)
+	_add_prop(world, FARM, 2, 8, 25, 7, "Bench", 0, true)
+	_add_prop(world, FARM, 3, 10, 27, 14, "FeedTub", 0, true)
+	_add_prop(world, FARM, 4, 10, 35, 18, "HayBale", 0, true)
+
+	# Animals make the lower-right area feel inhabited.
+	_add_prop(world, FARM, 0, 10, 29, 15, "SheepA", 0, true)
+	_add_prop(world, FARM, 1, 10, 33, 16, "SheepB", 0, true)
+	_add_prop(world, FARM, 2, 10, 35, 14, "ChickenA", 0, true)
+	_add_prop(world, FARM, 2, 10, 31, 18, "ChickenB", 0, true)
+
+	# Trees frame the map instead of being random clutter in the walkable core.
 	var tree_spots := [
-		Vector2i(1, 1), Vector2i(2, 1), Vector2i(10, 1), Vector2i(11, 2),
-		Vector2i(14, 1), Vector2i(20, 1), Vector2i(22, 2), Vector2i(25, 1),
-		Vector2i(28, 2), Vector2i(36, 1), Vector2i(38, 2), Vector2i(1, 6),
-		Vector2i(38, 6), Vector2i(1, 15), Vector2i(38, 15), Vector2i(2, 20),
-		Vector2i(36, 20), Vector2i(39, 19), Vector2i(22, 20)
+		Vector2i(1, 1), Vector2i(2, 2), Vector2i(10, 1), Vector2i(12, 2),
+		Vector2i(18, 1), Vector2i(21, 2), Vector2i(24, 1), Vector2i(37, 1),
+		Vector2i(38, 3), Vector2i(1, 6), Vector2i(38, 7), Vector2i(1, 15),
+		Vector2i(38, 15), Vector2i(2, 20), Vector2i(18, 20), Vector2i(22, 20),
+		Vector2i(36, 20), Vector2i(39, 19)
 	]
-	for p in tree_spots:
-		var t: Vector2i = tree_tiles[rng.randi_range(0, tree_tiles.size() - 1)]
-		_tile(TOWN, t.x, t.y, p.x, p.y)
+	for i in range(tree_spots.size()):
+		var p: Vector2i = tree_spots[i]
+		var row := i % 4
+		_add_prop(world, FARM, 3, row, p.x, p.y, "Tree_%02d" % i, 0, true)
 
-	for p in [
-		Vector2i(12, 4), Vector2i(13, 4), Vector2i(22, 5), Vector2i(23, 5),
-		Vector2i(27, 4), Vector2i(29, 6), Vector2i(35, 5), Vector2i(4, 7),
-		Vector2i(11, 6), Vector2i(37, 13), Vector2i(2, 13), Vector2i(23, 18),
-		Vector2i(15, 19)
-	]:
-		_tile(TOWN, 6, 0, p.x, p.y)
-	for p in [Vector2i(12, 5), Vector2i(28, 5), Vector2i(37, 7), Vector2i(2, 16)]:
-		_tile(TOWN, 6, 2, p.x, p.y)
+	# Flower, crop and shrub accents around routes and buildings.
+	var decor := [
+		Vector4i(4, 0, 12, 4), Vector4i(5, 0, 13, 4), Vector4i(6, 0, 22, 5),
+		Vector4i(4, 1, 23, 5), Vector4i(5, 1, 26, 4), Vector4i(6, 1, 34, 5),
+		Vector4i(4, 2, 11, 6), Vector4i(5, 2, 23, 18), Vector4i(6, 2, 16, 19),
+		Vector4i(4, 3, 2, 12), Vector4i(5, 3, 17, 12), Vector4i(6, 3, 37, 12),
+		Vector4i(4, 5, 25, 12), Vector4i(5, 5, 24, 12), Vector4i(8, 5, 36, 12)
+	]
+	for i in range(decor.size()):
+		var d: Vector4i = decor[i]
+		_add_prop(world, FARM, d.x, d.y, d.z, d.w, "Decor_%02d" % i, -2, false)
 
-	_dirt_rect(3, 13, 12, 7)
-	for spec in [
-		Vector4i(2, 13, 2, 6), Vector4i(15, 13, 3, 6), Vector4i(2, 18, 1, 7),
-		Vector4i(15, 18, 1, 8), Vector4i(4, 20, 0, 8), Vector4i(6, 20, 1, 8),
-		Vector4i(12, 20, 2, 8)
-	]:
-		_tile(FARM, spec.z, spec.w, spec.x, spec.y)
+func _add_prop(world: Node, texture: Texture2D, col: int, row: int, gx: int, gy: int, prop_name: String, z: int = 0, shadowed: bool = false) -> void:
+	var holder := Node2D.new()
+	holder.name = prop_name
+	holder.position = Vector2((gx + 0.5) * STEP, (gy + 1.0) * STEP)
+	holder.z_index = z
 
-	var fx := 26
-	var fy := 13
-	var fw := 11
-	var fh := 8
-	for x in range(fx, fx + fw):
-		var top_col := 8 if x == fx else (10 if x == fx + fw - 1 else 9)
-		_tile(TOWN, top_col, 4, x, fy)
-		if x != 31 and x != 32:
-			var bottom_col := 8 if x == fx else (10 if x == fx + fw - 1 else 9)
-			_tile(TOWN, bottom_col, 6, x, fy + fh - 1)
-	for y in range(fy + 1, fy + fh - 1):
-		_tile(TOWN, 8, 5, fx, y)
-		_tile(TOWN, 10, 5, fx + fw - 1, y)
-	for p in [Vector2i(28, 15), Vector2i(34, 14), Vector2i(35, 18), Vector2i(29, 19)]:
-		_tile(TOWN, 1, 0, p.x, p.y)
-	_tile(FARM, 0, 10, 29, 16)
-	_tile(FARM, 2, 10, 33, 17)
-	_tile(FARM, 2, 10, 35, 15)
-	_tile(FARM, 1, 10, 31, 18)
-	_tile(FARM, 0, 8, 27, 14)
-	_tile(FARM, 3, 8, 34, 19)
-	_tile(FARM, 3, 9, 28, 19)
+	if shadowed:
+		var shadow := Polygon2D.new()
+		shadow.polygon = PackedVector2Array([-18, -4, 18, -4, 23, 0, 18, 4, -18, 4, -23, 0])
+		shadow.color = Color(0.08, 0.07, 0.09, 0.24)
+		shadow.z_index = -1
+		holder.add_child(shadow)
 
-	for spec in [
-		Vector4i(4, 6, 2, 7), Vector4i(10, 5, 3, 7), Vector4i(11, 5, 4, 7),
-		Vector4i(12, 6, 5, 7), Vector4i(3, 7, 1, 6),
-		Vector4i(21, 8, 9, 0), Vector4i(23, 8, 10, 1), Vector4i(35, 8, 11, 2),
-		Vector4i(17, 12, 9, 3)
-	]:
-		_tile(FARM, spec.z, spec.w, spec.x, spec.y)
-	_tile(FARM, 1, 6, 24, 7)
-	_tile(FARM, 0, 6, 25, 7)
+	var sprite := Sprite2D.new()
+	sprite.texture = _atlas(texture, col, row)
+	sprite.scale = Vector2(3, 3)
+	sprite.position = Vector2(0, -STEP * 0.5)
+	holder.add_child(sprite)
+	world.add_child(holder)
+
+func _add_building(world: Node, texture: Texture2D, atlas_x: int, atlas_y: int, cols: int, rows: int, gx: int, gy: int, building_name: String) -> void:
+	var holder := Node2D.new()
+	holder.name = building_name
+	holder.position = Vector2((gx + cols * 0.5) * STEP, (gy + rows) * STEP)
+
+	var half_w := cols * STEP * 0.46
+	var shadow := Polygon2D.new()
+	shadow.polygon = PackedVector2Array([-half_w, -10, half_w, -10, half_w + 12, 0, half_w, 8, -half_w, 8, -half_w - 12, 0])
+	shadow.color = Color(0.07, 0.06, 0.08, 0.30)
+	shadow.z_index = -1
+	holder.add_child(shadow)
+
+	for ry in range(rows):
+		for rx in range(cols):
+			var sprite := Sprite2D.new()
+			sprite.texture = _atlas(texture, atlas_x + rx, atlas_y + ry)
+			sprite.scale = Vector2(3, 3)
+			sprite.position = Vector2((rx - cols * 0.5 + 0.5) * STEP, (ry - rows + 0.5) * STEP)
+			holder.add_child(sprite)
+	world.add_child(holder)

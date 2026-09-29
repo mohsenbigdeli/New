@@ -1,44 +1,78 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource path="res://scripts/fresh/game.gd" type="Script" id="1_game"]
 [ext_resource path="res://scenes/fresh/world.tscn" type="PackedScene" id="2_world"]
 [ext_resource path="res://scripts/fresh/joystick.gd" type="Script" id="3_joystick"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.19, 0.12, 0.14, 0.93)
+bg_color = Color(0.16, 0.10, 0.12, 0.94)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.96, 0.80, 0.49, 0.95)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
+border_color = Color(0.96, 0.79, 0.46, 0.96)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0.05, 0.03, 0.04, 0.42)
+shadow_size = 5
 
 [sub_resource type="StyleBoxFlat" id="MessageStyle"]
-bg_color = Color(0.16, 0.10, 0.12, 0.96)
+bg_color = Color(0.12, 0.08, 0.10, 0.97)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.96, 0.80, 0.49, 0.95)
+border_color = Color(0.96, 0.79, 0.46, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.03, 0.02, 0.03, 0.50)
+shadow_size = 7
+
+[sub_resource type="StyleBoxFlat" id="EnergyBack"]
+bg_color = Color(0.08, 0.06, 0.07, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.64, 0.45, 0.26, 1)
+
+[sub_resource type="StyleBoxFlat" id="EnergyFill"]
+bg_color = Color(0.39, 0.72, 0.30, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.70, 0.91, 0.42, 1)
 
 [sub_resource type="StyleBoxFlat" id="UseNormal"]
-bg_color = Color(0.53, 0.27, 0.20, 0.94)
+bg_color = Color(0.54, 0.27, 0.19, 0.96)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(1, 0.85, 0.55, 1)
+border_color = Color(1, 0.84, 0.52, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.06, 0.03, 0.03, 0.40)
+shadow_size = 5
 
 [sub_resource type="StyleBoxFlat" id="UsePressed"]
-bg_color = Color(0.38, 0.18, 0.15, 1)
+bg_color = Color(0.37, 0.17, 0.14, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(1, 0.92, 0.68, 1)
+border_color = Color(1, 0.94, 0.70, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
@@ -50,8 +84,8 @@ script = ExtResource("1_game")
 [node name="TitleCard" type="Panel" parent="HUD"]
 offset_left = 18.0
 offset_top = 16.0
-offset_right = 330.0
-offset_bottom = 62.0
+offset_right = 310.0
+offset_bottom = 60.0
 theme_override_styles/panel = SubResource("PanelStyle")
 mouse_filter = 2
 
@@ -66,35 +100,88 @@ vertical_alignment = 1
 theme_override_colors/font_color = Color(1, 0.94, 0.79, 1)
 theme_override_font_sizes/font_size = 17
 
-[node name="CropCard" type="Panel" parent="HUD"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -176.0
-offset_top = 16.0
-offset_right = -18.0
-offset_bottom = 62.0
+[node name="EnergyCard" type="Panel" parent="HUD"]
+offset_left = 18.0
+offset_top = 68.0
+offset_right = 310.0
+offset_bottom = 108.0
 theme_override_styles/panel = SubResource("PanelStyle")
 mouse_filter = 2
 
-[node name="CropCount" type="Label" parent="HUD/CropCard"]
+[node name="EnergyText" type="Label" parent="HUD/EnergyCard"]
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 112.0
+offset_bottom = 32.0
+text = "ENERGY  100/100"
+theme_override_colors/font_color = Color(1, 0.93, 0.77, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="EnergyBar" type="ProgressBar" parent="HUD/EnergyCard"]
+offset_left = 118.0
+offset_top = 10.0
+offset_right = 280.0
+offset_bottom = 30.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+theme_override_styles/background = SubResource("EnergyBack")
+theme_override_styles/fill = SubResource("EnergyFill")
+
+[node name="ObjectiveCard" type="Panel" parent="HUD"]
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -245.0
+offset_top = 16.0
+offset_right = 245.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("PanelStyle")
+mouse_filter = 2
+
+[node name="Objective" type="Label" parent="HUD/ObjectiveCard"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-text = "HARVEST  0"
+offset_left = 12.0
+offset_right = -12.0
+text = "FIRST HARVEST  •  Ship 3 turnips  0/3"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.91, 0.68, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="ResourceCard" type="Panel" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -420.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("PanelStyle")
+mouse_filter = 2
+
+[node name="Resources" type="Label" parent="HUD/ResourceCard"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+text = "180g   SEED 8   CROP 0   SHIP 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 theme_override_colors/font_color = Color(1, 0.94, 0.79, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 15
 
 [node name="Joystick" type="Control" parent="HUD"]
 anchors_preset = 3
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = -150.0
-offset_right = 150.0
-offset_bottom = -20.0
+offset_left = 22.0
+offset_top = -154.0
+offset_right = 152.0
+offset_bottom = -24.0
 script = ExtResource("3_joystick")
 
 [node name="UseButton" type="Button" parent="HUD"]
@@ -103,14 +190,14 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -112.0
-offset_top = -110.0
-offset_right = -30.0
+offset_left = -116.0
+offset_top = -116.0
+offset_right = -28.0
 offset_bottom = -28.0
 text = "A"
 theme_override_colors/font_color = Color(1, 0.95, 0.80, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.95, 0.80, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("UseNormal")
 theme_override_styles/hover = SubResource("UseNormal")
 theme_override_styles/pressed = SubResource("UsePressed")
@@ -123,9 +210,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -330.0
-offset_top = -98.0
-offset_right = 330.0
+offset_left = -355.0
+offset_top = -104.0
+offset_right = 355.0
 offset_bottom = -30.0
 theme_override_styles/panel = SubResource("MessageStyle")
 mouse_filter = 2
@@ -134,13 +221,21 @@ mouse_filter = 2
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
+offset_left = 20.0
 offset_top = 8.0
-offset_right = -18.0
+offset_right = -20.0
 offset_bottom = -8.0
 text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 theme_override_colors/font_color = Color(1, 0.94, 0.79, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
+
+[node name="ScreenFade" type="ColorRect" parent="HUD"]
+z_index = 100
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.05, 0)
+mouse_filter = 2
