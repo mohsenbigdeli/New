@@ -1,0 +1,95 @@
+name: Build Greenfield Reborn 0.2.1 APK
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'greenfield-reborn/source_payload.txt'
+      - '.github/workflows/build-greenfield-reborn.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unpack NEW Greenfield Reborn source and create original art
+        run: |
+          python -m pip install pillow
+          python - <<'PY'
+          import base64,lzma,pathlib,subprocess,sys
+          data=lzma.decompress(base64.b85decode(pathlib.Path('greenfield-reborn/source_payload.txt').read_text().strip()))
+          dst=pathlib.Path('greenfield-reborn')
+          while data:
+              fname,rest=data.split(b'\0',1)
+              n,rest=rest.split(b'\0',1)
+              size=int(n)
+              body,data=rest[:size],rest[size:]
+              path=dst/fname.decode()
+              path.parent.mkdir(parents=True,exist_ok=True)
+              if path.name=='create_godot_art.py':
+                  body=body.replace(b"P=Path('/mnt/data/Greenfield_Reborn_Godot/assets')",b"P=Path(__file__).resolve().parent/'assets'")
+              path.write_bytes(body)
+          subprocess.run([sys.executable,str(dst/'create_godot_art.py')],check=True)
+          print('NEW Reborn assets:',len(list((dst/'assets').glob('*.png'))))
+          assert (dst/'scripts/world.gd').exists() and (dst/'assets/player.png').exists()
+          PY
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platforms
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Install Godot 4.4.1 and export templates
+        run: |
+          set -euo pipefail
+          BASE=https://github.com/godotengine/godot/releases/download/4.4.1-stable
+          curl -fL --retry 3 "$BASE/Godot_v4.4.1-stable_linux.x86_64.zip" -o godot.zip
+          curl -fL --retry 3 "$BASE/Godot_v4.4.1-stable_export_templates.tpz" -o templates.tpz
+          unzip -qo godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          unzip -qj templates.tpz 'templates/android_debug.apk' 'templates/android_release.apk' -d "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          godot --headless --version
+      - name: Setup debug signing
+        run: |
+          mkdir -p "$HOME/.config/godot" "$GITHUB_WORKSPACE/build"
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_SDK_ROOT"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          keytool -genkeypair -keystore "$GITHUB_WORKSPACE/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname 'CN=Android Debug,O=Android,C=US'
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$GITHUB_WORKSPACE/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+      - name: Import and validate NEW Reborn game
+        run: godot --headless --path greenfield-reborn --editor --import --quit
+      - name: Build NEW Greenfield Reborn APK
+        run: godot --headless --path greenfield-reborn --export-debug Android "$GITHUB_WORKSPACE/build/Greenfield_Reborn_v0.2.1.apk"
+      - name: Verify it is APK and not the old game
+        run: |
+          test -s build/Greenfield_Reborn_v0.2.1.apk
+          unzip -t build/Greenfield_Reborn_v0.2.1.apk | tail -1
+          ls -lh build/Greenfield_Reborn_v0.2.1.apk
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Greenfield-Reborn-v0.2.1-Android
+          path: build/Greenfield_Reborn_v0.2.1.apk
+      - name: Publish direct APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create reborn-v0.2.1 build/Greenfield_Reborn_v0.2.1.apk --title 'Greenfield Reborn 0.2.1 Android' --notes 'Original Greenfield Reborn Godot prototype, NOT the old Greenfield Farm game.' --latest=false || gh release upload reborn-v0.2.1 build/Greenfield_Reborn_v0.2.1.apk --clobber
