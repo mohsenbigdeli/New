@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'greenfield-reborn/source_payload.txt'
+      - 'greenfield-reborn/source_payload_*.txt'
       - '.github/workflows/build-greenfield-reborn.yml'
   workflow_dispatch:
 permissions:
@@ -22,7 +22,7 @@ jobs:
           python -m pip install pillow
           python - <<'PY'
           import base64,lzma,pathlib,subprocess,sys
-          data=lzma.decompress(base64.b85decode(pathlib.Path('greenfield-reborn/source_payload.txt').read_text().strip()))
+          data=lzma.decompress(base64.b85decode(''.join(p.read_text().strip() for p in sorted(pathlib.Path('greenfield-reborn').glob('source_payload_*.txt')))))
           dst=pathlib.Path('greenfield-reborn')
           while data:
               fname,rest=data.split(b'\0',1)
