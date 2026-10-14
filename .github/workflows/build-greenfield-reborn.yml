@@ -34,7 +34,7 @@ jobs:
               if path.name=='create_godot_art.py':
                   body=body.replace(b"P=Path('/mnt/data/Greenfield_Reborn_Godot/assets')",b"P=Path(__file__).resolve().parent/'assets'")
               path.write_bytes(body)
-          subprocess.run([sys.executable,str(dst/'create_godot_art.py')],check=True)
+          subprocess.run([sys.executable,str((dst/'create_godot_art.py').resolve())],check=True,cwd=dst)
           print('NEW Reborn assets:',len(list((dst/'assets').glob('*.png'))))
           assert (dst/'scripts/world.gd').exists() and (dst/'assets/player.png').exists()
           PY
