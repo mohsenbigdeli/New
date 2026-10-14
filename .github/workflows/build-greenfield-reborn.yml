@@ -34,6 +34,10 @@ jobs:
               if path.name=='create_godot_art.py':
                   body=body.replace(b"P=Path('/mnt/data/Greenfield_Reborn_Godot/assets')",b"P=Path(__file__).resolve().parent/'assets'")
               path.write_bytes(body)
+          w=dst/'scripts/world.gd'
+          w.write_text(w.read_text().replace('                dist :=','                var dist :=').replace('                cell :=','                var cell :='),encoding='utf-8')
+          h=dst/'scripts/hud.gd'
+          h.write_text(h.read_text().replace('var region := world.scene_name.capitalize()', 'var region: String = str(world.scene_name).capitalize()'),encoding='utf-8')
           subprocess.run([sys.executable,str((dst/'create_godot_art.py').resolve())],check=True,cwd=dst)
           print('NEW Reborn assets:',len(list((dst/'assets').glob('*.png'))))
           assert (dst/'scripts/world.gd').exists() and (dst/'assets/player.png').exists()
@@ -81,7 +85,9 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
       - name: Import and validate NEW Reborn game
-        run: godot --headless --path greenfield-reborn --editor --import --quit
+        run: |
+          godot --headless --path greenfield-reborn --editor --import --quit 2>&1 | tee godot-import.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Failed to load script' godot-import.log; then exit 1; fi
       - name: Build NEW Greenfield Reborn APK
         run: godot --headless --path greenfield-reborn --export-debug Android "$GITHUB_WORKSPACE/build/Greenfield_Reborn_v0.2.1.apk"
       - name: Verify it is APK and not the old game
