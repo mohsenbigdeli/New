@@ -1,0 +1,62 @@
+name: Build Direct Greenfield APK
+on:
+  push:
+    branches: [build-greenfield-apk-20261014]
+    paths: ['.github/workflows/build-direct-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android SDK and debug signing
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+          fi
+      - name: Export Android APK using Godot
+        id: export
+        uses: firebelley/godot-export@v8.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+          relative_project_path: ./greenfield-farm
+          presets_to_export: Android
+          export_debug: true
+          verbose: true
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=$(find "${{ steps.export.outputs.build_directory }}" -type f -name '*.apk' | head -n1)
+          test -n "$APK"
+          mkdir -p output
+          cp "$APK" output/Greenfield_Farm_Android.apk
+          test -s output/Greenfield_Farm_Android.apk
+          file output/Greenfield_Farm_Android.apk
+          sha256sum output/Greenfield_Farm_Android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Greenfield-Farm-Android-APK
+          path: output/Greenfield_Farm_Android.apk
+          retention-days: 30
+      - name: Publish direct APK download
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create greenfield-farm-android-20261014 output/Greenfield_Farm_Android.apk --target "${{ github.sha }}" --title 'Greenfield Farm - Android APK' --notes 'APK built from existing Greenfield Farm source, not newer Greenfield Reborn.' --latest=false
