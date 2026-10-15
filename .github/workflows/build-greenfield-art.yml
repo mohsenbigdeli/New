@@ -30,6 +30,8 @@ jobs:
           dest.mkdir(parents=True,exist_ok=True)
           with zipfile.ZipFile(io.BytesIO(raw)) as z:
               z.extractall(dest)
+          hud=dest/'scripts/hud.gd'
+          hud.write_text(hud.read_text().replace('var shop := world.menu=="shop"','var shop: bool = world.menu=="shop"'),encoding='utf-8')
           assert (dest/'art/meadow.webp').stat().st_size>20000
           assert (dest/'scripts/farm.gd').stat().st_size>8000
           print('NEW game imported with detailed art, characters, and gameplay.')
