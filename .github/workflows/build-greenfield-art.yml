@@ -1,0 +1,131 @@
+name: Build Greenfield Reborn Art Edition 0.3 Android
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'greenfield-art/**'
+      - '.github/workflows/build-greenfield-art.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify and unpack NEW visual edition (not old Farm)
+        run: |
+          python - <<'PY'
+          import base64,lzma,zipfile,io,pathlib,hashlib
+          parts=sorted(pathlib.Path('greenfield-art').glob('payload_*.txt'))
+          assert len(parts)==10, f"Missing art edition chunks: {len(parts)}"
+          s=''.join(p.read_text().strip() for p in parts)
+          raw=lzma.decompress(base64.b85decode(s))
+          assert hashlib.sha256(raw).hexdigest()=='80fe265c623914aa114166bd561ccb841afd57c0bf1474b9cc80a309fa0f3331'
+          dest=pathlib.Path('greenfield-art/game')
+          dest.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              z.extractall(dest)
+          assert (dest/'art/meadow.webp').stat().st_size>20000
+          assert (dest/'scripts/farm.gd').stat().st_size>8000
+          print('NEW game imported with detailed art, characters, and gameplay.')
+          PY
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -1)
+          test -n "$SDKMANAGER"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          "$SDKMANAGER" --version
+      - name: Android platforms
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Godot 4.4.1 and Android export templates
+        run: |
+          BASE=https://github.com/godotengine/godot/releases/download/4.4.1-stable
+          curl -fLsS --retry 3 "$BASE/Godot_v4.4.1-stable_linux.x86_64.zip" -o godot.zip
+          curl -fLsS --retry 3 "$BASE/Godot_v4.4.1-stable_export_templates.tpz" -o templates.tpz
+          unzip -qo godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          unzip -qj templates.tpz 'templates/android_debug.apk' 'templates/android_release.apk' -d "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+      - name: Create debug signing and preset
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.config/godot" "$GITHUB_WORKSPACE/build"
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_SDK_ROOT"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          keytool -genkeypair -keystore "$GITHUB_WORKSPACE/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname 'CN=Android Debug,O=Android,C=US'
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$GITHUB_WORKSPACE/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+          cat > greenfield-art/game/export_presets.cfg <<'EOF'
+          [preset.0]
+          name="Android"
+          platform="Android"
+          runnable=true
+          advanced_options=false
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path="build/Greenfield_Reborn_Art_v03.apk"
+          script_export_mode=2
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template/release=""
+          gradle_build/use_gradle_build=false
+          architectures/armeabi-v7a=false
+          architectures/arm64-v8a=true
+          architectures/x86=false
+          architectures/x86_64=false
+          package/unique_name="com.greenfield.reborn.artedition"
+          package/name="Greenfield Reborn Art Edition"
+          package/signed=true
+          screen/immersive_mode=true
+          screen/support_small=true
+          screen/support_normal=true
+          screen/support_large=true
+          screen/support_xlarge=true
+          EOF
+      - name: Validate Godot GDScript
+        shell: bash
+        run: |
+          godot --headless --path greenfield-art/game --editor --import --quit 2>&1 | tee import.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Failed to load script|Parser Error' import.log; then exit 1; fi
+      - name: Build APK
+        shell: bash
+        run: |
+          godot --headless --path greenfield-art/game --export-debug Android "$GITHUB_WORKSPACE/build/Greenfield_Reborn_Art_v03.apk"
+          test -s build/Greenfield_Reborn_Art_v03.apk
+          unzip -t build/Greenfield_Reborn_Art_v03.apk | tail -1
+      - name: Godot game startup smoke test
+        shell: bash
+        run: |
+          timeout 25s godot --headless --path greenfield-art/game --quit-after 75 2>&1 | tee smoke.log || true
+          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid access' smoke.log; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GreenfieldReborn-ArtEdition-0.3-Android
+          path: build/Greenfield_Reborn_Art_v03.apk
+      - name: Publish new Android APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create reborn-art-v0.3 build/Greenfield_Reborn_Art_v03.apk --title 'Greenfield Reborn 0.3 - Art Edition' --notes 'New hand-crafted game edition with illustrated map, farming interactions, crops, seasons, villagers and mobile controls. Godot 4.4.1. Not the old Farm.' --latest=false || gh release upload reborn-art-v0.3 build/Greenfield_Reborn_Art_v03.apk --clobber
