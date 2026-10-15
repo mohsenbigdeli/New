@@ -40,7 +40,7 @@ jobs:
           patch=pathlib.Path('greenfield-v04/apply_patch.py').read_text()
           exec(compile(patch,'farming_upgrade.py','exec'))
           check=(dest/'scripts/farm.gd').read_text()
-          assert 'farm_plus = load(' in check and 'farm_plus.next_day(' in check
+          assert 'farm_plus=load(' in check and 'farm_plus.next_day(' in check
           print('FARMING PLUS 0.4: seasonal seeds, rain, quality, fertilizer, regrowth, farming skill, sprinklers, daily orders.')
           PY
       - uses: actions/setup-java@v4
