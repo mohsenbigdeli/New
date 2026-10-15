@@ -22,10 +22,10 @@ jobs:
           python - <<'PY'
           import base64,lzma,zipfile,io,pathlib,hashlib
           parts=sorted(pathlib.Path('greenfield-art').glob('payload_*.txt'))
-          assert len(parts)==10, f"Missing art edition chunks: {len(parts)}"
+          assert len(parts)==7, f"Missing art edition chunks: {len(parts)}"
           s=''.join(p.read_text().strip() for p in parts)
           raw=lzma.decompress(base64.b85decode(s))
-          assert hashlib.sha256(raw).hexdigest()=='80fe265c623914aa114166bd561ccb841afd57c0bf1474b9cc80a309fa0f3331'
+          assert hashlib.sha256(raw).hexdigest()=='23509c5eafb688aea2f9f223933522e74bc36e30f4634eddc1822e2c55a91d7a'
           dest=pathlib.Path('greenfield-art/game')
           dest.mkdir(parents=True,exist_ok=True)
           with zipfile.ZipFile(io.BytesIO(raw)) as z:
