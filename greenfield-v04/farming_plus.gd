@@ -84,7 +84,9 @@ func _spend(amount: float) -> bool:
     w.stamina-=amount
     return true
 
-func _grow_time(kind: int, fertilized: int) -> int:
+func _grow_time(kind: int, fertilized: int, is_regrowing: bool = false) -> int:
+    if is_regrowing and int(REGROW[kind])>0:
+        return int(REGROW[kind])
     return maxi(1,int(w.DAYS[kind])-(1 if fertilized>=2 else 0))
 
 func _award_xp(points: int) -> void:
@@ -99,6 +101,12 @@ func _effect_color(kind: int) -> Color:
     return palette[kind%palette.size()]
 
 func act(cell: Vector2i) -> void:
+    if w.chosen==2 and water<=0 and w.position_farmer.distance_to(Vector2(685,585))<230.0:
+        water=water_max
+        w._tell("Watering can refilled at the pond: %d/%d" % [water,water_max],4)
+        w._float("REFILL",w.position_farmer)
+        w._save_state()
+        return
     if cell.x < 0:
         cell=w._choose_plot()
     if not w._inside(cell) or w.position_farmer.distance_to(w._cell_pos(cell)) > 155.0:
@@ -181,8 +189,8 @@ func act(cell: Vector2i) -> void:
         3:
             if kind<0:
                 w._tell("Nothing planted here yet.")
-            elif int(s.get("age",0)) < _grow_time(kind,int(s.get("fert",0))):
-                var remaining: int = _grow_time(kind,int(s.get("fert",0)))-int(s.get("age",0))
+            elif int(s.get("age",0)) < _grow_time(kind,int(s.get("fert",0)),int(s.get("regrow",0))>0):
+                var remaining: int = _grow_time(kind,int(s.get("fert",0)),int(s.get("regrow",0))>0)-int(s.get("age",0))
                 w._tell("%s: %d watered night(s) until harvest." % [w.CROPS[kind],remaining])
             else:
                 if not _spend(1):return
@@ -333,11 +341,11 @@ func shop_tap(p: Vector2, size: Vector2) -> void:
         w.menu=""
         return
     if y>424:
-        shop_page=(shop_page+1)%3
+        shop_page=(shop_page+1)%4
         return
     var row: int=int((y-171.0)/43.0)
     if row<0 or row>=5:return
-    if shop_page<=1:
+    if shop_page<3:
         var kind:int=shop_page*5+row
         if kind<w.CROPS.size():buy(kind)
     else: buy_upgrade(row)
@@ -345,12 +353,12 @@ func shop_tap(p: Vector2, size: Vector2) -> void:
 func draw_shop(h: Control) -> void:
     h.draw_rect(Rect2(0,0,960,540),Color(0.04,0.05,0.04,0.76))
     h.panel(Rect2(227,79,508,385),Color(0.16,0.15,0.12,0.98),Color(0.88,0.60,0.34))
-    h.label("VALLEY MARKET  ·  PAGE %d/3" % [shop_page+1],253,120,23,Color(1,0.84,0.51))
+    h.label("VALLEY MARKET  ·  PAGE %d/4" % [shop_page+1],253,120,23,Color(1,0.84,0.51))
     h.label("X   CLOSE",646,122,13)
     for row in range(5):
         var y: float=169+float(row)*43.0
         h.panel(Rect2(252,y-6,457,36),Color(0.27,0.22,0.17,0.96))
-        if shop_page<2:
+        if shop_page<3:
             var k:int=shop_page*5+row
             if k<w.CROPS.size():
                 h.label("%s  %s" % [w.CROPS[k],"IN SEASON" if season_ok(k) else "OUT OF SEASON"],263,y+17,15)
@@ -375,7 +383,7 @@ func draw_world() -> void:
         var kind: int=int(p.get("crop",-1))
         if kind>=0:
             var age: int=int(p.get("age",0))
-            var days: int=_grow_time(kind,int(p.get("fert",0)))
+            var days: int=_grow_time(kind,int(p.get("fert",0)),int(p.get("regrow",0))>0)
             if age>=days:
                 var wave: float=0.6+0.4*sin(w.birds_time*3.0+float(c.x))
                 w.draw_arc(pos+Vector2(0,-21),24,0,TAU,22,Color(1,0.91,0.49,0.43+0.33*wave),2.0)
