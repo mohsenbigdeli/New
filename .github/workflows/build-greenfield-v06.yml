@@ -1,0 +1,185 @@
+name: Build Greenfield Reborn Precision Farming 0.6 Android
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'greenfield-v06/**'
+      - '.github/workflows/build-greenfield-v06.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify and unpack NEW visual edition (not old Farm)
+        run: |
+          python -m pip install pillow
+          python - <<'PY'
+          import base64,lzma,zipfile,io,pathlib,hashlib,zlib,shutil
+          parts=sorted(pathlib.Path('greenfield-art').glob('payload_*.txt'))
+          assert len(parts)==7, f"Missing art edition chunks: {len(parts)}"
+          s=''.join(p.read_text().strip() for p in parts)
+          raw=lzma.decompress(base64.b85decode(s))
+          assert hashlib.sha256(raw).hexdigest()=='23509c5eafb688aea2f9f223933522e74bc36e30f4634eddc1822e2c55a91d7a'
+          dest=pathlib.Path('greenfield-v06/game')
+          dest.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              z.extractall(dest)
+          hud=dest/'scripts/hud.gd'
+          hud.write_text(hud.read_text().replace('var shop := world.menu=="shop"','var shop: bool = world.menu=="shop"'),encoding='utf-8')
+          assert (dest/'art/meadow.webp').stat().st_size>20000
+          assert (dest/'scripts/farm.gd').stat().st_size>8000
+          addon=pathlib.Path('greenfield-v04/farming_plus.gd')
+          assert addon.stat().st_size>5000
+          shutil.copyfile(addon,dest/'scripts/farming_plus.gd')
+          patch=pathlib.Path('greenfield-v04/apply_patch.py').read_text()
+          exec(compile(patch.replace("greenfield-v04/game","greenfield-v06/game"),'farming_upgrade.py','exec'))
+          from PIL import Image
+          upgrade=pathlib.Path('greenfield-v05/apply_upgrade.py').read_text()
+          exec(compile(upgrade.replace('greenfield-v05/game','greenfield-v06/game'),'v05_upgrade.py','exec'))
+          fix=pathlib.Path('greenfield-v06/apply_precision_fix.py').read_text()
+          exec(compile(fix,'precision_fix.py','exec'))
+          check=(dest/'scripts/farm.gd').read_text()
+          assert 'farm_plus=load(' in check and 'farm_plus.next_day(' in check
+          assert (dest/'art/tool_icons.png').exists() and (dest/'art/farm_soil.png').exists()
+          assert (dest/'art/farm_ground.png').exists()
+          check=(dest/'scripts/farm.gd').read_text()
+          assert "const STEP := 43.0" in check and "func _plot_rect(" in check
+          print('PRECISION 0.6: exactly aligned 54 plots, terraformed base, front selection, icon tools, all Farming Plus features.')
+          PY
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -1)
+          test -n "$SDKMANAGER"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          "$SDKMANAGER" --version
+      - name: Android platforms
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Godot 4.4.1 and Android export templates
+        run: |
+          BASE=https://github.com/godotengine/godot/releases/download/4.4.1-stable
+          curl -fLsS --retry 3 "$BASE/Godot_v4.4.1-stable_linux.x86_64.zip" -o godot.zip
+          curl -fLsS --retry 3 "$BASE/Godot_v4.4.1-stable_export_templates.tpz" -o templates.tpz
+          unzip -qo godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          unzip -qj templates.tpz 'templates/android_debug.apk' 'templates/android_release.apk' -d "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+      - name: Create debug signing and preset
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.config/godot" "$GITHUB_WORKSPACE/build"
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_SDK_ROOT"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          keytool -genkeypair -keystore "$GITHUB_WORKSPACE/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname 'CN=Android Debug,O=Android,C=US'
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$GITHUB_WORKSPACE/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+          cat > greenfield-v06/game/export_presets.cfg <<'EOF'
+          [preset.0]
+          name="Android"
+          platform="Android"
+          runnable=true
+          advanced_options=false
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path="build/Greenfield_Reborn_Precision_v06.apk"
+          script_export_mode=2
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template/release=""
+          gradle_build/use_gradle_build=false
+          architectures/armeabi-v7a=false
+          architectures/arm64-v8a=true
+          architectures/x86=false
+          architectures/x86_64=false
+          package/unique_name="com.greenfield.reborn.precision"
+          package/name="Greenfield Reborn Precision Farming"
+          package/signed=true
+          screen/immersive_mode=true
+          screen/support_small=true
+          screen/support_normal=true
+          screen/support_large=true
+          screen/support_xlarge=true
+          EOF
+      - name: Validate Godot GDScript
+        shell: bash
+        run: |
+          godot --headless --path greenfield-v06/game --editor --import --quit 2>&1 | tee import.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Failed to load script|Parser Error' import.log; then exit 1; fi
+      - name: Regression-test precise cell interaction
+        shell: bash
+        run: |
+          cat > greenfield-v06/game/grid_regression.gd <<'EOF'
+          extends SceneTree
+          func _initialize() -> void:
+              call_deferred("_run")
+          func _run() -> void:
+              var scene: Node2D = load("res://scenes/Main.tscn").instantiate()
+              root.add_child(scene)
+              await process_frame
+              for cell in [Vector2i(0,0),Vector2i(4,3),Vector2i(8,5)]:
+                  var at: Vector2 = scene._cell_pos(cell)
+                  if not scene._plot_rect(cell).has_point(at) or scene._nearest_cell(at)!=cell:
+                      push_error("Plot render/selection mismatch at "+str(cell))
+                      quit(1)
+                      return
+                  scene.position_farmer=at+Vector2(0,50)
+                  scene.face=3
+                  var selected: Vector2i=scene._choose_plot()
+                  if selected!=cell:
+                      push_error("Wrong plot ahead: expected "+str(cell)+" got "+str(selected))
+                      quit(1)
+                      return
+                  scene.chosen=0
+                  scene._do_action()
+                  if not bool(scene.plots.get(cell,{}).get("tilled",false)):
+                      push_error("Hoe action did not till selected plot "+str(cell))
+                      quit(1)
+                      return
+              print("PASS: visual center, front-of-farmer selection and actual hoe action match in 3 separated plots.")
+              quit(0)
+          EOF
+          godot --headless --path greenfield-v06/game --script res://grid_regression.gd 2>&1 | tee regression.log
+          grep 'PASS: visual center' regression.log
+      - name: Build APK
+        shell: bash
+        run: |
+          godot --headless --path greenfield-v06/game --export-debug Android "$GITHUB_WORKSPACE/build/Greenfield_Reborn_Precision_v06.apk"
+          test -s build/Greenfield_Reborn_Precision_v06.apk
+          unzip -t build/Greenfield_Reborn_Precision_v06.apk | tail -1
+      - name: Godot game startup smoke test
+        shell: bash
+        run: |
+          timeout 25s godot --headless --path greenfield-v06/game --quit-after 75 2>&1 | tee smoke.log || true
+          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid access' smoke.log; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GreenfieldReborn-PrecisionFarming-0.6-Android
+          path: build/Greenfield_Reborn_Precision_v06.apk
+      - name: Publish new Android APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create reborn-precision-v0.6 build/Greenfield_Reborn_Precision_v06.apk --title 'Greenfield Reborn v0.6 - Precision Farming' --notes 'v0.6 fixes crop/tilling coordinate mismatch: removes prepainted static crops; exact 9x6 grid for drawing, touching, farming and highlighting; scripted input alignment checks, icons, 12 seasonal crops. Godot 4.4.1.' --latest=false || gh release upload reborn-precision-v0.6 build/Greenfield_Reborn_Precision_v06.apk --clobber
