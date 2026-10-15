@@ -37,7 +37,7 @@ jobs:
           addon=pathlib.Path('greenfield-v04/farming_plus.gd')
           assert addon.stat().st_size>5000
           shutil.copyfile(addon,dest/'scripts/farming_plus.gd')
-          patch=zlib.decompress(base64.b85decode(pathlib.Path('greenfield-v04/patch_payload.txt').read_text().strip())).decode()
+          patch=pathlib.Path('greenfield-v04/apply_patch.py').read_text()
           exec(compile(patch,'farming_upgrade.py','exec'))
           check=(dest/'scripts/farm.gd').read_text()
           assert 'farm_plus = load(' in check and 'farm_plus.next_day(' in check
